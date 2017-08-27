@@ -11,12 +11,13 @@ pub const YAXIS: Axis = Axis(1);
 pub struct Axis(usize);
 
 impl Axis {
-    /*
-    //todo this is a tree specific property. should not be here.
+    
+    //Returns x axis if the num is even.
+    //Returns y axis if the num is odd.
     #[inline(always)]
-    pub fn from_depth(depth: usize) -> Axis {
-        Axis(depth % 2)
-    }*/
+    pub fn from_num(num: usize) -> Axis {
+        Axis(num % 2)
+    }
 
     ///Returns the other axis.
     #[inline(always)]

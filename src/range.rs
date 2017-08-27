@@ -8,21 +8,21 @@ pub struct Range{
     pub end:PRIMT
 }
 impl Range{
-    /*
+    
     #[inline(always)]
     pub fn left(&self)->&PRIMT{
         &self.start
-    }*/
+    }
 
     #[inline(always)]
     pub fn midpoint(&self)->PRIMT{
         self.start+ self.len()/2.0
     }
-    /*
+    
     #[inline(always)]
     pub fn right(&self)->&PRIMT{
         &self.end
-    }*/
+    }
 
     #[inline(always)]
     pub fn left_or_right_or_contain(&self,pos:&PRIMT)->std::cmp::Ordering{
