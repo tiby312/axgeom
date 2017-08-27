@@ -6,6 +6,8 @@ pub type PRIMT=f32;
 pub const XAXIS: Axis = Axis(0);
 pub const YAXIS: Axis = Axis(1);
 
+///An Axis has a value of either X or Y.
+///It is used to look up values in 2d containers.
 #[derive(Copy,Clone,Debug)]
 #[must_use]
 pub struct Axis(usize);
@@ -25,6 +27,7 @@ impl Axis {
         Axis(1 - self.0)
     }
     
+
     #[inline(always)]
     pub fn get_axis_iter() -> AxisIter {
         AxisIter { val: 0 }
@@ -58,7 +61,7 @@ impl std::iter::Iterator for AxisIter {
     }
 }
 
-///A 2d generic container. 
+///A 2d generic container. Elements can be accessed using an Axis.
 #[derive(Copy,Clone,Debug)]
 #[must_use]
 pub struct VecCont<T:Clone+Copy>{
@@ -185,11 +188,14 @@ impl Vec2 {
         unsafe { self.raw.get_unchecked_mut(0) }
     }
 
+    ///Calculates the dot product.
     #[inline(always)]
     pub fn inner_product(&self, b: &Vec2) -> PRIMT {
         self.x() * b.x() + self.y() * b.y()
     }
 
+    ///Force the length of the vec to of max length nlen.
+    ///If the length of the vec is zero, this will panic.
     #[inline(always)]
     pub fn truncate(&mut self, nlen: PRIMT) {
         if self.len_sqr()<nlen.powi(2){
@@ -197,6 +203,7 @@ impl Vec2 {
             *self = *self * nlen;
         }
     }
+
 
     #[inline(always)]
     pub fn rotate90(&self) -> Vec2 {
@@ -210,11 +217,13 @@ impl Vec2 {
 
     }
 
+    ///Returns true if either element is nan.
     #[inline(always)]
     pub fn is_nan(&self) -> bool {
         self.x().is_nan()|self.y().is_nan()
     }
 
+    ///Calculates len using sqrt().
     #[inline(always)]
     pub fn len(&self) -> PRIMT {
         self.len_sqr().sqrt()

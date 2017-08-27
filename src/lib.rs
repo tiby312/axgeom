@@ -1,9 +1,5 @@
 mod vec;
-
 mod range;
-
-
-/// Rectangle module.
 mod rect;
 
 pub use self::vec::Vec2;
@@ -16,6 +12,7 @@ pub use self::vec::PRIMT;
 pub use self::vec::XAXIS;
 pub use self::vec::YAXIS;
 
+///A struct with cached calculations based off of a radius.
 #[derive(Copy,Clone,Debug)]
 pub struct RadiusProp {
     radius: PRIMT,
@@ -37,21 +34,25 @@ impl RadiusProp {
         }
     }
 
+    ///Returns the rdius
     #[inline]
     pub fn radius(&self) -> PRIMT {
         self.radius
     }
     
+    ///Returns the cached radius*2.0
     #[inline]
     pub fn radius2(&self) -> PRIMT {
         self.radius2
     }
     
+    ///Returns the cached radius.powi(2)
     #[inline]
     pub fn radius2_squared(&self) -> PRIMT {
         self.radius2_squared
     }
 
+    ///Returns the cached radius*(1/1.4142)
     #[inline]
     pub fn radius_x_root_2_inv(&self) -> PRIMT {
         self.radius_x_root_2_inv
