@@ -1,16 +1,20 @@
 mod vec;
+
+mod range;
+
+
+/// Rectangle module.
 mod rect;
 
 pub use self::vec::Vec2;
 pub use self::vec::ComputedVec2;
 pub use self::vec::VecCont;
-pub use self::vec::Range2;
+pub use self::range::Range;
 pub use self::vec::Axis;
-pub use self::rect::RectAbsolute;
+pub use self::rect::Rect;
 pub use self::vec::PRIMT;
 pub use self::vec::XAXIS;
 pub use self::vec::YAXIS;
-
 
 #[derive(Copy,Clone,Debug)]
 pub struct RadiusProp {
@@ -20,6 +24,8 @@ pub struct RadiusProp {
     radius_x_root_2_inv: PRIMT,
 }
 impl RadiusProp {
+
+    #[inline]
     pub fn create(radius: PRIMT) -> RadiusProp {
         let k = radius * 2.0;
 
@@ -31,16 +37,22 @@ impl RadiusProp {
         }
     }
 
+    #[inline]
     pub fn radius(&self) -> PRIMT {
         self.radius
     }
+    
+    #[inline]
     pub fn radius2(&self) -> PRIMT {
         self.radius2
     }
     
+    #[inline]
     pub fn radius2_squared(&self) -> PRIMT {
         self.radius2_squared
     }
+
+    #[inline]
     pub fn radius_x_root_2_inv(&self) -> PRIMT {
         self.radius_x_root_2_inv
     }

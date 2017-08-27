@@ -1,59 +1,68 @@
 use std::mem;
 
-use Range2;
-use PRIMT;
-use VecCont;
-use Vec2;
-use XAXIS;
-use YAXIS;
-use Axis;
+use range::Range;
+use vec::PRIMT;
+use vec::VecCont;
+use vec::Vec2;
+use vec::XAXIS;
+use vec::YAXIS;
+use vec::Axis;
 //Need to use this version so that subdivide doesnt result in floating point rounding
 //that may invalidate invariants
 
+
+///Stored as two Ranges. 
 #[derive(Copy,Clone,Debug)]
 #[must_use]
-pub struct RectAbsolute{
-    a:VecCont<Range2>
+pub struct Rect{
+    a:VecCont<Range>
 }
-impl RectAbsolute{
+impl Rect{
 
-    pub fn new(a:PRIMT,b:PRIMT,c:PRIMT,d:PRIMT)->RectAbsolute{
-        RectAbsolute{a:VecCont::new(Range2{start:a,end:b},Range2{start:c,end:d})}
+    #[inline(always)]
+    pub fn new(a:PRIMT,b:PRIMT,c:PRIMT,d:PRIMT)->Rect{
+        Rect{a:VecCont::new(Range{start:a,end:b},Range{start:c,end:d})}
     }
 
-    pub fn from_pos_and_radius(pos:&Vec2,radius:PRIMT)->RectAbsolute{
+    #[inline(always)]
+    pub fn from_pos_and_radius(pos:&Vec2,radius:PRIMT)->Rect{
         
         let rel=pos.get_axis(XAXIS);
-        let a=Range2{start:rel-radius,end:rel+radius};
+        let a=Range{start:rel-radius,end:rel+radius};
         
         let rel=pos.get_axis(YAXIS);
-        let b=Range2{start:rel-radius,end:rel+radius};
+        let b=Range{start:rel-radius,end:rel+radius};
         
-        RectAbsolute{a:VecCont::new(a,b)}
+        Rect{a:VecCont::new(a,b)}
     }
 
+    #[inline(always)]
     pub fn midpoint(&self)->Vec2{
         let a=self.get_range2(XAXIS).midpoint();
         let b=self.get_range2(YAXIS).midpoint();
         Vec2::new(a,b)
     }
 
-    pub fn get_range2(&self,axis:Axis)->&Range2{
+    #[inline(always)]
+    pub fn get_range2(&self,axis:Axis)->&Range{
         self.a.get_axis(axis)
     }
 
-    pub fn get_range2_mut(&mut self,axis:Axis)->&mut Range2{
+    #[inline(always)]
+    pub fn get_range2_mut(&mut self,axis:Axis)->&mut Range{
         self.a.get_axis_mut(axis)
     }
 
-    pub fn grow(&mut self,val:PRIMT)->&mut RectAbsolute{
+    #[inline(always)]
+    pub fn grow(&mut self,val:PRIMT)->&mut Rect{
         for axis in Axis::get_axis_iter() {
             self.get_range2_mut(axis).grow(val);
         }
         self
     }
 
-    pub fn contains_rect(&self,rect:&RectAbsolute)->bool{
+    #[inline(always)]
+    pub fn contains_rect(&self,rect:&Rect)->bool{
         for axis in Axis::get_axis_iter() {
             if !self.get_range2(axis).contains_rang(&rect.get_range2(axis)) {
                 return false;
@@ -62,7 +71,8 @@ impl RectAbsolute{
         true
     }
 
-    pub fn grow_to_fit(&mut self,rect:&RectAbsolute){
+    #[inline(always)]
+    pub fn grow_to_fit(&mut self,rect:&Rect){
         for axis in Axis::get_axis_iter() {
             let a=self.get_range2_mut(axis);
             let b=rect.get_range2(axis);
@@ -76,6 +86,7 @@ impl RectAbsolute{
         }
     }
 
+    #[inline(always)]
     pub fn get_longer_axis(&self)->Axis{
         if self.get_range2(XAXIS).len()>self.get_range2(YAXIS).len(){
             XAXIS
@@ -84,9 +95,10 @@ impl RectAbsolute{
         }
     }
 
-    pub fn get_intersect_rect(&self,rect:&RectAbsolute)->Option<RectAbsolute>{
+    #[inline(always)]
+    pub fn get_intersect_rect(&self,rect:&Rect)->Option<Rect>{
         
-        let mut rr:RectAbsolute=unsafe{mem::uninitialized()};
+        let mut rr:Rect=unsafe{mem::uninitialized()};
         for axis in Axis::get_axis_iter() {
             let a=self.get_range2(axis);
             let b=rect.get_range2(axis);
@@ -104,7 +116,8 @@ impl RectAbsolute{
         Some(rr)
     }
     
-    pub fn intersects_rect(&self, rect: &RectAbsolute)->bool{
+    #[inline(always)]
+    pub fn intersects_rect(&self, rect: &Rect)->bool{
         for axis in Axis::get_axis_iter() {
             if !self.get_range2(axis).intersects(&rect.get_range2(axis)){
                 return false;
@@ -113,11 +126,11 @@ impl RectAbsolute{
         return true;
     }
 
-
-    pub fn subdivide(&self, mut divider: PRIMT, axis: Axis) -> (RectAbsolute,RectAbsolute) {
+    #[inline(always)]
+    pub fn subdivide(&self, mut divider: PRIMT, axis: Axis) -> (Rect,Rect) {
 
         let ca=axis;
-        let na=axis.next2();
+        let na=axis.next();
 
         let rel=self.a.get_axis(ca);
         let carry_thru=self.a.get_axis(na);
@@ -128,19 +141,20 @@ impl RectAbsolute{
         }else if divider>rel.end{
             divider=rel.end;
         }
+        //TODO move some of this code into Range.
         //TODO check algoritm is okay?
         //assert!(divider>=rel.start,"{:?}",(divider,rel));
         //assert!(divider<=rel.end,"{:?}",(divider,rel));
         
 
-        let l=Range2{start:rel.start,end:divider};
-        let r=Range2{start:divider,end:rel.end};
+        let l=Range{start:rel.start,end:divider};
+        let r=Range{start:divider,end:rel.end};
 
-        let mut left:RectAbsolute=unsafe{mem::uninitialized()};
+        let mut left:Rect=unsafe{mem::uninitialized()};
         *left.a.get_axis_mut(ca)=l;
         *left.a.get_axis_mut(na)=*carry_thru;
         
-        let mut right:RectAbsolute=unsafe{mem::uninitialized()};
+        let mut right:Rect=unsafe{mem::uninitialized()};
         *right.a.get_axis_mut(ca)=r;
         *right.a.get_axis_mut(na)=*carry_thru;
         (left,right)
