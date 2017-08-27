@@ -86,3 +86,12 @@ impl Range{
         self.contains(val.start) || val.contains(self.start)
     }
 }
+
+
+impl std::cmp::PartialEq for Range {
+
+    #[inline(always)]
+    fn eq(&self, other: &Range) -> bool {
+        self.start == other.start && self.end == other.end
+    }
+}

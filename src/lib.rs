@@ -1,3 +1,26 @@
+
+//!	A 2D geometry library. It provies a way to easily extract 1d ranges from a 2d Rectangle based off of the x or y axis.
+//!	
+//!## Example
+//!
+//!```
+//!let rect = Rect::new(30.0,40.0,30.0,40.0);
+//!
+//!for k in Axis::get_axis_iter(){
+//!	let r=rect.get_range(k);
+//!	assert!(r.len()==10.0);
+//!}
+//!
+//!let (r1,r2)=rect.subdivide(35.0,XAXIS);
+//!assert!(r1.get_range(XAXIS)==&Range{start:30.0,end:35.0});
+//!assert!(r1.get_range(YAXIS)==&Range{start:30.0,end:40.0});
+//!	      
+//!assert!(r2.get_range(XAXIS)==&Range{start:35.0,end:40.0});
+//!assert!(r2.get_range(YAXIS)==&Range{start:30.0,end:40.0});
+//!	
+//!```
+//!
+
 mod vec;
 mod range;
 mod rect;
@@ -12,57 +35,23 @@ pub use self::vec::PRIMT;
 pub use self::vec::XAXIS;
 pub use self::vec::YAXIS;
 
-///A struct with cached calculations based off of a radius.
-#[derive(Copy,Clone,Debug)]
-pub struct RadiusProp {
-    radius: PRIMT,
-    radius2: PRIMT,
-    radius2_squared: PRIMT,
-    radius_x_root_2_inv: PRIMT,
-}
-impl RadiusProp {
-
-    #[inline]
-    pub fn create(radius: PRIMT) -> RadiusProp {
-        let k = radius * 2.0;
-
-        RadiusProp {
-            radius: radius,
-            radius2: k,
-            radius2_squared: k.powi(2),
-            radius_x_root_2_inv: radius * (1.0 / 1.4142),
-        }
-    }
-
-    ///Returns the rdius
-    #[inline]
-    pub fn radius(&self) -> PRIMT {
-        self.radius
-    }
-    
-    ///Returns the cached radius*2.0
-    #[inline]
-    pub fn radius2(&self) -> PRIMT {
-        self.radius2
-    }
-    
-    ///Returns the cached radius.powi(2)
-    #[inline]
-    pub fn radius2_squared(&self) -> PRIMT {
-        self.radius2_squared
-    }
-
-    ///Returns the cached radius*(1/1.4142)
-    #[inline]
-    pub fn radius_x_root_2_inv(&self) -> PRIMT {
-        self.radius_x_root_2_inv
-    }
-}
-
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     #[test]
-    fn it_works() {
+    fn test1() {
+        let rect = Rect::new(30.0,40.0,30.0,40.0);
+        for k in Axis::get_axis_iter(){
+            let r=rect.get_range(k);
+            assert!(r.len()==10.0);
+        }
+
+        let (r1,r2)=rect.subdivide(35.0,XAXIS);
+        assert!(r1.get_range(XAXIS)==&Range{start:30.0,end:35.0});
+        assert!(r1.get_range(YAXIS)==&Range{start:30.0,end:40.0});
+        
+        assert!(r2.get_range(XAXIS)==&Range{start:35.0,end:40.0});
+        assert!(r2.get_range(YAXIS)==&Range{start:30.0,end:40.0});
     }
 }

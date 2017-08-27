@@ -3,7 +3,10 @@ use std;
 ///A typedef to a f32. //TODO get rid of this typedef. 
 pub type PRIMT=f32;
 
+///The x axis is internally represented as 0.
 pub const XAXIS: Axis = Axis(0);
+
+///The y axis internally represented as 1.
 pub const YAXIS: Axis = Axis(1);
 
 ///An Axis has a value of either X or Y.
@@ -97,7 +100,7 @@ impl<T:Clone+Copy> VecCont<T>{
 }
 
 
-///A wrapper around a vec with the length and length sqr saved.
+///A wrapper around a Vec2 with the length and length sqr saved.
 ///Useful when you want to cache the length computation.
 #[derive(Copy,Clone,Debug)]
 pub struct ComputedVec2{
