@@ -4,6 +4,7 @@ use std;
 
 ///A 1d range. Internally represented as start and end. (not start and length)
 ///This means that subdivision does not result in any floating point calculations.
+///There is no protection against "degenerate" Ranges where start>end.
 #[derive(Copy,Clone,Debug)]
 #[must_use]
 pub struct Range{
@@ -63,6 +64,7 @@ impl Range{
     }
 
     ///Returns true if self contains the specified range.
+    //TODO rename rang range
     #[inline(always)]
     pub fn contains_rang(&self, val: &Range) -> bool {
         self.contains(val.start) && self.contains(val.end)

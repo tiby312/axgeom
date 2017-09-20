@@ -105,8 +105,7 @@ impl<T:Clone+Copy> VecCont<T>{
 #[derive(Copy,Clone,Debug)]
 pub struct ComputedVec2{
     vec:Vec2,
-    len:PRIMT,
-    len_sqr:PRIMT
+    len:PRIMT
 }
 impl ComputedVec2{
 
@@ -115,18 +114,13 @@ impl ComputedVec2{
     pub fn new(vec:Vec2)->ComputedVec2{
         let len_sqr=vec.len_sqr();
         let len=len_sqr.sqrt();
-        ComputedVec2{vec:vec,len:len,len_sqr:len_sqr}
+        ComputedVec2{vec:vec,len:len}
     }
 
     //Retrieve the cached length.
     #[inline(always)]
     pub fn len(&self) -> PRIMT {
         self.len
-    }
-
-    #[inline(always)]
-    pub fn len_sqr(&self) -> PRIMT {
-        self.len_sqr
     }
 
     ///Get a read only reference to the underlying vec.
