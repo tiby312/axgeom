@@ -15,8 +15,8 @@ pub struct Range{
 impl Range{
 
     #[inline(always)]
-    pub fn left(&self)->&PRIMT{
-        &self.start
+    pub fn left(&self)->PRIMT{
+        self.start
     }
 
     #[inline(always)]
@@ -25,8 +25,8 @@ impl Range{
     }
     
     #[inline(always)]
-    pub fn right(&self)->&PRIMT{
-        &self.end
+    pub fn right(&self)->PRIMT{
+        self.end
     }
 
     ///If the pos is to the left of the range, return less.
