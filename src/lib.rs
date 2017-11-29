@@ -21,6 +21,7 @@
 //!```
 //!
 
+#![feature(ord_max_min)]
 mod vec;
 mod range;
 mod rect;
@@ -31,7 +32,7 @@ pub use self::vec::VecCont;
 pub use self::range::Range;
 pub use self::vec::Axis;
 pub use self::rect::Rect;
-pub use self::vec::PRIMT;
+//pub use self::vec::PRIMT;
 pub use self::vec::XAXIS;
 pub use self::vec::YAXIS;
 

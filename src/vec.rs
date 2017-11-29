@@ -1,7 +1,7 @@
 use std;
 
 ///A typedef to a f32. //TODO get rid of this typedef. 
-pub type PRIMT=f32;
+//pub type PRIMT=f32;
 
 ///The x axis is internally represented as 0.
 pub const XAXIS: Axis = Axis(0);
@@ -24,6 +24,7 @@ impl Axis {
         Axis(num % 2)
     }
 
+    //TODO remove this and move to axis iter.
     ///Returns the other axis.
     #[inline(always)]
     pub fn next(&self) -> Axis {
@@ -67,10 +68,11 @@ impl std::iter::Iterator for AxisIter {
 ///A 2d generic container. Elements can be accessed using an Axis.
 #[derive(Copy,Clone,Debug)]
 #[must_use]
-pub struct VecCont<T:Clone+Copy>{
+pub struct VecCont<T>{
     raw:[T;2]
 }
-impl<T:Clone+Copy> VecCont<T>{
+
+impl<T> VecCont<T>{
 
     #[inline(always)]
     pub fn new(x: T, y: T) -> VecCont<T> {
@@ -96,8 +98,8 @@ impl<T:Clone+Copy> VecCont<T>{
     pub fn y(&self) -> &T {
         unsafe { self.raw.get_unchecked(1) }
     }
-
 }
+
 
 
 ///A wrapper around a Vec2 with the length and length sqr saved.
@@ -105,7 +107,7 @@ impl<T:Clone+Copy> VecCont<T>{
 #[derive(Copy,Clone,Debug)]
 pub struct ComputedVec2{
     vec:Vec2,
-    len:PRIMT
+    len:f32
 }
 impl ComputedVec2{
 
@@ -119,7 +121,7 @@ impl ComputedVec2{
 
     //Retrieve the cached length.
     #[inline(always)]
-    pub fn len(&self) -> PRIMT {
+    pub fn len(&self) -> f32 {
         self.len
     }
 
@@ -134,16 +136,16 @@ impl ComputedVec2{
 #[derive(Copy,Clone,Debug)]
 #[must_use]
 pub struct Vec2 {
-    raw: [PRIMT; 2],
+    raw: [f32; 2],
 }
 impl Vec2 {
     #[inline(always)]
-    pub fn new(x: PRIMT, y: PRIMT) -> Vec2 {
+    pub fn new(x: f32, y: f32) -> Vec2 {
         Vec2 { raw: [x, y] }
     }
 
     #[inline(always)]
-    pub fn set(&mut self, x: PRIMT, y: PRIMT) {
+    pub fn set(&mut self, x: f32, y: f32) {
         unsafe{
             *self.raw.get_unchecked_mut(0) = x;
             *self.raw.get_unchecked_mut(1) = y;
@@ -156,45 +158,45 @@ impl Vec2 {
     }
 
     #[inline(always)]
-    pub fn get_axis_mut<'a>(&'a mut self, a: Axis) -> &'a mut PRIMT {
+    pub fn get_axis_mut<'a>(&'a mut self, a: Axis) -> &'a mut f32 {
         unsafe { self.raw.get_unchecked_mut(a.0) }
     }
 
     #[inline(always)]
-    pub fn get_axis(&self, a: Axis) -> PRIMT {
+    pub fn get_axis(&self, a: Axis) -> f32 {
         unsafe { *self.raw.get_unchecked(a.0) }
     }
     
     #[inline(always)]
-    pub fn x(&self) -> PRIMT {
+    pub fn x(&self) -> f32 {
         unsafe { self.raw.get_unchecked(0).clone() }
     }
 
     #[inline(always)]
-    pub fn y(&self) -> PRIMT {
+    pub fn y(&self) -> f32 {
         unsafe { self.raw.get_unchecked(1).clone() }
     }
 
     #[inline(always)]
-    pub fn x_mut(&mut self) -> &mut PRIMT {
+    pub fn x_mut(&mut self) -> &mut f32 {
         unsafe { self.raw.get_unchecked_mut(0) }
     }
 
     #[inline(always)]
-    pub fn y_mut(&mut self) -> &mut PRIMT {
+    pub fn y_mut(&mut self) -> &mut f32 {
         unsafe { self.raw.get_unchecked_mut(0) }
     }
 
     ///Calculates the dot product.
     #[inline(always)]
-    pub fn inner_product(&self, b: &Vec2) -> PRIMT {
+    pub fn inner_product(&self, b: &Vec2) -> f32 {
         self.x() * b.x() + self.y() * b.y()
     }
 
     ///Force the length of the vec to of max length nlen.
     ///If the length of the vec is zero, this will panic.
     #[inline(always)]
-    pub fn truncate(&mut self, nlen: PRIMT) {
+    pub fn truncate(&mut self, nlen: f32) {
         if self.len_sqr()<nlen.powi(2){
             *self = *self / self.len();
             *self = *self * nlen;
@@ -222,12 +224,12 @@ impl Vec2 {
 
     ///Calculates len using sqrt().
     #[inline(always)]
-    pub fn len(&self) -> PRIMT {
+    pub fn len(&self) -> f32 {
         self.len_sqr().sqrt()
     }
 
     #[inline(always)]
-    pub fn len_sqr(&self) -> PRIMT {
+    pub fn len_sqr(&self) -> f32 {
         self.x()*self.x()+self.y()*self.y()
     }
 }
@@ -241,20 +243,20 @@ impl std::ops::Add for Vec2 {
     }
 }
 
-impl std::ops::Mul<PRIMT> for Vec2 {
+impl std::ops::Mul<f32> for Vec2 {
     type Output = Vec2;
 
     #[inline(always)]
-    fn mul(self, other: PRIMT) -> Vec2 {
+    fn mul(self, other: f32) -> Vec2 {
         Vec2::new(self.raw[0] * other, self.raw[1] * other)
     }
 }
 
-impl std::ops::Div<PRIMT> for Vec2 {
+impl std::ops::Div<f32> for Vec2 {
     type Output = Vec2;
 
     #[inline(always)]
-    fn div(self, other: PRIMT) -> Vec2 {
+    fn div(self, other: f32) -> Vec2 {
         Vec2::new(self.raw[0] / other, self.raw[1] / other)
     }
 }
@@ -268,10 +270,10 @@ impl std::ops::Neg for Vec2 {
     }
 }
 
-impl std::ops::MulAssign<PRIMT> for Vec2 {
+impl std::ops::MulAssign<f32> for Vec2 {
 
     #[inline(always)]
-    fn mul_assign(&mut self, rhs: PRIMT) {
+    fn mul_assign(&mut self, rhs: f32) {
         self.raw[0] *= rhs;
         self.raw[1] *= rhs;
     }
