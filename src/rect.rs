@@ -64,7 +64,7 @@ impl Rect<f32>{
 }
 
 impl<T:PartialOrd+PartialEq+Copy+Debug> Rect<T>{
-   ///subdivides the rectangle.
+    ///Subdivides the rectangle.
     ///No floating point calculations are done (so no precision loss/rounding issues).
     #[inline(always)]
     pub fn subdivide(&self, mut divider: T, axis: Axis) -> (Rect<T>,Rect<T>) {
@@ -113,7 +113,8 @@ impl<T:Ord+Copy+Debug> Rect<T>{
         true
     }
 
-
+    ///Grow the rectangle to fit the specified rectangle by replacing values
+    ///with the specified rectangle. No floating point computations.
     #[inline(always)]
     pub fn grow_to_fit(&mut self,rect:&Rect<T>){
         for axis in AxisIter::new() {
@@ -129,7 +130,9 @@ impl<T:Ord+Copy+Debug> Rect<T>{
         }
     }
 
-
+    ///Get an intersecting rectangle.
+    ///No floating point calculations as the new rectangle is made up of
+    ///values from this rectangle and the specified rectangle.
     #[inline(always)]
     pub fn get_intersect_rect(&self,rect:&Rect<T>)->Option<Rect<T>>{
         
@@ -152,6 +155,8 @@ impl<T:Ord+Copy+Debug> Rect<T>{
         Some(rr)
     }
     
+    
+    ///Faster than using get_intersect_rect() and checking is_some().
     #[inline(always)]
     pub fn intersects_rect(&self, rect: &Rect<T>)->bool{
         for axis in AxisIter::new() {
@@ -161,6 +166,7 @@ impl<T:Ord+Copy+Debug> Rect<T>{
         }
         return true;
     }
+    
 
     
 }

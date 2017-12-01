@@ -28,6 +28,7 @@ impl<T:Copy+Debug+Ord> Range<T>{
         }
     }
 
+    ///Returns true if the point is inside of the range or on top of.
     #[inline(always)]
     pub fn contains(&self, pos: T) -> bool {
         pos>=self.start&&pos<=self.end
