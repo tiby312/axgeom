@@ -1,6 +1,6 @@
-
-//!	A 2D geometry library. It provies a way to easily extract 1d ranges from a 2d Rectangle based off of the x or y axis.
-//!	Also provides functions that operate on types that implement Ord. 
+//!	A 2D geometry library. It provides a way to easily extract 1d ranges from a 2d Rectangle based off of the x or y axis.
+//!	Also provides functions that operate on types that implement Ord, as well has hard coded ones for f32.
+//!
 //!## Example
 //!
 //!```
@@ -38,7 +38,6 @@ pub use self::vec::AxisIter;
 pub use self::rect::Rect;
 pub use self::vec::XAXIS;
 pub use self::vec::YAXIS;
-
 
 #[cfg(test)]
 mod tests {

@@ -101,7 +101,7 @@ impl<T> VecCont<T>{
 
 
 
-///A wrapper around a Vec2 with the length and length sqr saved.
+///A wrapper around a Vec2 with the f32 length and length sqr saved.
 ///Useful when you want to cache the length computation.
 #[derive(Copy,Clone,Debug)]
 pub struct ComputedVec2{
@@ -131,7 +131,7 @@ impl ComputedVec2{
     }
 }
 
-///A 2d point with a way to get the value on a particular axis easily.
+///A 2d point made up of f32's with a way to get the value on a particular axis easily.
 #[derive(Copy,Clone,Debug)]
 #[must_use]
 pub struct Vec2 {
@@ -160,12 +160,10 @@ impl Vec2 {
         self.raw.get_axis(a)
     }
     
-    #[inline(always)]
     pub fn get(&self)->(&f32,&f32){
         self.raw.get()
     }
 
-    #[inline(always)]
     pub fn get_mut(&mut self)->(&mut f32,&mut f32){
         self.raw.get_mut()
     }
