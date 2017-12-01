@@ -1,8 +1,4 @@
 use std;
-
-///A typedef to a f32. //TODO get rid of this typedef. 
-//pub type PRIMT=f32;
-
 ///The x axis is internally represented as 0.
 pub const XAXIS: Axis = Axis(0);
 
@@ -17,10 +13,10 @@ pub struct Axis(usize);
 
 impl Axis {
     
-    //Returns x axis if the num is even.
-    //Returns y axis if the num is odd.
+    ///Returns x axis if the num is even.
+    ///Returns y axis if the num is odd.
     #[inline(always)]
-    pub fn from_num(num: usize) -> Axis {
+    pub fn from_num_even_xaxis(num: usize) -> Axis {
         Axis(num % 2)
     }
 
@@ -29,12 +25,6 @@ impl Axis {
     #[inline(always)]
     pub fn next(&self) -> Axis {
         Axis(1 - self.0)
-    }
-    
-
-    #[inline(always)]
-    pub fn get_axis_iter() -> AxisIter {
-        AxisIter { val: 0 }
     }
 }
 
@@ -49,6 +39,12 @@ impl std::cmp::PartialEq for Axis {
 ///Iterator to iterate over the x and y axises.
 pub struct AxisIter {
     val: usize,
+}
+impl AxisIter{
+    #[inline(always)]
+    pub fn new() -> AxisIter {
+        AxisIter { val: 0 }
+    }
 }
 impl std::iter::Iterator for AxisIter {
     type Item = Axis;
@@ -90,14 +86,17 @@ impl<T> VecCont<T>{
     }
     
     #[inline(always)]
-    pub fn x(&self) -> &T {
-        unsafe { self.raw.get_unchecked(0) }
+    pub fn get(&self) -> (&T,&T) {
+        unsafe { (self.raw.get_unchecked(0),self.raw.get_unchecked(1)) }
     }
 
     #[inline(always)]
-    pub fn y(&self) -> &T {
-        unsafe { self.raw.get_unchecked(1) }
+    pub fn get_mut(&mut self) -> (&mut T,&mut T) {
+        let k=&mut self.raw as *mut [T;2];
+        unsafe { ((*k).get_unchecked_mut(0),(*k).get_unchecked_mut(1)) }
     }
+
+
 }
 
 
@@ -136,61 +135,47 @@ impl ComputedVec2{
 #[derive(Copy,Clone,Debug)]
 #[must_use]
 pub struct Vec2 {
-    raw: [f32; 2],
+    raw: VecCont<f32>
 }
 impl Vec2 {
     #[inline(always)]
     pub fn new(x: f32, y: f32) -> Vec2 {
-        Vec2 { raw: [x, y] }
+        Vec2 { raw: VecCont::new(x,y) }
     }
 
     #[inline(always)]
     pub fn set(&mut self, x: f32, y: f32) {
-        unsafe{
-            *self.raw.get_unchecked_mut(0) = x;
-            *self.raw.get_unchecked_mut(1) = y;
-        }
-    }
-
-    #[inline(always)]
-    pub fn zero(&mut self){
-        self.raw=[0.0;2];
+        let a=self.raw.get_mut();
+        *a.0=x;
+        *a.1=y;
     }
 
     #[inline(always)]
     pub fn get_axis_mut<'a>(&'a mut self, a: Axis) -> &'a mut f32 {
-        unsafe { self.raw.get_unchecked_mut(a.0) }
+        self.raw.get_axis_mut(a)
     }
 
     #[inline(always)]
-    pub fn get_axis(&self, a: Axis) -> f32 {
-        unsafe { *self.raw.get_unchecked(a.0) }
+    pub fn get_axis(&self, a: Axis) -> &f32 {
+        self.raw.get_axis(a)
     }
     
     #[inline(always)]
-    pub fn x(&self) -> f32 {
-        unsafe { self.raw.get_unchecked(0).clone() }
+    pub fn get(&self)->(&f32,&f32){
+        self.raw.get()
     }
 
     #[inline(always)]
-    pub fn y(&self) -> f32 {
-        unsafe { self.raw.get_unchecked(1).clone() }
-    }
-
-    #[inline(always)]
-    pub fn x_mut(&mut self) -> &mut f32 {
-        unsafe { self.raw.get_unchecked_mut(0) }
-    }
-
-    #[inline(always)]
-    pub fn y_mut(&mut self) -> &mut f32 {
-        unsafe { self.raw.get_unchecked_mut(0) }
+    pub fn get_mut(&mut self)->(&mut f32,&mut f32){
+        self.raw.get_mut()
     }
 
     ///Calculates the dot product.
     #[inline(always)]
     pub fn inner_product(&self, b: &Vec2) -> f32 {
-        self.x() * b.x() + self.y() * b.y()
+        let a=self.get();
+        let b=b.get();
+        a.0 * b.0 + a.1 * b.1
     }
 
     ///Force the length of the vec to of max length nlen.
@@ -211,15 +196,11 @@ impl Vec2 {
 
     #[inline(always)]
     pub fn rotate_by(&self, b: Vec2) -> Vec2 {
-        Vec2::new(self.x() * b.x() - self.y() * b.y(),
-                  self.x() * b.y() + self.y() * b.x())
+        let a=self.get();
+        let b=b.get();
+        Vec2::new(a.0 * b.0 - a.1 * b.1,
+                  a.0 * b.1 + a.1 * b.0)
 
-    }
-
-    ///Returns true if either element is nan.
-    #[inline(always)]
-    pub fn is_nan(&self) -> bool {
-        self.x().is_nan()|self.y().is_nan()
     }
 
     ///Calculates len using sqrt().
@@ -230,7 +211,8 @@ impl Vec2 {
 
     #[inline(always)]
     pub fn len_sqr(&self) -> f32 {
-        self.x()*self.x()+self.y()*self.y()
+        let a=self.get();
+        a.0*a.0+a.1*a.1
     }
 }
 
@@ -239,7 +221,9 @@ impl std::ops::Add for Vec2 {
 
     #[inline(always)]
     fn add(self, other: Vec2) -> Vec2 {
-        Vec2 { raw: [self.raw[0] + other.raw[0], self.raw[1] + other.raw[1]] }
+        let a=self.get();
+        let b=other.get();
+        Vec2::new(a.0+b.0,a.1+b.1)
     }
 }
 
@@ -248,7 +232,8 @@ impl std::ops::Mul<f32> for Vec2 {
 
     #[inline(always)]
     fn mul(self, other: f32) -> Vec2 {
-        Vec2::new(self.raw[0] * other, self.raw[1] * other)
+        let a=self.get();
+        Vec2::new(a.0*other,a.1*other)
     }
 }
 
@@ -257,7 +242,8 @@ impl std::ops::Div<f32> for Vec2 {
 
     #[inline(always)]
     fn div(self, other: f32) -> Vec2 {
-        Vec2::new(self.raw[0] / other, self.raw[1] / other)
+        let a=self.get();
+        Vec2::new(a.0 / other, a.1 / other)
     }
 }
 
@@ -266,7 +252,8 @@ impl std::ops::Neg for Vec2 {
 
     #[inline(always)]
     fn neg(self) -> Vec2 {
-        Vec2::new(-self.raw[0], -self.raw[1])
+        let a=self.get();
+        Vec2::new(-a.0, -a.1)
     }
 }
 
@@ -274,8 +261,9 @@ impl std::ops::MulAssign<f32> for Vec2 {
 
     #[inline(always)]
     fn mul_assign(&mut self, rhs: f32) {
-        self.raw[0] *= rhs;
-        self.raw[1] *= rhs;
+        let a=self.get_mut();
+        *a.0*=rhs;
+        *a.1*=rhs;
     }
 }
 
@@ -283,8 +271,10 @@ impl std::ops::AddAssign for Vec2 {
 
     #[inline(always)]
     fn add_assign(&mut self, rhs: Vec2) {
-        self.raw[0] += rhs.raw[0];
-        self.raw[1] += rhs.raw[1];
+        let a=self.get_mut();
+        let b=rhs.get();
+        *a.0+=*b.0;
+        *a.1+=*b.1;
     }
 }
 
@@ -293,6 +283,8 @@ impl std::ops::Sub for Vec2 {
 
     #[inline(always)]
     fn sub(self, other: Vec2) -> Vec2 {
-        Vec2 { raw: [self.raw[0] - other.raw[0], self.raw[1] - other.raw[1]] }
+        let a=self.get();
+        let b=other.get();
+        Vec2::new(a.0-b.0,a.1-b.1)
     }
 }

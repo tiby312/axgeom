@@ -1,16 +1,12 @@
 use std::mem;
-
 use range::Range;
-//use vec::PRIMT;
 use vec::VecCont;
 use vec::Vec2;
 use vec::XAXIS;
 use vec::YAXIS;
 use vec::Axis;
+use vec::AxisIter;
 use std::fmt::Debug;
-//Need to use this version so that subdivide doesnt result in floating point rounding
-//that may invalidate invariants
-
 
 ///Stored as two Ranges. 
 #[derive(Copy,Clone,Debug)]
@@ -50,9 +46,6 @@ impl Rect<f32>{
         Rect{a:VecCont::new(a,b)}
     }
 
-    
-    
-
     #[inline(always)]
     pub fn midpoint(&self)->Vec2{
         let a=self.get_range(XAXIS).midpoint();
@@ -60,82 +53,18 @@ impl Rect<f32>{
         Vec2::new(a,b)
     }
     
-
-    
     ///Grow in all directions by val.
     #[inline(always)]
     pub fn grow(&mut self,val:f32)->&mut Rect<f32>{
-        for axis in Axis::get_axis_iter() {
+        for axis in AxisIter::new() {
             self.get_range_mut(axis).grow(val);
         }
         self
     }
 }
-impl<T:Ord+Copy+Debug> Rect<T>{
 
-
-
-    ///Returns true if the specified rect is inside of this rect.
-    #[inline(always)]
-    pub fn contains_rect(&self,rect:&Rect<T>)->bool{
-        for axis in Axis::get_axis_iter() {
-            if !self.get_range(axis).contains_rang(&rect.get_range(axis)) {
-                return false;
-            }        
-        }
-        true
-    }
-
-
-    #[inline(always)]
-    pub fn grow_to_fit(&mut self,rect:&Rect<T>){
-        for axis in Axis::get_axis_iter() {
-            let a=self.get_range_mut(axis);
-            let b=rect.get_range(axis);
-            
-            if b.start<a.start{
-                a.start=b.start;
-            }
-            if b.end>a.end{
-                a.end=b.end;
-            }
-        }
-    }
-
-
-    #[inline(always)]
-    pub fn get_intersect_rect(&self,rect:&Rect<T>)->Option<Rect<T>>{
-        
-        let mut rr:Rect<T>=unsafe{mem::uninitialized()};
-        for axis in Axis::get_axis_iter() {
-            //TODO use range's methods
-            let a=self.get_range(axis);
-            let b=rect.get_range(axis);
-
-            let left=a.start.max(b.start);
-            let right=a.end.min(b.end);
-            rr.get_range_mut(axis).start=left;
-            rr.get_range_mut(axis).end=right;
-        
-            if right<=left{
-                return None;
-            }
-        }
-
-        Some(rr)
-    }
-    
-    #[inline(always)]
-    pub fn intersects_rect(&self, rect: &Rect<T>)->bool{
-        for axis in Axis::get_axis_iter() {
-            if !self.get_range(axis).intersects(&rect.get_range(axis)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    ///subdivides the rectangle.
+impl<T:PartialOrd+PartialEq+Copy+Debug> Rect<T>{
+   ///subdivides the rectangle.
     ///No floating point calculations are done (so no precision loss/rounding issues).
     #[inline(always)]
     pub fn subdivide(&self, mut divider: T, axis: Axis) -> (Rect<T>,Rect<T>) {
@@ -169,5 +98,69 @@ impl<T:Ord+Copy+Debug> Rect<T>{
         *right.a.get_axis_mut(ca)=r;
         *right.a.get_axis_mut(na)=*carry_thru;
         (left,right)
+    } 
+}
+impl<T:Ord+Copy+Debug> Rect<T>{
+
+    ///Returns true if the specified rect is inside of this rect.
+    #[inline(always)]
+    pub fn contains_rect(&self,rect:&Rect<T>)->bool{
+        for axis in AxisIter::new() {
+            if !self.get_range(axis).contains_range(&rect.get_range(axis)) {
+                return false;
+            }        
+        }
+        true
     }
+
+
+    #[inline(always)]
+    pub fn grow_to_fit(&mut self,rect:&Rect<T>){
+        for axis in AxisIter::new() {
+            let a=self.get_range_mut(axis);
+            let b=rect.get_range(axis);
+            
+            if b.start<a.start{
+                a.start=b.start;
+            }
+            if b.end>a.end{
+                a.end=b.end;
+            }
+        }
+    }
+
+
+    #[inline(always)]
+    pub fn get_intersect_rect(&self,rect:&Rect<T>)->Option<Rect<T>>{
+        
+        let mut rr:Rect<T>=unsafe{mem::uninitialized()};
+        for axis in AxisIter::new() {
+            //TODO use range's methods
+            let a=self.get_range(axis);
+            let b=rect.get_range(axis);
+
+            let left=a.start.max(b.start);
+            let right=a.end.min(b.end);
+            rr.get_range_mut(axis).start=left;
+            rr.get_range_mut(axis).end=right;
+        
+            if right<=left{
+                return None;
+            }
+        }
+
+        Some(rr)
+    }
+    
+    #[inline(always)]
+    pub fn intersects_rect(&self, rect: &Rect<T>)->bool{
+        for axis in AxisIter::new() {
+            if !self.get_range(axis).intersects(&rect.get_range(axis)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    
 }
