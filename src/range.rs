@@ -28,6 +28,21 @@ impl<T:Copy+Debug+Ord> Range<T>{
         }
     }
 
+    #[inline(always)]
+    pub fn grow_to_fit(&mut self,b:&Range<T>){
+        
+            let a=self;
+            
+            if b.start<a.start{
+                a.start=b.start;
+            }
+            if b.end>a.end{
+                a.end=b.end;
+            }
+        
+    }
+
+
     ///Returns true if the point is inside of the range or on top of.
     #[inline(always)]
     pub fn contains(&self, pos: T) -> bool {
