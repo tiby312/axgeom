@@ -7,7 +7,7 @@ use std::fmt::Debug;
 ///There is no protection against "degenerate" Ranges where start>end.
 #[derive(Copy,Clone,Debug)]
 #[must_use]
-pub struct Range<T:Copy+Debug>{
+pub struct Range<T:Copy>{
     pub start:T,
     pub end:T
 }

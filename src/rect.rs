@@ -15,6 +15,8 @@ pub struct Rect<T:Copy+Debug>{
     a:VecCont<Range<T>>
 }
 
+use AxisTrait;
+
 impl<T:Copy+Debug> Rect<T>{
 
     #[inline(always)]
@@ -22,6 +24,18 @@ impl<T:Copy+Debug> Rect<T>{
         Rect{a:VecCont::new(Range{start:a,end:b},Range{start:c,end:d})}
     }
 
+    
+    pub fn get_range2<X:AxisTrait>(&self)->&Range<T>{
+        //TODO optimize furthur?
+        self.a.get_axis(X::get())
+    }
+    
+    pub fn get_range2_mut<X:AxisTrait>(&self)->&Range<T>{
+        //TODO optimize furthur?
+        self.a.get_axis(X::get())
+    }
+
+    
     #[inline(always)]
     pub fn get_range(&self,axis:Axis)->&Range<T>{
         self.a.get_axis(axis)

@@ -7,7 +7,7 @@ pub const YAXIS: Axis = Axis(1);
 
 ///An Axis has a value of either X or Y.
 ///It is used to look up values in 2d containers.
-#[derive(Copy,Clone,Debug)]
+#[derive(Copy,Clone,Debug,PartialEq)]
 #[must_use]
 pub struct Axis(usize);
 
@@ -28,13 +28,6 @@ impl Axis {
     }
 }
 
-impl std::cmp::PartialEq for Axis {
-
-    #[inline(always)]
-    fn eq(&self, other: &Axis) -> bool {
-        self.0 == other.0
-    }
-}
 
 ///Iterator to iterate over the x and y axises.
 pub struct AxisIter {

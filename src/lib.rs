@@ -39,6 +39,30 @@ pub use self::rect::Rect;
 pub use self::vec::XAXIS;
 pub use self::vec::YAXIS;
 
+
+pub struct XAXIS_S{}
+impl AxisTrait for XAXIS_S{
+    type Next=YAXIS_S;
+    fn get()->Axis{
+        XAXIS
+    }
+}
+pub struct YAXIS_S{}
+impl AxisTrait for YAXIS_S{
+    type Next=XAXIS_S;
+    fn get()->Axis{
+        YAXIS
+    }
+}
+
+pub trait AxisTrait{
+    type Next:AxisTrait;
+    fn get()->Axis;
+}
+
+
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
