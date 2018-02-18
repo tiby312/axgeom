@@ -24,7 +24,7 @@
 //!```
 //!
 
-#![feature(ord_max_min)]
+//#![feature(ord_max_min)]
 mod vec;
 mod range;
 mod rect;
@@ -40,6 +40,7 @@ pub use self::vec::XAXIS;
 pub use self::vec::YAXIS;
 
 
+///The x axis implementation of the AxisTrait
 pub struct XAXIS_S{}
 impl AxisTrait for XAXIS_S{
     type Next=YAXIS_S;
@@ -47,6 +48,8 @@ impl AxisTrait for XAXIS_S{
         XAXIS
     }
 }
+
+///The y axis implementation of the AxisTrait
 pub struct YAXIS_S{}
 impl AxisTrait for YAXIS_S{
     type Next=XAXIS_S;
@@ -55,6 +58,8 @@ impl AxisTrait for YAXIS_S{
     }
 }
 
+///Axis trait can be used to extract the x or y axis out of a vector
+///when you know the axis as compile time.
 pub trait AxisTrait{
     type Next:AxisTrait;
     fn get()->Axis;

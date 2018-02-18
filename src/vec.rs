@@ -153,10 +153,12 @@ impl Vec2 {
         self.raw.get_axis(a)
     }
     
+    #[inline(always)]
     pub fn get(&self)->(&f32,&f32){
         self.raw.get()
     }
 
+    #[inline(always)]
     pub fn get_mut(&mut self)->(&mut f32,&mut f32){
         self.raw.get_mut()
     }

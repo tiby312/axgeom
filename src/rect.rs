@@ -8,6 +8,8 @@ use vec::Axis;
 use vec::AxisIter;
 use std::fmt::Debug;
 
+use XAXIS_S;
+use YAXIS_S;
 ///Stored as two Ranges. 
 #[derive(Copy,Clone,Debug)]
 #[must_use]
@@ -24,17 +26,17 @@ impl<T:Copy+Debug> Rect<T>{
         Rect{a:VecCont::new(Range{start:a,end:b},Range{start:c,end:d})}
     }
 
-    
+    #[inline(always)]
     pub fn get_range2<X:AxisTrait>(&self)->&Range<T>{
         //TODO optimize furthur?
         self.a.get_axis(X::get())
     }
-    
-    pub fn get_range2_mut<X:AxisTrait>(&self)->&Range<T>{
-        //TODO optimize furthur?
-        self.a.get_axis(X::get())
-    }
 
+    #[inline(always)]
+    pub fn get_range2_mut<X:AxisTrait>(&mut self)->&mut Range<T>{
+        //TODO optimize furthur?
+        self.a.get_axis_mut(X::get())
+    }
     
     #[inline(always)]
     pub fn get_range(&self,axis:Axis)->&Range<T>{
@@ -45,6 +47,7 @@ impl<T:Copy+Debug> Rect<T>{
     pub fn get_range_mut(&mut self,axis:Axis)->&mut Range<T>{
         self.a.get_axis_mut(axis)
     }
+    
 }
 impl Rect<f32>{
     ///Creates a Rect where the pos is in the center, had the edges are spaced a radius away.
@@ -60,19 +63,30 @@ impl Rect<f32>{
         Rect{a:VecCont::new(a,b)}
     }
 
+    //TODO GET RID OF. Require ORD trait
+    #[inline(always)]
+    pub fn contains_vec(&self,pos:&Vec2)->bool{
+        let x=*(pos.get().0);
+        let y=*(pos.get().1);
+        let a=self.get_range2::<XAXIS_S>();
+        let b=self.get_range2::<YAXIS_S>();
+        x>=a.start&&x<=a.end && y>=b.start&&y<=b.end 
+    }
+    
+
     #[inline(always)]
     pub fn midpoint(&self)->Vec2{
-        let a=self.get_range(XAXIS).midpoint();
-        let b=self.get_range(YAXIS).midpoint();
+        let a=self.get_range2::<XAXIS_S>().midpoint();
+        let b=self.get_range2::<YAXIS_S>().midpoint();
         Vec2::new(a,b)
     }
     
     ///Grow in all directions by val.
     #[inline(always)]
     pub fn grow(&mut self,val:f32)->&mut Rect<f32>{
-        for axis in AxisIter::new() {
-            self.get_range_mut(axis).grow(val);
-        }
+        self.get_range2_mut::<XAXIS_S>().grow(val);
+        self.get_range2_mut::<YAXIS_S>().grow(val);
+        
         self
     }
 }
@@ -116,14 +130,26 @@ impl<T:PartialOrd+PartialEq+Copy+Debug> Rect<T>{
 }
 impl<T:Ord+Copy+Debug> Rect<T>{
 
+
+    #[inline(always)]
+    pub fn contains_pos(&self,a:T,b:T)->bool{
+        self.get_range2::<XAXIS_S>().contains(a) &&
+        self.get_range2::<YAXIS_S>().contains(b)
+    }
+
     ///Returns true if the specified rect is inside of this rect.
     #[inline(always)]
     pub fn contains_rect(&self,rect:&Rect<T>)->bool{
-        for axis in AxisIter::new() {
-            if !self.get_range(axis).contains_range(&rect.get_range(axis)) {
-                return false;
-            }        
+
+        //This seems like something a macro would be suited for.
+
+        if !self.get_range2::<XAXIS_S>().contains_range(&rect.get_range2::<XAXIS_S>()) {
+            return false;
         }
+        if !self.get_range2::<YAXIS_S>().contains_range(&rect.get_range2::<YAXIS_S>()) {
+            return false;
+        }
+
         true
     }
 
