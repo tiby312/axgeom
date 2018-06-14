@@ -2,14 +2,15 @@
 use std;
 use std::fmt::Debug;
 
+
 ///A 1d range. Internally represented as start and end. (not start and length)
 ///This means that subdivision does not result in any floating point calculations.
 ///There is no protection against "degenerate" Ranges where start>end.
-#[derive(Copy,Clone,Debug)]
+#[derive(Copy,Clone,Debug,Eq,PartialEq)]
 #[must_use]
-pub struct Range<T:Copy>{
-    pub start:T,
-    pub end:T
+pub struct Range<T:Copy+Debug>{
+    pub left:T,
+    pub right:T
 }
 impl<T:Copy+Debug+Ord> Range<T>{
 
@@ -19,9 +20,9 @@ impl<T:Copy+Debug+Ord> Range<T>{
     #[inline(always)]
     pub fn left_or_right_or_contain(&self,pos:&T)->std::cmp::Ordering{
         
-        if *pos<self.start{
+        if *pos<self.left{
             return std::cmp::Ordering::Less
-        }else if *pos>self.end{
+        }else if *pos>self.right{
             return std::cmp::Ordering::Greater
         }else{
             return std::cmp::Ordering::Equal
@@ -33,11 +34,11 @@ impl<T:Copy+Debug+Ord> Range<T>{
         
             let a=self;
             
-            if b.start<a.start{
-                a.start=b.start;
+            if b.left<a.left{
+                a.left=b.left;
             }
-            if b.end>a.end{
-                a.end=b.end;
+            if b.right>a.right{
+                a.right=b.right;
             }
         
     }
@@ -46,69 +47,38 @@ impl<T:Copy+Debug+Ord> Range<T>{
     ///Returns true if the point is inside of the range or on top of.
     #[inline(always)]
     pub fn contains(&self, pos: T) -> bool {
-        pos>=self.start&&pos<=self.end
+        pos>=self.left&&pos<=self.right
     }
 
     ///Returns true if self contains the specified range.
     #[inline(always)]
     pub fn contains_range(&self, val: &Range<T>) -> bool {
-        self.contains(val.start) && self.contains(val.end)
+        self.contains(val.left) && self.contains(val.right)
     }
 
     ///Creates a range that represents the intersection range.
     #[inline(always)]
     pub fn get_intersection(&self,val:&Range<T>)->Option<Range<T>>{
   
-        let a=self.start.max(val.start);
-        let b=self.end.min(val.end);
+        let a=self.left.max(val.left);
+        let b=self.right.min(val.right);
         if a>b{
             None
         }else{
-            Some(Range{start:a,end:b})
+            Some(Range{left:a,right:b})
         }
     }
 
     ///Returns true if two ranges intersect.
     #[inline(always)]
     pub fn intersects(&self, val: &Range<T>) -> bool {
-        self.contains(val.start) || val.contains(self.start)
-    }
-}
-
-impl Range<f32>{
-    
-    #[inline(always)]
-    pub fn len(&self)->f32{
-        self.end-self.start
-    }
-
-    ///Grow in both ends by the specified value.
-    #[inline(always)]
-    pub fn grow(&mut self,val:f32)->&mut Range<f32>{
-        self.start-=val;
-        self.end+=val;
-        self
-    }
-    
-    #[inline(always)]
-    pub fn midpoint(&self)->f32{
-        self.start+ self.len()/2.0
-    }
-}
-
-impl<T:Copy+Debug> Range<T>{
-    #[inline(always)]
-    pub fn left(&self)->T{
-        self.start
-    }
-    
-    #[inline(always)]
-    pub fn right(&self)->T{
-        self.end
+        //TODO double check this?
+        self.contains(val.left) || val.contains(self.left)
     }
 }
 
 
+/*
 impl<T:PartialEq+Copy+Debug> std::cmp::PartialEq for Range<T> {
 
     #[inline(always)]
@@ -116,3 +86,4 @@ impl<T:PartialEq+Copy+Debug> std::cmp::PartialEq for Range<T> {
         self.left() == other.left() && self.right()==other.right()
     }
 }
+*/

@@ -1,102 +1,48 @@
-use std::mem;
+
 use range::Range;
-use vec::VecCont;
-use vec::Vec2;
-use vec::XAXIS;
-use vec::YAXIS;
-use vec::Axis;
-use vec::AxisIter;
 use std::fmt::Debug;
 
-use XAXIS_S;
-use YAXIS_S;
+use *;
+
 ///Stored as two Ranges. 
 #[derive(Copy,Clone,Debug)]
 #[must_use]
-pub struct Rect<T:Copy+Debug>{
-    a:VecCont<Range<T>>
-}
+pub struct Rect<T:Copy+Debug>(
+    pub [Range<T>;2]
+);
 
-use AxisTrait;
 
 impl<T:Copy+Debug> Rect<T>{
-
     #[inline(always)]
     pub fn new(a:T,b:T,c:T,d:T)->Rect<T>{
-        Rect{a:VecCont::new(Range{start:a,end:b},Range{start:c,end:d})}
+        let r1=Range{left:a,right:b};
+        let r2=Range{left:c,right:d};
+        Rect([r1,r2])
     }
-
     #[inline(always)]
-    pub fn get_range2<X:AxisTrait>(&self)->&Range<T>{
-        //TODO optimize furthur?
-        self.a.get_axis(X::get())
+    pub fn get(&self)->((T,T),(T,T)){
+        let f=&self.0;
+        ((f[0].left,f[0].right),(f[1].left,f[1].right))
     }
-
     #[inline(always)]
-    pub fn get_range2_mut<X:AxisTrait>(&mut self)->&mut Range<T>{
-        //TODO optimize furthur?
-        self.a.get_axis_mut(X::get())
+    pub fn as_axis(&self)->AxisWrapRef<Range<T>>{
+        AxisWrapRef(&self.0)
     }
-    
     #[inline(always)]
-    pub fn get_range(&self,axis:Axis)->&Range<T>{
-        self.a.get_axis(axis)
-    }
-
-    #[inline(always)]
-    pub fn get_range_mut(&mut self,axis:Axis)->&mut Range<T>{
-        self.a.get_axis_mut(axis)
-    }
-    
-}
-impl Rect<f32>{
-    ///Creates a Rect where the pos is in the center, had the edges are spaced a radius away.
-    #[inline(always)]
-    pub fn from_pos_and_radius(pos:&Vec2,radius:f32)->Rect<f32>{
-        
-        let rel=pos.get_axis(XAXIS);
-        let a=Range{start:rel-radius,end:rel+radius};
-        
-        let rel=pos.get_axis(YAXIS);
-        let b=Range{start:rel-radius,end:rel+radius};
-        
-        Rect{a:VecCont::new(a,b)}
-    }
-
-    //TODO GET RID OF. Require ORD trait
-    #[inline(always)]
-    pub fn contains_vec(&self,pos:&Vec2)->bool{
-        let x=*(pos.get().0);
-        let y=*(pos.get().1);
-        let a=self.get_range2::<XAXIS_S>();
-        let b=self.get_range2::<YAXIS_S>();
-        x>=a.start&&x<=a.end && y>=b.start&&y<=b.end 
-    }
-    
-
-    #[inline(always)]
-    pub fn midpoint(&self)->Vec2{
-        let a=self.get_range2::<XAXIS_S>().midpoint();
-        let b=self.get_range2::<YAXIS_S>().midpoint();
-        Vec2::new(a,b)
-    }
-    
-    ///Grow in all directions by val.
-    #[inline(always)]
-    pub fn grow(&mut self,val:f32)->&mut Rect<f32>{
-        self.get_range2_mut::<XAXIS_S>().grow(val);
-        self.get_range2_mut::<YAXIS_S>().grow(val);
-        
-        self
+    pub fn as_axis_mut(&mut self)->AxisWrapRefMut<Range<T>>{
+        AxisWrapRefMut(&mut self.0)
     }
 }
 
-impl<T:PartialOrd+PartialEq+Copy+Debug> Rect<T>{
+impl<T:Ord+Copy+Debug> Rect<T>{
+
+    
     ///Subdivides the rectangle.
     ///No floating point calculations are done (so no precision loss/rounding issues).
     #[inline(always)]
-    pub fn subdivide(&self, mut divider: T, axis: Axis) -> (Rect<T>,Rect<T>) {
-
+    pub fn subdivide<A:AxisTrait>(&self, axis:A,mut divider: T) -> (Rect<T>,Rect<T>) {
+        unimplemented!();
+        /*
         let ca=axis;
         let na=axis.next();
 
@@ -109,12 +55,7 @@ impl<T:PartialOrd+PartialEq+Copy+Debug> Rect<T>{
         }else if divider>rel.end{
             divider=rel.end;
         }
-        //TODO move some of this code into Range.
-        //TODO check algoritm is okay?
-        //assert!(divider>=rel.start,"{:?}",(divider,rel));
-        //assert!(divider<=rel.end,"{:?}",(divider,rel));
-        
-
+  
         let l=Range{start:rel.start,end:divider};
         let r=Range{start:divider,end:rel.end};
 
@@ -126,15 +67,14 @@ impl<T:PartialOrd+PartialEq+Copy+Debug> Rect<T>{
         *right.a.get_axis_mut(ca)=r;
         *right.a.get_axis_mut(na)=*carry_thru;
         (left,right)
+        */
     } 
-}
-impl<T:Ord+Copy+Debug> Rect<T>{
-
+    
 
     #[inline(always)]
     pub fn contains_pos(&self,a:T,b:T)->bool{
-        self.get_range2::<XAXIS_S>().contains(a) &&
-        self.get_range2::<YAXIS_S>().contains(b)
+        self.as_axis().get(XAXISS).contains(a) &&
+        self.as_axis().get(YAXISS).contains(b)
     }
 
     ///Returns true if the specified rect is inside of this rect.
@@ -143,16 +83,17 @@ impl<T:Ord+Copy+Debug> Rect<T>{
 
         //This seems like something a macro would be suited for.
 
-        if !self.get_range2::<XAXIS_S>().contains_range(&rect.get_range2::<XAXIS_S>()) {
+        if !self.as_axis().get(XAXISS).contains_range(rect.as_axis().get(XAXISS)) {
             return false;
         }
-        if !self.get_range2::<YAXIS_S>().contains_range(&rect.get_range2::<YAXIS_S>()) {
+        if !self.as_axis().get(YAXISS).contains_range(rect.as_axis().get(YAXISS)) {
             return false;
         }
 
-        true
+        return true;
     }
 
+    /*
     ///Grow the rectangle to fit the specified rectangle by replacing values
     ///with the specified rectangle. No floating point computations.
     #[inline(always)]
@@ -169,33 +110,37 @@ impl<T:Ord+Copy+Debug> Rect<T>{
             }
         }
     }
+    */
 
     ///Get an intersecting rectangle.
     ///No floating point calculations as the new rectangle is made up of
     ///values from this rectangle and the specified rectangle.
     #[inline(always)]
-    pub fn get_intersect_rect(&self,rect:&Rect<T>)->Option<Rect<T>>{
+    pub fn get_intersect_rect(&self,other:&Rect<T>)->Option<Rect<T>>{
         
-        let mut rr:Rect<T>=unsafe{mem::uninitialized()};
-        for axis in AxisIter::new() {
-            //TODO use range's methods
-            let a=self.get_range(axis);
-            let b=rect.get_range(axis);
+        macro_rules! macro_axis{
+            ($axis:ident)=>{
+                {
+                    let xr=other.as_axis().get($axis);
+                    let xf=self.as_axis().get($axis);
 
-            let left=a.start.max(b.start);
-            let right=a.end.min(b.end);
-            rr.get_range_mut(axis).start=left;
-            rr.get_range_mut(axis).end=right;
-        
-            if right<=left{
-                return None;
+                    let range=Range{left:xr.left.max(xf.left),right:xr.right.min(xf.right)};
+                    
+                    //TODO figure out inequality
+                    if range.right<range.left{
+                        return None
+                    }  
+                    range
+                } 
             }
         }
 
-        Some(rr)
+        let r1=macro_axis!(XAXISS);
+        let r2=macro_axis!(YAXISS);
+        Some(Rect([r1,r2]))
     }
     
-    
+    /*
     ///Faster than using get_intersect_rect() and checking is_some().
     #[inline(always)]
     pub fn intersects_rect(&self, rect: &Rect<T>)->bool{
@@ -206,7 +151,7 @@ impl<T:Ord+Copy+Debug> Rect<T>{
         }
         return true;
     }
-    
+    */
 
     
 }

@@ -24,46 +24,134 @@
 //!```
 //!
 
-//#![feature(ord_max_min)]
-mod vec;
 mod range;
 mod rect;
 
-pub use self::vec::Vec2;
-pub use self::vec::ComputedVec2;
-pub use self::vec::VecCont;
 pub use self::range::Range;
-pub use self::vec::Axis;
-pub use self::vec::AxisIter;
 pub use self::rect::Rect;
-pub use self::vec::XAXIS;
-pub use self::vec::YAXIS;
 
 
 ///The x axis implementation of the AxisTrait
-pub struct XAXIS_S{}
-impl AxisTrait for XAXIS_S{
-    type Next=YAXIS_S;
-    fn get()->Axis{
-        XAXIS
+#[derive(Copy,Clone)]
+pub struct XAXISS;
+impl AxisTrait for XAXISS{
+    type Next=YAXISS;
+    /*
+    fn new()->Self{
+        XAXISS
+    }
+    */
+    fn is_xaxis(&self)->bool{
+        true
+    }
+    fn next(&self)->Self::Next{
+        YAXISS
     }
 }
 
 ///The y axis implementation of the AxisTrait
-pub struct YAXIS_S{}
-impl AxisTrait for YAXIS_S{
-    type Next=XAXIS_S;
-    fn get()->Axis{
-        YAXIS
+#[derive(Copy,Clone)]
+pub struct YAXISS;
+impl AxisTrait for YAXISS{
+    type Next=XAXISS;
+    /*
+    fn new()->Self{
+        YAXISS
+    }
+    */
+    fn is_xaxis(&self)->bool{
+        false
+    }
+    fn next(&self)->Self::Next{
+        XAXISS
     }
 }
 
 ///Axis trait can be used to extract the x or y axis out of a vector
 ///when you know the axis as compile time.
-pub trait AxisTrait{
+pub trait AxisTrait:Sync+Send+Copy+Clone{
     type Next:AxisTrait;
-    fn get()->Axis;
+    fn is_xaxis(&self)->bool;
+    fn next(&self)->Self::Next;
+
+    fn is_equal_to<B:AxisTrait>(&self,other:B)->bool{
+        if self.is_xaxis() && other.is_xaxis(){
+            return true;
+        }
+        if !self.is_xaxis() && !other.is_xaxis(){
+            return true;
+        }
+
+        return false;
+    }
 }
+
+
+
+pub struct AxisWrap<T>(pub [T;2]);
+impl<T> AxisWrap<T>{
+    pub fn get<A:AxisTrait>(&self,axis:A)->&T{
+        if axis.is_xaxis(){
+            &self.0[0]
+        }else{
+            &self.0[1]
+        }
+    }
+    pub fn get_mut<A:AxisTrait>(&mut self,axis:A)->&mut T{
+        if axis.is_xaxis(){
+            &mut self.0[0]
+        }else{
+            &mut self.0[1]
+        }
+    }
+    pub fn set<A:AxisTrait>(&mut self,axis:A,a:T){
+        if axis.is_xaxis(){
+            self.0[0]=a;
+        }else{
+            self.0[1]=a;
+        }
+    }
+}
+
+pub struct AxisWrapRef<'a,T:'a>(pub &'a [T;2]);
+impl<'a,T:'a> AxisWrapRef<'a,T>{
+    pub fn get<A:AxisTrait>(&self,axis:A)->&'a T{
+        if axis.is_xaxis(){
+            &self.0[0]
+        }else{
+            &self.0[1]
+        }
+    }
+}
+
+
+pub struct AxisWrapRefMut<'a,T:'a>(pub &'a mut [T;2]);
+impl<'a,T:'a> AxisWrapRefMut<'a,T>{
+    pub fn get<A:AxisTrait>(&self,axis:A)->&T{
+        if axis.is_xaxis(){
+            &self.0[0]
+        }else{
+            &self.0[1]
+        }
+    }
+    pub fn get_mut <A:AxisTrait>(&mut self,axis:A)->&mut T{
+        if axis.is_xaxis(){
+            &mut self.0[0]
+        }else{
+            &mut self.0[1]
+        }
+    }
+    
+    pub fn set<A:AxisTrait>(&mut self,axis:A,a:T){
+        if axis.is_xaxis(){
+            self.0[0]=a;
+        }else{
+            self.0[1]=a;
+        }
+    }
+}
+
+
 
 
 
