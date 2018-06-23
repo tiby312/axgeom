@@ -8,11 +8,11 @@ use std::fmt::Debug;
 ///There is no protection against "degenerate" Ranges where start>end.
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
 #[must_use]
-pub struct Range<T:Copy+Debug>{
+pub struct Range<T:Copy>{
     pub left:T,
     pub right:T
 }
-impl<T:Copy+Debug+Ord> Range<T>{
+impl<T:Copy+Ord> Range<T>{
 
     ///If the pos is to the left of the range, return less.
     ///If the pos is to the right of the range, return greater.

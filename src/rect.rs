@@ -7,12 +7,12 @@ use *;
 ///Stored as two Ranges. 
 #[derive(Copy,Clone,Debug)]
 #[must_use]
-pub struct Rect<T:Copy+Debug>(
+pub struct Rect<T:Copy>(
     pub [Range<T>;2]
 );
 
 
-impl<T:Copy+Debug> Rect<T>{
+impl<T:Copy> Rect<T>{
     #[inline(always)]
     pub fn new(a:T,b:T,c:T,d:T)->Rect<T>{
         let r1=Range{left:a,right:b};
@@ -34,40 +34,39 @@ impl<T:Copy+Debug> Rect<T>{
     }
 }
 
-impl<T:Ord+Copy+Debug> Rect<T>{
+impl<T:Ord+Copy> Rect<T>{
 
     
     ///Subdivides the rectangle.
     ///No floating point calculations are done (so no precision loss/rounding issues).
     #[inline(always)]
     pub fn subdivide<A:AxisTrait>(&self, axis:A,mut divider: T) -> (Rect<T>,Rect<T>) {
-        unimplemented!();
-        /*
+        
         let ca=axis;
         let na=axis.next();
 
-        let rel=self.a.get_axis(ca);
-        let carry_thru=self.a.get_axis(na);
+        let rel=self.as_axis().get(ca);
+        let carry_thru=self.as_axis().get(na);
 
         
-        if divider<rel.start{
-            divider=rel.start;
-        }else if divider>rel.end{
-            divider=rel.end;
+        if divider<rel.left{
+            divider=rel.left;
+        }else if divider>rel.right{
+            divider=rel.right;
         }
   
-        let l=Range{start:rel.start,end:divider};
-        let r=Range{start:divider,end:rel.end};
+        let l=Range{left:rel.left,right:divider};
+        let r=Range{left:divider,right:rel.right};
 
-        let mut left:Rect<T>=unsafe{mem::uninitialized()};
-        *left.a.get_axis_mut(ca)=l;
-        *left.a.get_axis_mut(na)=*carry_thru;
+        let mut left:Rect<T>=unsafe{std::mem::uninitialized()};
+        *left.as_axis_mut().get_mut(ca)=l;
+        *left.as_axis_mut().get_mut(na)=*carry_thru;
         
-        let mut right:Rect<T>=unsafe{mem::uninitialized()};
-        *right.a.get_axis_mut(ca)=r;
-        *right.a.get_axis_mut(na)=*carry_thru;
+        let mut right:Rect<T>=unsafe{std::mem::uninitialized()};
+        *right.as_axis_mut().get_mut(ca)=r;
+        *right.as_axis_mut().get_mut(na)=*carry_thru;
         (left,right)
-        */
+        
     } 
     
 

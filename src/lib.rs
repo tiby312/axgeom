@@ -36,11 +36,7 @@ pub use self::rect::Rect;
 pub struct XAXISS;
 impl AxisTrait for XAXISS{
     type Next=YAXISS;
-    /*
-    fn new()->Self{
-        XAXISS
-    }
-    */
+
     fn is_xaxis(&self)->bool{
         true
     }
@@ -54,11 +50,7 @@ impl AxisTrait for XAXISS{
 pub struct YAXISS;
 impl AxisTrait for YAXISS{
     type Next=XAXISS;
-    /*
-    fn new()->Self{
-        YAXISS
-    }
-    */
+
     fn is_xaxis(&self)->bool{
         false
     }
