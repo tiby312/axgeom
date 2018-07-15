@@ -1,7 +1,4 @@
-
 use std;
-use std::fmt::Debug;
-
 
 ///A 1d range. Internally represented as start and end. (not start and length)
 ///This means that subdivision does not result in any floating point calculations.
@@ -11,6 +8,31 @@ use std::fmt::Debug;
 pub struct Range<T:Copy>{
     pub left:T,
     pub right:T
+}
+impl<T:Copy+PartialOrd> Range<T>{
+
+    ///Returns true if the point is inside of the range or on top of.
+    ///True if pos>=self.left&&pos<=self.right 
+    #[inline(always)]
+    pub fn contains(&self, pos: T) -> bool {
+        pos>=self.left&&pos<=self.right
+    }
+}
+
+impl<T:Copy+std::ops::Sub<Output=T>> Range<T>{
+    #[inline(always)]
+    pub fn len(&self)->T{
+        self.right-self.left
+    }
+}
+
+impl<T:Copy+std::ops::Sub<Output=T>+std::ops::Add<Output=T>> Range<T>{
+    #[inline(always)]
+    pub fn grow(&mut self,radius:T)->&mut Self{
+        self.right=self.right+radius;
+        self.left=self.left-radius;
+        self
+    }
 }
 impl<T:Copy+Ord> Range<T>{
 
@@ -44,11 +66,6 @@ impl<T:Copy+Ord> Range<T>{
     }
 
 
-    ///Returns true if the point is inside of the range or on top of.
-    #[inline(always)]
-    pub fn contains(&self, pos: T) -> bool {
-        pos>=self.left&&pos<=self.right
-    }
 
     ///Returns true if self contains the specified range.
     #[inline(always)]
@@ -76,14 +93,3 @@ impl<T:Copy+Ord> Range<T>{
         self.contains(val.left) || val.contains(self.left)
     }
 }
-
-
-/*
-impl<T:PartialEq+Copy+Debug> std::cmp::PartialEq for Range<T> {
-
-    #[inline(always)]
-    fn eq(&self, other: &Range<T>) -> bool {
-        self.left() == other.left() && self.right()==other.right()
-    }
-}
-*/
