@@ -1,11 +1,11 @@
 [package]
 name = "axgeom"
-version = "0.2.0"
+version = "1.0.0"
 authors = ["Ken Reed <kenakioreed@gmail.com>"]
 description = "2D Geometry Library provides ability to extract 1d ranges out of 2d objects."
 license = "MIT/Apache-2.0"
 repository = "https://github.com/tiby312/axgeom"
 keywords = ["geometry", "axis"]
-readme = "README.md"
+readme = "readme.md"
 
 [dependencies]

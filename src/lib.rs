@@ -1,4 +1,4 @@
-//!	A 2D geometry library. It provides a way to easily extract 1d ranges from a 2d Rectangle based off of the x or y axis.
+//!	A 2D geometry library. It provides a way to easily extract 1d ranges from a 2d container based off of the x or y axis.
 //!	Also provides functions that operate on types that implement Ord.
 
 mod range;
@@ -38,12 +38,15 @@ impl AxisTrait for YAXISS{
     }
 }
 
-///Axis trait can be used to extract the x or y axis out of a vector
+///Axis trait can be used to extract the x or y portions of a container.
 ///when you know the axis as compile time.
+///The X implementation of this trait's Next associated trait is the Y implementation.
+///The Y implementation of this trait's Next associated trait is the X implementation. 
 pub trait AxisTrait:Sync+Send+Copy+Clone{
     type Next:AxisTrait;
     fn is_xaxis(&self)->bool;
     fn next(&self)->Self::Next;
+
     #[inline(always)]
     fn is_equal_to<B:AxisTrait>(&self,other:B)->bool{
         if self.is_xaxis() && other.is_xaxis(){
@@ -52,13 +55,12 @@ pub trait AxisTrait:Sync+Send+Copy+Clone{
         if !self.is_xaxis() && !other.is_xaxis(){
             return true;
         }
-
         return false;
     }
 }
 
 
-///A wrapper around an array that lets you extra the x and y components using the AxisTrait.
+///A wrapper around an array that lets you extract the x and y components using the AxisTrait.
 pub struct AxisWrapRef<'a,T:'a>(pub &'a [T;2]);
 impl<'a,T:'a> AxisWrapRef<'a,T>{
     pub fn get<A:AxisTrait>(&self,axis:A)->&'a T{
@@ -71,26 +73,3 @@ impl<'a,T:'a> AxisWrapRef<'a,T>{
 }
 
 
-
-
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn test1() {
-        let rect = Rect::new(30.0,40.0,30.0,40.0);
-        for k in AxisIter::new(){
-            let r=rect.get_range(k);
-            assert!(r.len()==10.0);
-        }
-
-        let (r1,r2)=rect.subdivide(35.0,XAXIS);
-        assert_eq!(*r1.get_range(XAXIS),Range{start:30.0,end:35.0});
-        assert_eq!(*r1.get_range(YAXIS),Range{start:30.0,end:40.0});
-        
-        assert_eq!(*r2.get_range(XAXIS),Range{start:35.0,end:40.0});
-        assert_eq!(*r2.get_range(YAXIS),Range{start:30.0,end:40.0});
-    }
-}

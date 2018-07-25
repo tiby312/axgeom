@@ -2,7 +2,8 @@ use std;
 
 ///A 1d range. Internally represented as start and end. (not start and length)
 ///This means that subdivision does not result in any floating point calculations.
-///There is no protection against "degenerate" Ranges where start>end.
+///The left value be <= the right value.
+///There is no protection against "degenerate" Ranges where left>right.
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
 #[must_use]
 pub struct Range<T:Copy>{
@@ -54,15 +55,13 @@ impl<T:Copy+Ord> Range<T>{
     #[inline(always)]
     pub fn grow_to_fit(&mut self,b:&Range<T>){
         
-            let a=self;
-            
-            if b.left<a.left{
-                a.left=b.left;
-            }
-            if b.right>a.right{
-                a.right=b.right;
-            }
-        
+        let a=self;  
+        if b.left<a.left{
+            a.left=b.left;
+        }
+        if b.right>a.right{
+            a.right=b.right;
+        }
     }
 
 
