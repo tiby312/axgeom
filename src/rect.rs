@@ -3,7 +3,7 @@ use range::Range;
 
 use *;
 
-///Stored as two Ranges. 
+///An axis aligned rectangle. Stored as two Ranges. 
 #[derive(Copy,Clone,Debug)]
 #[must_use]
 pub struct Rect<T:Copy>(
