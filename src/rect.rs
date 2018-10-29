@@ -12,12 +12,18 @@ pub struct Rect<T:Copy>(
 
 
 impl<T:Copy> Rect<T>{
+
+    ///(a,b) is the x component range.
+    ///(c,d) is the y component range.
     #[inline(always)]
     pub fn new(a:T,b:T,c:T,d:T)->Rect<T>{
         let r1=Range{left:a,right:b};
         let r2=Range{left:c,right:d};
         Rect([r1,r2])
     }
+
+    ///(a,b) is the x component range.
+    ///(c,d) is the y component range.
     #[inline(always)]
     pub fn get(&self)->((T,T),(T,T)){
         let f=&self.0;
@@ -126,14 +132,16 @@ impl<T:Ord+Copy> Rect<T>{
                 {
                     {
                         let sx=self.get_range_mut($axis);
-                        //let sx=a.get_mut($axis);
-                        let rx=rect.get_range($axis);//as_axis().get($axis);
+                        let rx=rect.get_range($axis);
+                        sx.grow_to_fit(rx);
+                        /*
                         if rx.left<sx.left{
                             sx.left=rx.left;
                         }
                         if rx.right>sx.right{
                             sx.right=rx.right;
                         }
+                        */
                     }
                 }
             }
