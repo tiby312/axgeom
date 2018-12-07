@@ -4,6 +4,9 @@ use std;
 ///This means that subdivision does not result in any floating point calculations.
 ///The left value be <= the right value.
 ///There is no protection against "degenerate" Ranges where left>right.
+///Unlike std::ops::Range, It is a fully closed range. So [], not [) or ().
+
+
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
 #[must_use]
 pub struct Range<T:Copy>{

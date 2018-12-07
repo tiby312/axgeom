@@ -4,6 +4,8 @@ use range::Range;
 use *;
 
 ///An axis aligned rectangle. Stored as two Ranges. 
+///It is a fully closed rectangle. So [], not [) or ().
+#[repr(transparent)]
 #[derive(Copy,Clone,Debug)]
 #[must_use]
 pub struct Rect<T:Copy>(
@@ -29,9 +31,9 @@ impl<T:Copy> Rect<T>{
         let f=&self.0;
         ((f[0].left,f[0].right),(f[1].left,f[1].right))
     }
+
     #[inline(always)]
     pub fn get_range(&self,axis:impl AxisTrait)->&Range<T>{
-        //self.().get(axis)
         if axis.is_xaxis(){
             &self.0[0]
         }else{
@@ -68,7 +70,14 @@ impl<T:Copy+std::ops::Sub<Output=T>+std::ops::Add<Output=T>> Rect<T>{
 }
 
 impl<T:Ord+Copy> Rect<T>{
+    #[inline(always)]
+    pub fn equals(&self,a:&Rect<T>)->bool{
+        //TODO optimize
+        let ((a1,b1),(c1,d1))=self.get();
+        let ((a2,b2),(c2,d2))=a.get();
 
+        (a1==a2)&&(b1==b2)&&(c1==c2)&&(d1==d2)
+    }
     
     ///Subdivides the rectangle.
     ///No floating point calculations are done (so no precision loss/rounding issues).
