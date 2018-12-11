@@ -161,6 +161,25 @@ impl<T:Ord+Copy> Rect<T>{
         self
     }
     
+    #[inline(always)]
+    pub fn intersects_rect(&self,other:&Rect<T>)->bool{
+        macro_rules! macro_axis{
+            ($axis:ident)=>{
+                {
+                    let xr=other.get_range($axis);
+                    let xf=self.get_range($axis);
+
+                    if !xr.intersects(xf){
+                        return false
+                    }
+                } 
+            }
+        }
+
+        macro_axis!(XAXISS);
+        macro_axis!(YAXISS);
+        return true;
+    }
 
     ///Get an intersecting rectangle.
     ///No floating point calculations as the new rectangle is made up of
