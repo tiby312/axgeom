@@ -1,7 +1,6 @@
 
-use range::Range;
-
-use *;
+use crate::range::Range;
+use crate::*;
 
 ///An axis aligned rectangle. Stored as two Ranges. 
 ///It is a fully closed rectangle. Points exactly along the border of the rectangle are considered inside the rectangle. 
