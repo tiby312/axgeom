@@ -56,7 +56,7 @@ pub trait AxisTrait:Sync+Send+Copy+Clone{
         if !self.is_xaxis() && !other.is_xaxis(){
             return true;
         }
-        return false;
+        false
     }
 }
 

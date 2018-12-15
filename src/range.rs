@@ -24,7 +24,7 @@ impl<T:Copy+PartialOrd> Range<T>{
 
 impl<T:Copy+std::ops::Sub<Output=T>> Range<T>{
     #[inline]
-    pub fn len(&self)->T{
+    pub fn distance(&self)->T{
         self.right-self.left
     }
 }
@@ -46,11 +46,11 @@ impl<T:Copy+Ord> Range<T>{
     pub fn left_or_right_or_contain(&self,pos:&T)->std::cmp::Ordering{
         
         if *pos<self.left{
-            return std::cmp::Ordering::Less
+            std::cmp::Ordering::Less
         }else if *pos>self.right{
-            return std::cmp::Ordering::Greater
+            std::cmp::Ordering::Greater
         }else{
-            return std::cmp::Ordering::Equal
+            std::cmp::Ordering::Equal
         }
     }
 

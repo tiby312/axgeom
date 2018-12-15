@@ -87,7 +87,7 @@ impl<T:Ord+Copy> Rect<T>{
         let na=axis.next();
 
         let rel=self.get_range(ca);
-        let carry_thru=self.get_range(na);
+        let carry_thru=*self.get_range(na);
 
         
         if divider<rel.left{
@@ -101,11 +101,11 @@ impl<T:Ord+Copy> Rect<T>{
 
         let mut left:Rect<T>=unsafe{std::mem::uninitialized()};
         *left.get_range_mut(ca)=l;
-        *left.get_range_mut(na)=*carry_thru;
+        *left.get_range_mut(na)=carry_thru;
         
         let mut right:Rect<T>=unsafe{std::mem::uninitialized()};
         *right.get_range_mut(ca)=r;
-        *right.get_range_mut(na)=*carry_thru;
+        *right.get_range_mut(na)=carry_thru;
         (left,right)
         
     } 
@@ -124,8 +124,7 @@ impl<T:Ord+Copy> Rect<T>{
         if !self.get_range(YAXISS).contains_range(rect.get_range(YAXISS)) {
             return false;
         }
-
-        return true;
+        true
     }
 
     
@@ -169,7 +168,7 @@ impl<T:Ord+Copy> Rect<T>{
 
         macro_axis!(XAXISS);
         macro_axis!(YAXISS);
-        return true;
+        true
     }
 
     ///Get an intersecting rectangle.
