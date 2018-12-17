@@ -1,6 +1,6 @@
 [package]
 name = "axgeom"
-version = "1.0.4"
+version = "1.0.5"
 authors = ["Ken Reed <kenakioreed@gmail.com>"]
 description = "Library that provides ability to extract 1d ranges out of 2d objects."
 license = "MIT/Apache-2.0"
