@@ -110,6 +110,11 @@ impl<T:Ord+Copy> Rect<T>{
         
     } 
     
+    #[inline]
+    pub fn is_valid(&self)->bool{
+        self.0[0].is_valid() &&
+        self.0[0].is_valid()
+    }
 
 
     ///Returns true if the specified rect is inside of this rect.

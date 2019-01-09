@@ -39,6 +39,10 @@ impl<T:Copy+std::ops::Sub<Output=T>+std::ops::Add<Output=T>> Range<T>{
 }
 impl<T:Copy+Ord> Range<T>{
 
+    #[inline]
+    pub fn is_valid(&self)->bool{
+        self.left<=self.right
+    }
     ///If the pos is to the left of the range, return less.
     ///If the pos is to the right of the range, return greater.
     ///If the pos intersects with the range, return equal.
