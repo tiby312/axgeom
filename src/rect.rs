@@ -1,6 +1,7 @@
 
 use crate::range::Range;
 use crate::*;
+use ordered_float::*;
 
 ///An axis aligned rectangle. Stored as two Ranges. 
 ///It is a fully closed rectangle. Points exactly along the border of the rectangle are considered inside the rectangle. 
@@ -11,6 +12,58 @@ pub struct Rect<T:Copy>(
     pub [Range<T>;2]
 );
 
+
+
+
+impl<T:num_traits::float::Float> AsRef<Rect<T>> for Rect<NotNan<T>>{
+    fn as_ref(&self)->&Rect<T>{
+       unsafe{&*( self as *const Rect<NotNan<T>> as *const Rect<T> )}
+    }
+}
+
+impl<T:num_traits::float::Float> AsMut<Rect<T>> for Rect<NotNan<T>>{
+    fn as_mut(&mut self)->&mut Rect<T>{
+       unsafe{&mut *( self as *mut Rect<NotNan<T>> as *mut Rect<T> )}
+    }
+}
+
+#[derive(Debug)]
+pub struct RectNanErr;
+
+impl<T:num_traits::float::Float> Rect<T>{
+
+    pub fn into_notnan(self)->Result<Rect<NotNan<T>>,RectNanErr>{
+
+        let a=self.get_range(XAXISS);
+        let b=self.get_range(YAXISS);
+        
+        let floats=[NotNan::new(a.left),NotNan::new(a.right),NotNan::new(b.left),NotNan::new(b.right)];
+
+        match floats{
+            [Ok(a),Ok(b),Ok(c),Ok(d)]=>{
+                Ok(Rect::new(a,b,c,d))
+            },
+            _=>{
+                Err(RectNanErr)
+            }
+        }
+    }
+}
+
+impl<T:num_traits::float::Float> Rect<NotNan<T>>{
+    pub fn into_inner(self)->Rect<T>{
+        //TODO improve performance this to use transmute?
+        let ((x1,x2),(y1,y2))=self.get();
+        Rect::new(x1.into_inner(),x2.into_inner(),y1.into_inner(),y2.into_inner())
+    }
+}
+
+
+impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Rect<T>{
+    pub fn from_point(point:[T;2],radius:[T;2])->Rect<T>{
+        Rect::new(point[0]-radius[0],point[0]+radius[0],point[1]-radius[1],point[1]+radius[1])
+    }  
+}
 
 impl<T:Copy> Rect<T>{
 

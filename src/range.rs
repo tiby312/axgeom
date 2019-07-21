@@ -13,6 +13,8 @@ pub struct Range<T:Copy>{
     pub left:T,
     pub right:T
 }
+
+
 impl<T:Copy+PartialOrd> Range<T>{
 
     ///Returns true if the point is inside of the range or on top of.
