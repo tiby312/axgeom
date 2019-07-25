@@ -29,10 +29,12 @@ impl<T:num_traits::float::Float> AsMut<Rect<T>> for Rect<NotNan<T>>{
     }
 }
 
+///Thrown if unable to convert rectangle of floats to NotNan.
 #[derive(Debug)]
 pub struct RectNanErr;
 
 impl<T:num_traits::float::Float> Rect<T>{
+    ///Convert a ractangle of floats to a rectangle of NotNan floats.
     #[inline(always)]
     pub fn into_notnan(self)->Result<Rect<NotNan<T>>,RectNanErr>{
 
@@ -53,9 +55,9 @@ impl<T:num_traits::float::Float> Rect<T>{
 }
 
 impl<T:num_traits::float::Float> Rect<NotNan<T>>{
+    ///Convert a rectangle of NotNan floats to primitive floats.
     #[inline(always)]
     pub fn into_inner(self)->Rect<T>{
-        //TODO improve performance this to use transmute?
         let ((x1,x2),(y1,y2))=self.get();
         Rect::new(x1.into_inner(),x2.into_inner(),y1.into_inner(),y2.into_inner())
     }
@@ -63,6 +65,7 @@ impl<T:num_traits::float::Float> Rect<NotNan<T>>{
 
 
 impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Rect<T>{
+    ///Create a rectangle from a point and radius.
     #[inline(always)]
     pub fn from_point(point:[T;2],radius:[T;2])->Rect<T>{
         Rect::new(point[0]-radius[0],point[0]+radius[0],point[1]-radius[1],point[1]+radius[1])
@@ -88,6 +91,7 @@ impl<T:Copy> Rect<T>{
         ((f[0].left,f[0].right),(f[1].left,f[1].right))
     }
 
+    ///Get the range of one axis.
     #[inline(always)]
     pub fn get_range(&self,axis:impl AxisTrait)->&Range<T>{
         if axis.is_xaxis(){
@@ -97,6 +101,7 @@ impl<T:Copy> Rect<T>{
         }
     }
     
+    ///Get the mutable range of one axis.
     #[inline(always)]
     pub fn get_range_mut(&mut self,axis:impl AxisTrait)->&mut Range<T>{
         if axis.is_xaxis(){
@@ -109,6 +114,7 @@ impl<T:Copy> Rect<T>{
 
 impl<T:PartialOrd+Copy> Rect<T>{
 
+    ///Returns true if the point is contained in the the ranges of both axis.
     #[inline(always)]
     pub fn contains_point(&self,a:[T;2])->bool{
         self.get_range(XAXISS).contains(a[0]) &&
@@ -118,6 +124,7 @@ impl<T:PartialOrd+Copy> Rect<T>{
 
 
 impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Rect<T>{
+    ///Grow a rectangle of a radius.
     #[inline(always)]
     pub fn grow(&mut self,radius:T)->&mut Self{
         self.0[0].grow(radius);
@@ -127,6 +134,8 @@ impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Rect<T>{
 }
 
 impl<T:Ord+Copy> Rect<T>{
+
+    ///Returns true if two rectangles has the same values.
     #[inline(always)]
     pub fn equals(&self,a:&Rect<T>)->bool{
         //TODO optimize
@@ -165,6 +174,7 @@ impl<T:Ord+Copy> Rect<T>{
         }
     } 
     
+    ///Returns true if the rectangle's ranges are not degenerate.
     #[inline(always)]
     pub fn is_valid(&self)->bool{
         self.0[0].is_valid() &&
@@ -175,8 +185,6 @@ impl<T:Ord+Copy> Rect<T>{
     ///Returns true if the specified rect is inside of this rect.
     #[inline(always)]
     pub fn contains_rect(&self,rect:&Rect<T>)->bool{
-
-        //This seems like something a macro would be suited for.
 
         if !self.get_range(XAXISS).contains_range(rect.get_range(XAXISS)) {
             return false;
