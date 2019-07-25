@@ -34,18 +34,15 @@ impl<T:num_traits::float::Float> AsMut<Rect<T>> for Rect<NotNan<T>>{
 pub struct RectNanErr;
 
 impl<T:num_traits::float::Float> Rect<T>{
-    ///Convert a ractangle of floats to a rectangle of NotNan floats.
+    ///Convert a rectangle of floats to a rectangle of NotNan floats.
     #[inline(always)]
     pub fn into_notnan(self)->Result<Rect<NotNan<T>>,RectNanErr>{
 
-        let a=self.get_range(XAXISS);
-        let b=self.get_range(YAXISS);
-        
-        let floats=[NotNan::new(a.left),NotNan::new(a.right),NotNan::new(b.left),NotNan::new(b.right)];
-
-        match floats{
-            [Ok(a),Ok(b),Ok(c),Ok(d)]=>{
-                Ok(Rect::new(a,b,c,d))
+        let a=self.0[0].into_notnan();
+        let b=self.0[1].into_notnan();
+        match (a,b){
+            (Ok(a),Ok(b))=>{
+                Ok(Rect([a,b]))
             },
             _=>{
                 Err(RectNanErr)
@@ -58,8 +55,7 @@ impl<T:num_traits::float::Float> Rect<NotNan<T>>{
     ///Convert a rectangle of NotNan floats to primitive floats.
     #[inline(always)]
     pub fn into_inner(self)->Rect<T>{
-        let ((x1,x2),(y1,y2))=self.get();
-        Rect::new(x1.into_inner(),x2.into_inner(),y1.into_inner(),y2.into_inner())
+        Rect([self.0[0].into_inner(),self.0[1].into_inner()])
     }
 }
 
@@ -68,7 +64,9 @@ impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Rect<T>{
     ///Create a rectangle from a point and radius.
     #[inline(always)]
     pub fn from_point(point:[T;2],radius:[T;2])->Rect<T>{
-        Rect::new(point[0]-radius[0],point[0]+radius[0],point[1]-radius[1],point[1]+radius[1])
+        let a=Range::from_point(point[0],radius[0]);
+        let b=Range::from_point(point[1],radius[1]);
+        Rect([a,b])
     }  
 }
 

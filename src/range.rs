@@ -38,6 +38,69 @@ impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Range<T>{
         self
     }
 }
+
+use ordered_float::NotNan;
+
+
+impl<T:num_traits::float::Float> AsRef<Range<T>> for Range<NotNan<T>>{
+    #[inline(always)]
+    fn as_ref(&self)->&Range<T>{
+       unsafe{&*( self as *const Range<NotNan<T>> as *const Range<T> )}
+    }
+}
+
+impl<T:num_traits::float::Float> AsMut<Range<T>> for Range<NotNan<T>>{
+    #[inline(always)]
+    fn as_mut(&mut self)->&mut Range<T>{
+       unsafe{&mut *( self as *mut Range<NotNan<T>> as *mut Range<T> )}
+    }
+}
+
+
+///Thrown if unable to convert range of floats to NotNan.
+#[derive(Debug)]
+pub struct RangeNanErr;
+
+impl<T:num_traits::float::Float> Range<T>{
+    ///Convert a range of floats to a rectangle of NotNan floats.
+    #[inline(always)]
+    pub fn into_notnan(self)->Result<Range<NotNan<T>>,RangeNanErr>{
+
+        let a=NotNan::new(self.left);
+        let b=NotNan::new(self.right);
+        match (a,b){
+            (Ok(left),Ok(right))=>{
+                Ok(Range{left,right})
+            },
+            _=>{
+                Err(RangeNanErr)
+            }
+        }
+    }
+}
+
+
+impl<T:num_traits::float::Float> Range<NotNan<T>>{
+    ///Convert a range of NotNan floats to primitive floats.
+    #[inline(always)]
+    pub fn into_inner(self)->Range<T>{
+        Range{left:self.left.into_inner(),right:self.right.into_inner()}
+    }
+}
+
+
+
+impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Range<T>{
+    ///Create a range from a point and radius.
+    #[inline(always)]
+    pub fn from_point(point:T,radius:T)->Range<T>{
+        Range{left:point-radius,right:point+radius}
+    }  
+}
+
+
+
+
 impl<T:Copy+Ord> Range<T>{
 
     #[inline(always)]
