@@ -8,7 +8,7 @@
 
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
 #[must_use]
-pub struct Range<T:Copy>{
+pub struct Range<T>{
     pub left:T,
     pub right:T
 }

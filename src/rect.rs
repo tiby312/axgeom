@@ -8,7 +8,7 @@ use ordered_float::*;
 #[repr(transparent)]
 #[derive(Copy,Clone,Debug)]
 #[must_use]
-pub struct Rect<T:Copy>(
+pub struct Rect<T>(
     pub [Range<T>;2]
 );
 
