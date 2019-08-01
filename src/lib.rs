@@ -10,6 +10,7 @@ mod rect;
 
 pub use self::range::Range;
 pub use self::rect::Rect;
+use cgmath::num_traits;
 
 ///The x axis implementation of the AxisTrait
 #[derive(Copy,Clone)]

@@ -4,7 +4,7 @@
 ///The left value be <= the right value.
 ///There is no protection against "degenerate" Ranges where left>right.
 ///Unlike std::ops::Range, It is a fully closed range. Points exactly on the borders are considered inside the range.
-
+use cgmath::BaseFloat;
 
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
 #[must_use]
@@ -37,31 +37,33 @@ impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Range<T>{
         self.left=self.left-radius;
         self
     }
+
+
 }
 
-use ordered_float::NotNan;
-
-
-impl<T:num_traits::float::Float> AsRef<Range<T>> for Range<NotNan<T>>{
+use crate::num_traits::NumCast;
+/*
+impl<T:BaseFloat> AsRef<Range<T>> for Range<NotNan<T>>{
     #[inline(always)]
     fn as_ref(&self)->&Range<T>{
        unsafe{&*( self as *const Range<NotNan<T>> as *const Range<T> )}
     }
 }
 
-impl<T:num_traits::float::Float> AsMut<Range<T>> for Range<NotNan<T>>{
+impl<T:BaseFloat> AsMut<Range<T>> for Range<NotNan<T>>{
     #[inline(always)]
     fn as_mut(&mut self)->&mut Range<T>{
        unsafe{&mut *( self as *mut Range<NotNan<T>> as *mut Range<T> )}
     }
 }
+*/
 
-
+/*
 ///Thrown if unable to convert range of floats to NotNan.
 #[derive(Debug)]
 pub struct RangeNanErr;
 
-impl<T:num_traits::float::Float> Range<T>{
+impl<T:BaseFloat> Range<T>{
     ///Convert a range of floats to a rectangle of NotNan floats.
     #[inline(always)]
     pub fn into_notnan(self)->Result<Range<NotNan<T>>,RangeNanErr>{
@@ -78,16 +80,35 @@ impl<T:num_traits::float::Float> Range<T>{
         }
     }
 }
+*/
+
+impl<S: NumCast + Copy> Range<S> {
+    /// Component-wise casting to another type.
+    #[inline]
+    pub fn cast<T: NumCast>(&self) -> Option<Range<T>> {
+        let a=NumCast::from(self.left);
+        let b=NumCast::from(self.right);
+        match (a,b){
+            (Some(left),Some(right))=>{
+                Some(Range{left,right})
+            },
+            _=>{
+                None
+            }
+        }
+    }
+}
 
 
-impl<T:num_traits::float::Float> Range<NotNan<T>>{
+/*
+impl<T:BaseFloat> Range<NotNan<T>>{
     ///Convert a range of NotNan floats to primitive floats.
     #[inline(always)]
     pub fn into_inner(self)->Range<T>{
         Range{left:self.left.into_inner(),right:self.right.into_inner()}
     }
 }
-
+*/
 
 
 impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Range<T>{
