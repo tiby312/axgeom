@@ -19,7 +19,7 @@ impl<T:Copy+PartialOrd> Range<T>{
     ///Returns true if the point is inside of the range or on top of.
     #[inline(always)]
     pub fn contains(&self, pos: T) -> bool {
-        pos>=self.left&&pos<=self.right
+        pos>=self.left&&pos<self.right
     }
 }
 

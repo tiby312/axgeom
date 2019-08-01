@@ -236,22 +236,11 @@ impl<T:Ord+Copy> Rect<T>{
     
     #[inline(always)]
     pub fn intersects_rect(&self,other:&Rect<T>)->bool{
-        macro_rules! macro_axis{
-            ($axis:ident)=>{
-                {
-                    let xr=other.get_range($axis);
-                    let xf=self.get_range($axis);
-
-                    if !xr.intersects(xf){
-                        return false
-                    }
-                } 
-            }
+        if other.x.intersects(&self.x) && other.y.intersects(&self.y){
+            true
+        }else{
+            false
         }
-
-        macro_axis!(XAXISS);
-        macro_axis!(YAXISS);
-        true
     }
 
     ///Get an intersecting rectangle.
