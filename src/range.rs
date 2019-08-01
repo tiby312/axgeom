@@ -84,7 +84,7 @@ impl<T:BaseFloat> Range<T>{
 
 impl<S: NumCast + Copy> Range<S> {
     /// Component-wise casting to another type.
-    #[inline]
+    #[inline(always)]
     pub fn cast<T: NumCast>(&self) -> Option<Range<T>> {
         let a=NumCast::from(self.left);
         let b=NumCast::from(self.right);

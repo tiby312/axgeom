@@ -22,7 +22,7 @@ pub struct Rect<T>{
 
 impl<S: NumCast + Copy> Rect<S> {
     /// Component-wise casting to another type.
-    #[inline]
+    #[inline(always)]
     pub fn cast<T: NumCast>(&self) -> Option<Rect<T>> {
         let a=self.x.cast();
         let b=self.y.cast();
