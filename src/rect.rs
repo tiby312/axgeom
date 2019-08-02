@@ -2,7 +2,7 @@
 use crate::range::Range;
 use crate::*;
 
-use crate::num_traits::NumCast;
+//use crate::num_traits::NumCast;
 
 use cgmath::prelude::*;
 use cgmath::vec2;
@@ -19,7 +19,7 @@ pub struct Rect<T>{
 }
 
 
-
+/*
 impl<S: NumCast + Copy> Rect<S> {
     /// Component-wise casting to another type.
     #[inline(always)]
@@ -36,6 +36,38 @@ impl<S: NumCast + Copy> Rect<S> {
         }
     }
 }
+*/
+use core::convert::TryFrom;
+
+
+impl<S:Copy> Rect<S>{
+    pub fn inner_into<A:From<S>>(&self)->Rect<A>{
+        let x=self.x.inner_into();
+        let y=self.y.inner_into();
+
+        Rect{x,y}
+    }
+
+    pub fn inner_try_into<A:TryFrom<S>>(&self)->Result<Rect<A>,A::Error>{
+        let x=self.x.inner_try_into();
+        let y=self.y.inner_try_into();
+        match(x,y){
+            (Ok(x),Ok(y))=>{
+                Ok(Rect{x,y})
+            },
+            (Ok(_),Err(e))=>{
+                Err(e)
+            },
+            (Err(e),Ok(_))=>{
+                Err(e)
+            },
+            (Err(e1),Err(e2))=>{
+                Err(e1)
+            }
+        }
+    }
+}
+
 
 
 impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Rect<T>{

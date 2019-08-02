@@ -41,7 +41,7 @@ impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Range<T>{
 
 }
 
-use crate::num_traits::NumCast;
+//use crate::num_traits::NumCast;
 /*
 impl<T:BaseFloat> AsRef<Range<T>> for Range<NotNan<T>>{
     #[inline(always)]
@@ -81,7 +81,7 @@ impl<T:BaseFloat> Range<T>{
     }
 }
 */
-
+/*
 impl<S: NumCast + Copy> Range<S> {
     /// Component-wise casting to another type.
     #[inline(always)]
@@ -94,6 +94,38 @@ impl<S: NumCast + Copy> Range<S> {
             },
             _=>{
                 None
+            }
+        }
+    }
+
+}
+*/
+
+use core::convert::TryFrom;
+
+impl<S:Copy> Range<S>{
+    
+    pub fn inner_into<A:From<S>>(&self)->Range<A>{
+        let left=A::from(self.left);
+        let right=A::from(self.right);
+        Range{left,right}
+    }
+
+    pub fn inner_try_into<A:TryFrom<S>>(&self)->Result<Range<A>,A::Error>{
+        let left=A::try_from(self.left);
+        let right=A::try_from(self.right);
+        match (left,right){
+            (Ok(left),Ok(right))=>{
+                Ok(Range{left,right})
+            },
+            (Ok(_),Err(e))=>{
+                Err(e)
+            },
+            (Err(e),Ok(_))=>{
+                Err(e)
+            },
+            (Err(e1),Err(e2))=>{
+                Err(e1)
             }
         }
     }
