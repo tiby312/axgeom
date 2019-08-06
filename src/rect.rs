@@ -2,12 +2,12 @@
 use crate::range::Range;
 use crate::*;
 
-//use crate::num_traits::NumCast;
+use num_traits::NumCast;
 
-use cgmath::prelude::*;
-use cgmath::vec2;
-use cgmath::Vector2;
-use cgmath::BaseFloat;
+use core::convert::TryFrom;
+use ordered_float::NotNan;
+use num_traits::Float;
+use crate::vec2::vec2;
 
 ///An axis aligned rectangle. Stored as two Ranges. 
 ///It is a fully closed rectangle. Points exactly along the border of the rectangle are considered inside the rectangle. 
@@ -19,13 +19,12 @@ pub struct Rect<T>{
 }
 
 
-/*
 impl<S: NumCast + Copy> Rect<S> {
     /// Component-wise casting to another type.
     #[inline(always)]
-    pub fn cast<T: NumCast>(&self) -> Option<Rect<T>> {
-        let a=self.x.cast();
-        let b=self.y.cast();
+    pub fn inner_cast<T: NumCast>(&self) -> Option<Rect<T>> {
+        let a=self.x.inner_cast();
+        let b=self.y.inner_cast();
         match (a,b){
             (Some(x),Some(y))=>{
                 Some(Rect{x,y})
@@ -36,11 +35,19 @@ impl<S: NumCast + Copy> Rect<S> {
         }
     }
 }
-*/
-use core::convert::TryFrom;
+
+
+impl<N:Float> AsRef<Rect<N>> for Rect<NotNan<N>>{
+    #[inline(always)]
+    fn as_ref(&self)->&Rect<N>{
+        unsafe{&*((self as *const Self) as *const Rect<N>)}
+    }
+}
+
 
 
 impl<S:Copy> Rect<S>{
+    #[inline(always)]
     pub fn inner_into<A:From<S>>(&self)->Rect<A>{
         let x=self.x.inner_into();
         let y=self.y.inner_into();
@@ -48,6 +55,7 @@ impl<S:Copy> Rect<S>{
         Rect{x,y}
     }
 
+    #[inline(always)]
     pub fn inner_try_into<A:TryFrom<S>>(&self)->Result<Rect<A>,A::Error>{
         let x=self.x.inner_try_into();
         let y=self.y.inner_try_into();
@@ -61,7 +69,7 @@ impl<S:Copy> Rect<S>{
             (Err(e),Ok(_))=>{
                 Err(e)
             },
-            (Err(e1),Err(e2))=>{
+            (Err(e1),Err(_))=>{
                 Err(e1)
             }
         }
@@ -70,14 +78,37 @@ impl<S:Copy> Rect<S>{
 
 
 
+
 impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Rect<T>{
     ///Create a rectangle from a point and radius.
     #[inline(always)]
-    pub fn from_point(point:[T;2],radius:[T;2])->Rect<T>{
-        let x=Range::from_point(point[0],radius[0]);
-        let y=Range::from_point(point[1],radius[1]);
+    pub fn from_point(point:Vec2<T>,radius:Vec2<T>)->Rect<T>{
+        let x=Range::from_point(point.x,radius.x);
+        let y=Range::from_point(point.y,radius.y);
         Rect{x,y}
     }  
+}
+
+impl<T> Rect<T>{
+     ///Get the range of one axis.
+    #[inline(always)]
+    pub fn get_range(&self,axis:impl AxisTrait)->&Range<T>{
+        if axis.is_xaxis(){
+            &self.x
+        }else{
+            &self.y
+        }
+    }
+    
+    ///Get the mutable range of one axis.
+    #[inline(always)]
+    pub fn get_range_mut(&mut self,axis:impl AxisTrait)->&mut Range<T>{
+        if axis.is_xaxis(){
+            &mut self.x
+        }else{
+            &mut self.y
+        }
+    }
 }
 
 impl<T:Copy> Rect<T>{
@@ -99,34 +130,16 @@ impl<T:Copy> Rect<T>{
         ((f.x.left,f.x.right),(f.y.left,f.y.right))
     }
 
-    ///Get the range of one axis.
-    #[inline(always)]
-    pub fn get_range(&self,axis:impl AxisTrait)->&Range<T>{
-        if axis.is_xaxis(){
-            &self.x
-        }else{
-            &self.y
-        }
-    }
-    
-    ///Get the mutable range of one axis.
-    #[inline(always)]
-    pub fn get_range_mut(&mut self,axis:impl AxisTrait)->&mut Range<T>{
-        if axis.is_xaxis(){
-            &mut self.x
-        }else{
-            &mut self.y
-        }
-    }
+   
 }
 
 impl<T:PartialOrd+Copy> Rect<T>{
 
     ///Returns true if the point is contained in the the ranges of both axis.
     #[inline(always)]
-    pub fn contains_point(&self,a:[T;2])->bool{
-        self.get_range(XAXISS).contains(a[0]) &&
-        self.get_range(YAXISS).contains(a[1])
+    pub fn contains_point(&self,a:Vec2<T>)->bool{
+        self.x.contains(a.x) &&
+        self.y.contains(a.y)
     }
 }
 
@@ -145,11 +158,12 @@ impl<T:Copy+PartialOrd+core::ops::Sub<Output=T>+core::ops::Mul<Output=T>+core::o
 
     ///If the point is outisde the rectangle, returns the squared distance from a point to a rectangle.
     ///If the point is inside the rectangle, it will return None.
+    #[inline(always)]
     pub fn distance_squared_to_point(
         &self,
-        point: [T; 2],
+        point: Vec2<T>,
     ) -> Option<T> {
-        let (px, py) = (point[0], point[1]);
+        let (px, py) = (point.x, point.y);
 
         let ((a, b), (c, d)) = self.get();
 
@@ -172,8 +186,8 @@ impl<T:Copy+PartialOrd+core::ops::Sub<Output=T>+core::ops::Mul<Output=T>+core::o
 }
 
 impl<T:num_traits::Num+Copy> Rect<T>{
-
-    pub fn derive_center(&self) -> Vector2<T> {
+    #[inline(always)]
+    pub fn derive_center(&self) -> Vec2<T> {
         let two = T::one() + T::one();
         let ((a, b), (c, d)) = self.get();
         vec2(a + (b - a) / two, c + (d - c) / two)
@@ -233,13 +247,11 @@ impl<T:Ord+Copy> Rect<T>{
     #[inline(always)]
     pub fn contains_rect(&self,rect:&Rect<T>)->bool{
 
-        if !self.get_range(XAXISS).contains_range(rect.get_range(XAXISS)) {
-            return false;
+        if self.x.contains_range(&rect.x) && self.y.contains_range(&rect.y){
+            true
+        }else {
+            false
         }
-        if !self.get_range(YAXISS).contains_range(rect.get_range(YAXISS)) {
-            return false;
-        }
-        true
     }
 
     

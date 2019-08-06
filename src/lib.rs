@@ -7,10 +7,16 @@
 
 mod range;
 mod rect;
+mod vec2;
 
+
+pub use ordered_float;
+pub use num_traits;
+pub use self::vec2::Vec2;
 pub use self::range::Range;
 pub use self::rect::Rect;
-use cgmath::num_traits;
+pub use self::vec2::vec2;
+
 
 ///The x axis implementation of the AxisTrait
 #[derive(Copy,Clone)]

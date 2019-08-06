@@ -4,7 +4,11 @@
 ///The left value be <= the right value.
 ///There is no protection against "degenerate" Ranges where left>right.
 ///Unlike std::ops::Range, It is a fully closed range. Points exactly on the borders are considered inside the range.
-use cgmath::BaseFloat;
+
+
+use num_traits::NumCast;
+use ordered_float::NotNan;
+use num_traits::Float;
 
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
 #[must_use]
@@ -41,22 +45,16 @@ impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Range<T>{
 
 }
 
-//use crate::num_traits::NumCast;
-/*
-impl<T:BaseFloat> AsRef<Range<T>> for Range<NotNan<T>>{
+
+
+
+impl<N:Float> AsRef<Range<N>> for Range<NotNan<N>>{
     #[inline(always)]
-    fn as_ref(&self)->&Range<T>{
-       unsafe{&*( self as *const Range<NotNan<T>> as *const Range<T> )}
+    fn as_ref(&self)->&Range<N>{
+        unsafe{&*((self as *const Self) as *const Range<N>)}
     }
 }
 
-impl<T:BaseFloat> AsMut<Range<T>> for Range<NotNan<T>>{
-    #[inline(always)]
-    fn as_mut(&mut self)->&mut Range<T>{
-       unsafe{&mut *( self as *mut Range<NotNan<T>> as *mut Range<T> )}
-    }
-}
-*/
 
 /*
 ///Thrown if unable to convert range of floats to NotNan.
@@ -81,11 +79,11 @@ impl<T:BaseFloat> Range<T>{
     }
 }
 */
-/*
+
 impl<S: NumCast + Copy> Range<S> {
     /// Component-wise casting to another type.
     #[inline(always)]
-    pub fn cast<T: NumCast>(&self) -> Option<Range<T>> {
+    pub fn inner_cast<T: NumCast>(&self) -> Option<Range<T>> {
         let a=NumCast::from(self.left);
         let b=NumCast::from(self.right);
         match (a,b){
@@ -99,18 +97,20 @@ impl<S: NumCast + Copy> Range<S> {
     }
 
 }
-*/
+
 
 use core::convert::TryFrom;
 
 impl<S:Copy> Range<S>{
     
+    #[inline(always)]
     pub fn inner_into<A:From<S>>(&self)->Range<A>{
         let left=A::from(self.left);
         let right=A::from(self.right);
         Range{left,right}
     }
 
+    #[inline(always)]
     pub fn inner_try_into<A:TryFrom<S>>(&self)->Result<Range<A>,A::Error>{
         let left=A::try_from(self.left);
         let right=A::try_from(self.right);
@@ -124,7 +124,7 @@ impl<S:Copy> Range<S>{
             (Err(e),Ok(_))=>{
                 Err(e)
             },
-            (Err(e1),Err(e2))=>{
+            (Err(e1),Err(_))=>{
                 Err(e1)
             }
         }
