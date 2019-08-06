@@ -55,6 +55,12 @@ impl<N:Float> AsRef<Range<N>> for Range<NotNan<N>>{
     }
 }
 
+impl<N:Float> AsMut<Range<N>> for Range<NotNan<N>>{
+    #[inline(always)]
+    fn as_mut(&mut self)->&mut Range<N>{
+        unsafe{&mut *((self as *mut Self) as *mut Range<N>)}
+    }
+}
 
 /*
 ///Thrown if unable to convert range of floats to NotNan.

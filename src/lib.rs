@@ -70,7 +70,7 @@ pub trait AxisTrait:Sync+Send+Copy+Clone{
     }
 }
 
-
+/*
 ///A wrapper around an array that lets you extract the x and y components using the AxisTrait.
 pub struct AxisWrapRef<'a,T:'a>(pub &'a [T;2]);
 impl<'a,T:'a> AxisWrapRef<'a,T>{
@@ -83,5 +83,5 @@ impl<'a,T:'a> AxisWrapRef<'a,T>{
         }
     }
 }
-
+*/
 

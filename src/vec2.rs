@@ -1,7 +1,7 @@
 
 use core::ops::*;
 use ordered_float::NotNan;
-
+use crate::AxisTrait;
 
 use num_traits::float::Float;
 use num_traits::NumCast;
@@ -13,6 +13,10 @@ pub fn vec2<N>(x:N,y:N)->Vec2<N>{
 	Vec2{x,y}
 }
 
+#[inline(always)]
+pub fn vec2same<N:Copy>(a:N)->Vec2<N>{
+	Vec2{x:a,y:a}
+}
 
 
 
@@ -21,6 +25,7 @@ impl<N:Float> AsRef<Vec2<N>> for Vec2<NotNan<N>>{
 	fn as_ref(&self)->&Vec2<N>{
 		unsafe{&*((self as *const Self) as *const Vec2<N>)}
 	}
+
 }
 
 
@@ -40,14 +45,70 @@ impl<S:Mul<Output=S> + Add<Output=S> + Copy> Vec2<S>{
 	pub fn dot(&self,other:Vec2<S>)->S{
 		self.x*other.x+self.y*other.y
 	}
+}
+impl<S:Float> Vec2<S>{
 
 	#[inline(always)]
 	pub fn normalize_to(&self,mag:S)->Vec2<S>{
-		unimplemented!();
+		let l=self.magnitude2().sqrt();
+		(*self)*(mag/l)
 	}
 }
 
+
+// This is a simple macro named `say_hello`.
+
+#[macro_export]
+macro_rules! vec2_prim_cast {
+    // `()` indicates that the macro takes no argument.
+    ($l:expr,$tp:ty) => (
+    	vec2($l.x as $tp,$l.y as $tp)
+    )
+}
+
+#[macro_export]
+macro_rules! arr2_prim_cast {
+    // `()` indicates that the macro takes no argument.
+    ($l:expr,$tp:ty) => (
+    	[$l[0] as $tp,$l[1] as $tp]
+    )
+}
+
+
+
+
+
+#[test]
+fn test_prim_cast(){
+	let k=vec2(0.5f32,0.5);
+	let k=vec2_prim_cast!(k,f64);
+
+}
+
 impl<B> Vec2<B>{
+
+
+     ///Get the range of one axis.
+    #[inline(always)]
+    pub fn get_axis(&self,axis:impl AxisTrait)->&B{
+        if axis.is_xaxis(){
+            &self.x
+        }else{
+            &self.y
+        }
+    }
+    
+    ///Get the mutable range of one axis.
+    #[inline(always)]
+    pub fn get_axis_mut(&mut self,axis:impl AxisTrait)->&mut B{
+        if axis.is_xaxis(){
+            &mut self.x
+        }else{
+            &mut self.y
+        }
+    }
+
+
 
 	#[inline(always)]
 	pub fn inner_into<A:From<B>>(self)->Vec2<A>{
