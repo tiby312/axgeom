@@ -5,9 +5,8 @@ use crate::AxisTrait;
 use num_traits::float::Float;
 use core::convert::TryFrom;
 use num_traits::Zero;
-
 use primitive_from::PrimitiveFrom;
-use num_traits::AsPrimitive;
+
 
 
 
@@ -80,8 +79,8 @@ impl<S:Float> Vec2<S>{
 
 
 ///Cast an array of 2 elements of primitive type to another primitive type using "as" on each element.
-pub fn arr2_as<A:Copy + 'static,B:AsPrimitive<A>>(a:[B;2])->[A;2]{
-	[a[0].as_(),a[1].as_()]
+pub fn arr2_as<B:Copy,A:PrimitiveFrom<B>>(a:[B;2])->[A;2]{
+	[PrimitiveFrom::from(a[0]),PrimitiveFrom::from(a[1])]
 }
 
 impl<B:Copy> Vec2<B>{
@@ -90,10 +89,8 @@ impl<B:Copy> Vec2<B>{
 	}
 }
 
-
-
 impl<B> Vec2<B>{
-
+	
 
      ///Get the range of one axis.
     #[inline(always)]

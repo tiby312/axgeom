@@ -55,10 +55,7 @@ impl<N:Float> AsMut<Rect<N>> for Rect<NotNan<N>>{
 
 
 impl<S:Copy> Rect<S>{
-    #[inline(always)]
-    pub fn inner_as<B:PrimitiveFrom<S>>(&self)->Rect<B>{
-        Rect{x:self.x.inner_as(),y:self.y.inner_as()}
-    }
+    
 
     #[inline(always)]
     pub fn inner_into<A:From<S>>(&self)->Rect<A>{
@@ -103,6 +100,7 @@ impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Rect<T>{
 }
 
 impl<T> Rect<T>{
+    
      ///Get the range of one axis.
     #[inline(always)]
     pub fn get_range(&self,axis:impl AxisTrait)->&Range<T>{
@@ -125,6 +123,10 @@ impl<T> Rect<T>{
 }
 
 impl<T:Copy> Rect<T>{
+    #[inline(always)]
+    pub fn inner_as<B:PrimitiveFrom<T>>(&self)->Rect<B>{
+        Rect{x:self.x.inner_as(),y:self.y.inner_as()}
+    }
 
     ///(a,b) is the x component range.
     ///(c,d) is the y component range.

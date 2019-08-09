@@ -83,8 +83,8 @@ impl<S: NumCast + Copy> Range<S> {
 
 use core::convert::TryFrom;
 
+
 impl<S:Copy> Range<S>{
-    
     #[inline(always)]
     pub fn inner_as<B:PrimitiveFrom<S>>(&self)->Range<B>{
         Range{left:PrimitiveFrom::from(self.left),right:PrimitiveFrom::from(self.right)}
