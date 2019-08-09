@@ -16,6 +16,8 @@ pub use self::vec2::Vec2;
 pub use self::range::Range;
 pub use self::rect::Rect;
 pub use self::vec2::vec2;
+pub use self::vec2::vec2same;
+pub use self::vec2::arr2_as;
 
 
 ///The x axis implementation of the AxisTrait

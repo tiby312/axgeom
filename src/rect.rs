@@ -1,13 +1,11 @@
 
 use crate::range::Range;
 use crate::*;
-
-use num_traits::NumCast;
-
 use core::convert::TryFrom;
 use ordered_float::NotNan;
 use num_traits::Float;
 use crate::vec2::vec2;
+use primitive_from::PrimitiveFrom;
 
 ///An axis aligned rectangle. Stored as two Ranges. 
 ///It is a fully closed rectangle. Points exactly along the border of the rectangle are considered inside the rectangle. 
@@ -19,6 +17,9 @@ pub struct Rect<T>{
 }
 
 
+
+
+/*
 impl<S: NumCast + Copy> Rect<S> {
     /// Component-wise casting to another type.
     #[inline(always)]
@@ -35,6 +36,7 @@ impl<S: NumCast + Copy> Rect<S> {
         }
     }
 }
+*/
 
 
 impl<N:Float> AsRef<Rect<N>> for Rect<NotNan<N>>{
@@ -53,6 +55,11 @@ impl<N:Float> AsMut<Rect<N>> for Rect<NotNan<N>>{
 
 
 impl<S:Copy> Rect<S>{
+    #[inline(always)]
+    pub fn inner_as<B:PrimitiveFrom<S>>(&self)->Rect<B>{
+        Rect{x:self.x.inner_as(),y:self.y.inner_as()}
+    }
+
     #[inline(always)]
     pub fn inner_into<A:From<S>>(&self)->Rect<A>{
         let x=self.x.inner_into();
@@ -135,8 +142,6 @@ impl<T:Copy> Rect<T>{
         let f=self;
         ((f.x.left,f.x.right),(f.y.left,f.y.right))
     }
-
-   
 }
 
 impl<T:PartialOrd+Copy> Rect<T>{

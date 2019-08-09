@@ -2,17 +2,22 @@
 use core::ops::*;
 use ordered_float::NotNan;
 use crate::AxisTrait;
-
 use num_traits::float::Float;
-use num_traits::NumCast;
 use core::convert::TryFrom;
 use num_traits::Zero;
 
+use primitive_from::PrimitiveFrom;
+use num_traits::AsPrimitive;
+
+
+
+///Convenience function to create a vector.
 #[inline(always)]
 pub fn vec2<N>(x:N,y:N)->Vec2<N>{
 	Vec2{x,y}
 }
 
+///Convenience function to create a vector where both component are the same.
 #[inline(always)]
 pub fn vec2same<N:Copy>(a:N)->Vec2<N>{
 	Vec2{x:a,y:a}
@@ -28,12 +33,21 @@ impl<N:Float> AsRef<Vec2<N>> for Vec2<NotNan<N>>{
 
 }
 
+impl<N:Float> AsMut<Vec2<N>> for Vec2<NotNan<N>>{
+	#[inline(always)]
+	fn as_mut(&mut self)->&mut Vec2<N>{
+		unsafe{&mut *((self as *mut Self) as *mut Vec2<N>)}
+	}
 
+}
+
+///A 2D vector.
 #[derive(Copy,Clone,Debug,PartialEq,Eq,Hash)]
 pub struct Vec2<N>{
 	pub x:N,
 	pub y:N
 }
+
 
 
 impl<S:Mul<Output=S> + Add<Output=S> + Copy> Vec2<S>{
@@ -53,37 +67,30 @@ impl<S:Float> Vec2<S>{
 		let l=self.magnitude2().sqrt();
 		(*self)*(mag/l)
 	}
-}
 
-
-// This is a simple macro named `say_hello`.
-
-#[macro_export]
-macro_rules! vec2_prim_cast {
-    // `()` indicates that the macro takes no argument.
-    ($l:expr,$tp:ty) => (
-    	vec2($l.x as $tp,$l.y as $tp)
-    )
-}
-
-#[macro_export]
-macro_rules! arr2_prim_cast {
-    // `()` indicates that the macro takes no argument.
-    ($l:expr,$tp:ty) => (
-    	[$l[0] as $tp,$l[1] as $tp]
-    )
+	#[inline(always)]
+	pub fn magnitude(&self)->S{
+		self.magnitude2().sqrt()
+	}
 }
 
 
 
 
 
-#[test]
-fn test_prim_cast(){
-	let k=vec2(0.5f32,0.5);
-	let k=vec2_prim_cast!(k,f64);
 
+///Cast an array of 2 elements of primitive type to another primitive type using "as" on each element.
+pub fn arr2_as<A:Copy + 'static,B:AsPrimitive<A>>(a:[B;2])->[A;2]{
+	[a[0].as_(),a[1].as_()]
 }
+
+impl<B:Copy> Vec2<B>{
+	pub fn inner_as<A:PrimitiveFrom<B>>(&self)->Vec2<A>{
+		vec2(PrimitiveFrom::from(self.x),PrimitiveFrom::from(self.y))
+	}
+}
+
+
 
 impl<B> Vec2<B>{
 
@@ -138,7 +145,7 @@ impl<B> Vec2<B>{
 	}
 }
 
-
+/*
 impl<S: NumCast + Copy> Vec2<S> {
     /// Component-wise casting to another type.
     #[inline]
@@ -155,7 +162,7 @@ impl<S: NumCast + Copy> Vec2<S> {
     	}
     }
 }
-
+*/
 
 
 impl<S:Add<Output=S> + Copy> Add<Self> for Vec2<S>{

@@ -1,15 +1,12 @@
-
-///A 1d range. Internally represented as start and end. (not start and length)
-///This means that subdivision does not result in any floating point calculations.
-///The left value be <= the right value.
-///There is no protection against "degenerate" Ranges where left>right.
-///Unlike std::ops::Range, It is a fully closed range. Points exactly on the borders are considered inside the range.
-
-
-use num_traits::NumCast;
 use ordered_float::NotNan;
 use num_traits::Float;
-
+use primitive_from::PrimitiveFrom;
+///A 1d range. Internally represented as start and end. (not start and length)
+///This means that subdivision does not result in any floating point calculations.
+///The left value must be <= the right value.
+///There is no protection against "degenerate" Ranges where left>right.
+///A point is in the range if it is in the interval:[left,right)
+///Unlike std::ops::Range, It is a fully closed range. Points exactly on the borders are considered inside the range.
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
 #[must_use]
 pub struct Range<T>{
@@ -18,12 +15,16 @@ pub struct Range<T>{
 }
 
 
+
+
+
+
 impl<T:Copy+PartialOrd> Range<T>{
 
     ///Returns true if the point is inside of the range or on top of.
     #[inline(always)]
     pub fn contains(&self, pos: T) -> bool {
-        pos>=self.left&&pos<self.right
+        self.left<=pos && pos<self.right
     }
 }
 
@@ -41,8 +42,6 @@ impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Range<T>{
         self.left=self.left-radius;
         self
     }
-
-
 }
 
 
@@ -63,29 +62,6 @@ impl<N:Float> AsMut<Range<N>> for Range<NotNan<N>>{
 }
 
 /*
-///Thrown if unable to convert range of floats to NotNan.
-#[derive(Debug)]
-pub struct RangeNanErr;
-
-impl<T:BaseFloat> Range<T>{
-    ///Convert a range of floats to a rectangle of NotNan floats.
-    #[inline(always)]
-    pub fn into_notnan(self)->Result<Range<NotNan<T>>,RangeNanErr>{
-
-        let a=NotNan::new(self.left);
-        let b=NotNan::new(self.right);
-        match (a,b){
-            (Ok(left),Ok(right))=>{
-                Ok(Range{left,right})
-            },
-            _=>{
-                Err(RangeNanErr)
-            }
-        }
-    }
-}
-*/
-
 impl<S: NumCast + Copy> Range<S> {
     /// Component-wise casting to another type.
     #[inline(always)]
@@ -103,12 +79,17 @@ impl<S: NumCast + Copy> Range<S> {
     }
 
 }
-
+*/
 
 use core::convert::TryFrom;
 
 impl<S:Copy> Range<S>{
     
+    #[inline(always)]
+    pub fn inner_as<B:PrimitiveFrom<S>>(&self)->Range<B>{
+        Range{left:PrimitiveFrom::from(self.left),right:PrimitiveFrom::from(self.right)}
+    }
+
     #[inline(always)]
     pub fn inner_into<A:From<S>>(&self)->Range<A>{
         let left=A::from(self.left);
@@ -138,15 +119,6 @@ impl<S:Copy> Range<S>{
 }
 
 
-/*
-impl<T:BaseFloat> Range<NotNan<T>>{
-    ///Convert a range of NotNan floats to primitive floats.
-    #[inline(always)]
-    pub fn into_inner(self)->Range<T>{
-        Range{left:self.left.into_inner(),right:self.right.into_inner()}
-    }
-}
-*/
 
 
 impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Range<T>{
@@ -162,6 +134,7 @@ impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Range<T>{
 
 impl<T:Copy+Ord> Range<T>{
 
+    #[must_use]
     #[inline(always)]
     pub fn is_valid(&self)->bool{
         self.left<=self.right
@@ -193,8 +166,6 @@ impl<T:Copy+Ord> Range<T>{
         }
     }
 
-
-
     ///Returns true if self contains the specified range.
     #[inline(always)]
     pub fn contains_range(&self, val: &Range<T>) -> bool {
@@ -217,7 +188,6 @@ impl<T:Copy+Ord> Range<T>{
     ///Returns true if two ranges intersect.
     #[inline(always)]
     pub fn intersects(&self, val: &Range<T>) -> bool {
-        //TODO double check this?
         self.contains(val.left) || val.contains(self.left)
     }
 }
