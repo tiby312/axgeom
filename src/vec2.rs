@@ -12,7 +12,7 @@ use primitive_from::PrimitiveFrom;
 
 ///Convenience function to create a vector.
 #[inline(always)]
-pub fn vec2<N>(x:N,y:N)->Vec2<N>{
+pub const fn vec2<N>(x:N,y:N)->Vec2<N>{
 	Vec2{x,y}
 }
 

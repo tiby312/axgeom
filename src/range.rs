@@ -20,6 +20,20 @@ pub struct Range<T>{
 
 
 impl<T:Copy+PartialOrd> Range<T>{
+    ///If the pos is to the left of the range, return less.
+    ///If the pos is to the right of the range, return greater.
+    ///else, return equal.
+    #[inline(always)]
+    pub fn left_or_right_or_contain(&self,pos:&T)->core::cmp::Ordering{
+        
+        if *pos<self.left{
+            core::cmp::Ordering::Less
+        }else if *pos>self.right{
+            core::cmp::Ordering::Greater
+        }else{
+            core::cmp::Ordering::Equal
+        }
+    }
 
     ///Returns true if the point is inside of the range or on top of.
     #[inline(always)]
@@ -139,21 +153,7 @@ impl<T:Copy+Ord> Range<T>{
     pub fn is_valid(&self)->bool{
         self.left<=self.right
     }
-    ///If the pos is to the left of the range, return less.
-    ///If the pos is to the right of the range, return greater.
-    ///If the pos intersects with the range, return equal.
-    #[inline(always)]
-    pub fn left_or_right_or_contain(&self,pos:&T)->core::cmp::Ordering{
-        
-        if *pos<self.left{
-            core::cmp::Ordering::Less
-        }else if *pos>self.right{
-            core::cmp::Ordering::Greater
-        }else{
-            core::cmp::Ordering::Equal
-        }
-    }
-
+   
     #[inline(always)]
     pub fn grow_to_fit(&mut self,b:&Range<T>){
         
