@@ -16,29 +16,6 @@ pub struct Rect<T>{
     pub y:Range<T>
 }
 
-
-
-
-/*
-impl<S: NumCast + Copy> Rect<S> {
-    /// Component-wise casting to another type.
-    #[inline(always)]
-    pub fn inner_cast<T: NumCast>(&self) -> Option<Rect<T>> {
-        let a=self.x.inner_cast();
-        let b=self.y.inner_cast();
-        match (a,b){
-            (Some(x),Some(y))=>{
-                Some(Rect{x,y})
-            },
-            _=>{
-                None
-            }
-        }
-    }
-}
-*/
-
-
 impl<N:Float> AsRef<Rect<N>> for Rect<NotNan<N>>{
     #[inline(always)]
     fn as_ref(&self)->&Rect<N>{
@@ -207,8 +184,9 @@ impl<T:num_traits::Num+Copy> Rect<T>{
     }
 }
 
-impl<T:Ord+Copy> Rect<T>{
 
+impl<T:PartialOrd+Copy> Rect<T>{
+    
     ///Returns true if two rectangles has the same values.
     #[inline(always)]
     pub fn equals(&self,a:&Rect<T>)->bool{
@@ -246,7 +224,8 @@ impl<T:Ord+Copy> Rect<T>{
         }else{
              (Rect{x:carry_thru,y:l},Rect{x:carry_thru,y:r})
         }
-    } 
+    }    
+    
     
     ///Returns true if the rectangle's ranges are not degenerate.
     #[inline(always)]
@@ -267,7 +246,7 @@ impl<T:Ord+Copy> Rect<T>{
         }
     }
 
-    
+
     ///Grow the rectangle to fit the specified rectangle by replacing values
     ///with the specified rectangle. No floating point computations.
     #[inline(always)]
@@ -299,6 +278,11 @@ impl<T:Ord+Copy> Rect<T>{
             false
         }
     }
+
+}
+
+
+impl<T:Ord+Copy> Rect<T>{
 
     ///Get an intersecting rectangle.
     ///No floating point calculations as the new rectangle is made up of

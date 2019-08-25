@@ -15,10 +15,6 @@ pub struct Range<T>{
 }
 
 
-
-
-
-
 impl<T:Copy+PartialOrd> Range<T>{
     ///If the pos is to the left of the range, return less.
     ///If the pos is to the right of the range, return greater.
@@ -39,6 +35,38 @@ impl<T:Copy+PartialOrd> Range<T>{
     #[inline(always)]
     pub fn contains(&self, pos: T) -> bool {
         self.left<=pos && pos<=self.right  //TODO should pos be strictly less than right???
+    }
+
+
+    #[must_use]
+    #[inline(always)]
+    pub fn is_valid(&self)->bool{
+        self.left<=self.right
+    }
+   
+    #[inline(always)]
+    pub fn grow_to_fit(&mut self,b:&Range<T>){
+        
+        let a=self;  
+        if b.left<a.left{
+            a.left=b.left;
+        }
+        if b.right>a.right{
+            a.right=b.right;
+        }
+    }
+
+    ///Returns true if self contains the specified range.
+    #[inline(always)]
+    pub fn contains_range(&self, val: &Range<T>) -> bool {
+        self.contains(val.left) && self.contains(val.right)
+    }
+
+
+    ///Returns true if two ranges intersect.
+    #[inline(always)]
+    pub fn intersects(&self, val: &Range<T>) -> bool {
+        self.contains(val.left) || val.contains(self.left)
     }
 }
 
@@ -148,30 +176,6 @@ impl<T:Copy+core::ops::Sub<Output=T>+core::ops::Add<Output=T>> Range<T>{
 
 impl<T:Copy+Ord> Range<T>{
 
-    #[must_use]
-    #[inline(always)]
-    pub fn is_valid(&self)->bool{
-        self.left<=self.right
-    }
-   
-    #[inline(always)]
-    pub fn grow_to_fit(&mut self,b:&Range<T>){
-        
-        let a=self;  
-        if b.left<a.left{
-            a.left=b.left;
-        }
-        if b.right>a.right{
-            a.right=b.right;
-        }
-    }
-
-    ///Returns true if self contains the specified range.
-    #[inline(always)]
-    pub fn contains_range(&self, val: &Range<T>) -> bool {
-        self.contains(val.left) && self.contains(val.right)
-    }
-
     ///Creates a range that represents the intersection range.
     #[inline(always)]
     pub fn get_intersection(&self,val:&Range<T>)->Option<Range<T>>{
@@ -183,11 +187,5 @@ impl<T:Copy+Ord> Range<T>{
         }else{
             Some(Range{left:a,right:b})
         }
-    }
-
-    ///Returns true if two ranges intersect.
-    #[inline(always)]
-    pub fn intersects(&self, val: &Range<T>) -> bool {
-        self.contains(val.left) || val.contains(self.left)
     }
 }
