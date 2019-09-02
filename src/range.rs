@@ -14,7 +14,6 @@ pub struct Range<T>{
     pub right:T
 }
 
-
 impl<T:Copy+PartialOrd> Range<T>{
     ///If the pos is to the left of the range, return less.
     ///If the pos is to the right of the range, return greater.
