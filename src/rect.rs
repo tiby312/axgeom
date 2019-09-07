@@ -187,20 +187,13 @@ impl<T:num_traits::Num+Copy> Rect<T>{
 
 impl<T:PartialOrd+Copy> Rect<T>{
     
-    ///Returns true if two rectangles has the same values.
-    #[inline(always)]
-    pub fn equals(&self,a:&Rect<T>)->bool{
-        //TODO optimize
-        let ((a1,b1),(c1,d1))=self.get();
-        let ((a2,b2),(c2,d2))=a.get();
-
-        (a1==a2)&&(b1==b2)&&(c1==c2)&&(d1==d2)
-    }
-    
     ///Subdivides the rectangle.
-    ///No floating point calculations are done (so no precision loss/rounding issues).
+    ///No floating point calculations are done.
+    ///Important to note that a point that was in the original rectangle,
+    ///could actually be inside both subdivded rectangles.
+    ///This is because the ranges are inclusive on both sides [left,right].
     #[inline(always)]
-    pub fn subdivide<A:AxisTrait>(&self, axis:A,mut divider: T) -> (Rect<T>,Rect<T>) {
+    pub fn subdivide<A:AxisTrait>(&self, axis:A,divider: T) -> (Rect<T>,Rect<T>) {
         
         let ca=axis;
         let na=axis.next();
@@ -208,17 +201,8 @@ impl<T:PartialOrd+Copy> Rect<T>{
         let rel=self.get_range(ca);
         let carry_thru=*self.get_range(na);
 
-        
-        if divider<rel.left{
-            divider=rel.left;
-        }else if divider>rel.right{
-            divider=rel.right;
-        }
+        let (l,r)=rel.subdivide(divider);
   
-        let l=Range{left:rel.left,right:divider};
-        let r=Range{left:divider,right:rel.right};
-
-
         if axis.is_xaxis(){
             (Rect{x:l,y:carry_thru},Rect{x:r,y:carry_thru})
         }else{

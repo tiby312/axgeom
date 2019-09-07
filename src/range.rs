@@ -1,12 +1,18 @@
 use ordered_float::NotNan;
 use num_traits::Float;
 use primitive_from::PrimitiveFrom;
-///A 1d range. Internally represented as start and end. (not start and length)
+use core::convert::TryFrom;
+
+///A 1D range. Internally represented as start and end. (as opposed to a start and length)
 ///This means that subdivision does not result in any floating point calculations.
 ///The left value must be <= the right value.
 ///There is no protection against "degenerate" Ranges where left>right.
-///A point is in the range if it is in the interval:[left,right)
-///Unlike std::ops::Range, It is a fully closed range. Points exactly on the borders are considered inside the range.
+///Behavior of any of the functions with degenrate Ranges is unspecified.
+///
+///
+///A point is consindered inside of a range if the point is in [left,right).
+///
+///
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
 #[must_use]
 pub struct Range<T>{
@@ -14,6 +20,12 @@ pub struct Range<T>{
     pub right:T
 }
 
+impl<T> Range<T>{
+    #[inline(always)]
+    pub fn new(left:T,right:T)->Range<T>{
+        Range{left,right}
+    }
+}
 impl<T:Copy+PartialOrd> Range<T>{
     ///If the pos is to the left of the range, return less.
     ///If the pos is to the right of the range, return greater.
@@ -23,7 +35,7 @@ impl<T:Copy+PartialOrd> Range<T>{
         
         if *pos<self.left{
             core::cmp::Ordering::Less
-        }else if *pos>self.right{
+        }else if *pos>=self.right{
             core::cmp::Ordering::Greater
         }else{
             core::cmp::Ordering::Equal
@@ -33,9 +45,21 @@ impl<T:Copy+PartialOrd> Range<T>{
     ///Returns true if the point is inside of the range or on top of.
     #[inline(always)]
     pub fn contains(&self, pos: T) -> bool {
-        self.left<=pos && pos<=self.right  //TODO should pos be strictly less than right???
+        self.left<=pos && pos<self.right
     }
 
+    ///Subdivides the range.
+    ///No floating point calculations are done.
+    #[inline(always)]
+    pub fn subdivide(&self,divider: T) -> (Range<T>,Range<T>) {
+        
+        debug_assert!(self.left<=divider);
+        debug_assert!(divider<self.right);
+  
+        let l=Range{left:self.left,right:divider};
+        let r=Range{left:divider,right:self.right};
+        (l,r)
+    }
 
     #[must_use]
     #[inline(always)]
@@ -58,7 +82,8 @@ impl<T:Copy+PartialOrd> Range<T>{
     ///Returns true if self contains the specified range.
     #[inline(always)]
     pub fn contains_range(&self, val: &Range<T>) -> bool {
-        self.contains(val.left) && self.contains(val.right)
+        self.left<=val.left && val.right<=self.right
+        //self.contains(val.left) && self.contains(val.right)
     }
 
 
@@ -69,6 +94,17 @@ impl<T:Copy+PartialOrd> Range<T>{
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_range(){
+        let a=Range::new(0,5);
+        let b=Range::new(0,5);
+        assert!(a.contains_range(&b))
+    }
+}
 impl<T:Copy+core::ops::Sub<Output=T>> Range<T>{
     #[inline(always)]
     pub fn distance(&self)->T{
@@ -101,29 +137,6 @@ impl<N:Float> AsMut<Range<N>> for Range<NotNan<N>>{
         unsafe{&mut *((self as *mut Self) as *mut Range<N>)}
     }
 }
-
-/*
-impl<S: NumCast + Copy> Range<S> {
-    /// Component-wise casting to another type.
-    #[inline(always)]
-    pub fn inner_cast<T: NumCast>(&self) -> Option<Range<T>> {
-        let a=NumCast::from(self.left);
-        let b=NumCast::from(self.right);
-        match (a,b){
-            (Some(left),Some(right))=>{
-                Some(Range{left,right})
-            },
-            _=>{
-                None
-            }
-        }
-    }
-
-}
-*/
-
-use core::convert::TryFrom;
-
 
 impl<S:Copy> Range<S>{
     #[inline(always)]
