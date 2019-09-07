@@ -12,6 +12,8 @@ mod vec2;
 
 pub use ordered_float;
 pub use num_traits;
+pub use primitive_from;
+
 pub use self::vec2::Vec2;
 pub use self::range::Range;
 pub use self::rect::Rect;
