@@ -96,9 +96,7 @@ impl<T: Copy> Rect<T> {
     ///(c,d) is the y component range.
     #[inline(always)]
     pub fn new(a: T, b: T, c: T, d: T) -> Rect<T> {
-        let x = Range { left: a, right: b };
-        let y = Range { left: c, right: d };
-        Rect { x, y }
+        Rect { x: Range { left: a, right: b }, y: Range { left: c, right: d } }
     }
 
     ///(a,b) is the x component range.
@@ -218,11 +216,7 @@ impl<T: PartialOrd + Copy> Rect<T> {
     ///Returns true if the specified rect is inside of this rect.
     #[inline(always)]
     pub fn contains_rect(&self, rect: &Rect<T>) -> bool {
-        if self.x.contains_range(&rect.x) && self.y.contains_range(&rect.y) {
-            true
-        } else {
-            false
-        }
+        self.x.contains_range(&rect.x) && self.y.contains_range(&rect.y)
     }
 
     ///Grow the rectangle to fit the specified rectangle by replacing values
@@ -246,11 +240,7 @@ impl<T: PartialOrd + Copy> Rect<T> {
 
     #[inline(always)]
     pub fn intersects_rect(&self, other: &Rect<T>) -> bool {
-        if other.x.intersects(&self.x) && other.y.intersects(&self.y) {
-            true
-        } else {
-            false
-        }
+        other.x.intersects(&self.x) && other.y.intersects(&self.y)
     }
 }
 
