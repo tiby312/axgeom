@@ -170,9 +170,6 @@ impl<T:Copy+PartialOrd+core::ops::Sub<Output=T>+core::ops::Mul<Output=T>+core::o
             Some(dis)
         }
     }
-
-
-
 }
 
 impl<T:num_traits::Num+Copy> Rect<T>{

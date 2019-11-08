@@ -3,6 +3,9 @@ use num_traits::Float;
 use primitive_from::PrimitiveFrom;
 use core::convert::TryFrom;
 
+
+///TODO use this:
+///https://doc.rust-lang.org/std/ops/struct.Range.html
 ///A 1D range. Internally represented as start and end. (as opposed to a start and length)
 ///This means that subdivision does not result in any floating point calculations.
 ///The left value must be <= the right value.
@@ -83,7 +86,6 @@ impl<T:Copy+PartialOrd> Range<T>{
     #[inline(always)]
     pub fn contains_range(&self, val: &Range<T>) -> bool {
         self.left<=val.left && val.right<=self.right
-        //self.contains(val.left) && self.contains(val.right)
     }
 
 
