@@ -4,8 +4,9 @@ use primitive_from::PrimitiveFrom;
 use core::convert::TryFrom;
 
 
-///TODO use this:
-///https://doc.rust-lang.org/std/ops/struct.Range.html
+//TODO use this:
+//https://doc.rust-lang.org/std/ops/struct.Range.html
+
 ///A 1D range. Internally represented as start and end. (as opposed to a start and length)
 ///This means that subdivision does not result in any floating point calculations.
 ///The left value must be <= the right value.
@@ -13,8 +14,7 @@ use core::convert::TryFrom;
 ///Behavior of any of the functions with degenrate Ranges is unspecified.
 ///
 ///
-///A point is consindered inside of a range if the point is in [left,right).
-///
+///A point is consindered inside of a range if the point is in [left,right), a semi-open interval.
 ///
 #[derive(Copy,Clone,Debug,Eq,PartialEq)]
 #[must_use]

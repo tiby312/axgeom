@@ -73,19 +73,3 @@ pub trait AxisTrait:Sync+Send+Copy+Clone{
         false
     }
 }
-
-/*
-///A wrapper around an array that lets you extract the x and y components using the AxisTrait.
-pub struct AxisWrapRef<'a,T:'a>(pub &'a [T;2]);
-impl<'a,T:'a> AxisWrapRef<'a,T>{
-    #[inline(always)]
-    pub fn get<A:AxisTrait>(&self,axis:A)->&'a T{
-        if axis.is_xaxis(){
-            &self.0[0]
-        }else{
-            &self.0[1]
-        }
-    }
-}
-*/
-
