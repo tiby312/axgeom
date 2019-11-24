@@ -39,7 +39,82 @@ pub struct Vec2<N> {
     pub y: N,
 }
 
-impl<S: Mul<Output = S> + Add<Output = S> + Copy> Vec2<S> {
+
+#[inline(always)]
+pub fn absdiff<T>(x: T, y: T) -> T
+where
+    T: Sub<Output = T> + PartialOrd,
+{
+    if x < y {
+        y - x
+    } else {
+        x - y
+    }
+}
+
+
+fn gen_abs<S:Neg<Output=S>+PartialOrd+Zero>(num:S)->S{
+    if num<S::zero(){
+        -num
+    }else{
+        num
+    }
+}
+impl<S:Copy + Neg<Output=S>+PartialOrd+Zero> Vec2<S>{
+
+    #[inline(always)]
+    pub fn abs(&self)->Vec2<S>{
+        vec2(gen_abs(self.x),gen_abs(self.y))   
+    }   
+    #[inline(always)]
+    pub fn rotate_90deg_right(&self)->Vec2<S>{
+        vec2(-self.y,self.x)
+    }
+    #[inline(always)]
+    pub fn rotate_90deg_left(&self)->Vec2<S>{
+        vec2(self.y,self.x)
+    }
+
+    #[inline(always)]
+    pub fn split_into_components(&self)->[Vec2<S>;2]{
+        [vec2(self.x,S::zero()),vec2(S::zero(),self.y)]
+    }  
+ 
+}
+
+impl<S:Add<Output=S> + Sub<Output=S>+PartialOrd + Copy> Vec2<S>{
+    #[inline(always)]
+    pub fn manhattan_dis(&self,other:Vec2<S>)->S{
+        (absdiff(self.x, other.x) + absdiff(self.y, other.y))
+    }
+    
+}
+
+
+#[test]
+fn test_rotate(){
+
+    let b=vec2(1,1).rotate_90deg_right();
+    assert_eq!(b,vec2(-1,1));
+
+    let b=vec2(1,0).rotate_90deg_right();
+    assert_eq!(b,vec2(0,1));
+
+}
+
+
+
+impl<S: Mul<Output = S>+ Div<Output=S>+ Add<Output = S> + Copy> Vec2<S> {
+    #[inline(always)]
+    pub fn scale(&self,other:Vec2<S>)->Vec2<S>{
+        vec2(self.x*other.x,self.y*other.y)
+    }
+
+    #[inline(always)]
+    pub fn inv_scale(&self,other:Vec2<S>)->Vec2<S>{
+        vec2(self.x/other.x,self.y/other.y)
+    }
+
     #[inline(always)]
     pub fn magnitude2(&self) -> S {
         self.x * self.x + self.y * self.y
@@ -50,6 +125,15 @@ impl<S: Mul<Output = S> + Add<Output = S> + Copy> Vec2<S> {
     }
 }
 impl<S: Float> Vec2<S> {
+    #[inline(always)]
+    pub fn truncate_at(&self, mag: S) -> Vec2<S> {
+        if self.magnitude()>mag{
+            self.normalize_to(mag)
+        }else{
+            *self
+        }
+    }
+
     #[inline(always)]
     pub fn normalize_to(&self, mag: S) -> Vec2<S> {
         let l = self.magnitude2().sqrt();
@@ -74,6 +158,7 @@ impl<B: Copy> Vec2<B> {
 }
 
 impl<B> Vec2<B> {
+
     ///Get the range of one axis.
     #[inline(always)]
     pub fn get_axis(&self, axis: impl AxisTrait) -> &B {

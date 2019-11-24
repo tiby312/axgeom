@@ -85,6 +85,11 @@ impl<T> Rect<T> {
 
 impl<T: Copy> Rect<T> {
     #[inline(always)]
+    pub fn top_left(&self)->Vec2<T>{
+        vec2(self.x.left,self.y.left)
+    }
+
+    #[inline(always)]
     pub fn inner_as<B: PrimitiveFrom<T>>(&self) -> Rect<B> {
         Rect {
             x: self.x.inner_as(),
