@@ -199,24 +199,6 @@ impl<B> Vec2<B> {
     }
 }
 
-/*
-impl<S: NumCast + Copy> Vec2<S> {
-    /// Component-wise casting to another type.
-    #[inline]
-    pub fn cast<T: NumCast>(&self) -> Option<Vec2<S>> {
-        let a=NumCast::from(self.x);
-        let b=NumCast::from(self.y);
-        match(a,b){
-            (Some(x),Some(y))=>{
-                Some(Vec2{x,y})
-            },
-            _=>{
-                None
-            }
-        }
-    }
-}
-*/
 
 impl<S: Add<Output = S> + Copy> Add<Self> for Vec2<S> {
     type Output = Self;

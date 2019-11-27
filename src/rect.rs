@@ -85,8 +85,8 @@ impl<T> Rect<T> {
 
 impl<T: Copy> Rect<T> {
     #[inline(always)]
-    pub fn top_left(&self)->Vec2<T>{
-        vec2(self.x.left,self.y.left)
+    pub fn top_start(&self)->Vec2<T>{
+        vec2(self.x.start,self.y.start)
     }
 
     #[inline(always)]
@@ -101,7 +101,7 @@ impl<T: Copy> Rect<T> {
     ///(c,d) is the y component range.
     #[inline(always)]
     pub fn new(a: T, b: T, c: T, d: T) -> Rect<T> {
-        Rect { x: Range { left: a, right: b }, y: Range { left: c, right: d } }
+        Rect { x: Range { start: a, end: b }, y: Range { start: c, end: d } }
     }
 
     ///(a,b) is the x component range.
@@ -109,7 +109,7 @@ impl<T: Copy> Rect<T> {
     #[inline(always)]
     pub fn get(&self) -> ((T, T), (T, T)) {
         let f = self;
-        ((f.x.left, f.x.right), (f.y.left, f.y.right))
+        ((f.x.start, f.x.end), (f.y.start, f.y.end))
     }
 }
 
@@ -176,7 +176,7 @@ impl<T: PartialOrd + Copy> Rect<T> {
     ///No floating point calculations are done.
     ///Important to note that a point that was in the original rectangle,
     ///could actually be inside both subdivded rectangles.
-    ///This is because the ranges are inclusive on both sides [left,right].
+    ///This is because the ranges are inclusive on both sides [start,end].
     #[inline(always)]
     pub fn subdivide<A: AxisTrait>(&self, axis: A, divider: T) -> (Rect<T>, Rect<T>) {
         let ca = axis;
@@ -261,12 +261,12 @@ impl<T: Ord + Copy> Rect<T> {
                 let xf = self.get_range($axis);
 
                 let range = Range {
-                    left: xr.left.max(xf.left),
-                    right: xr.right.min(xf.right),
+                    start: xr.start.max(xf.start),
+                    end: xr.end.min(xf.end),
                 };
 
                 //TODO figure out inequality
-                if range.right < range.left {
+                if range.end < range.start {
                     return None;
                 }
                 range

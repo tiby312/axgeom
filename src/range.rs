@@ -8,35 +8,36 @@ use primitive_from::PrimitiveFrom;
 
 ///A 1D range. Internally represented as start and end. (as opposed to a start and length)
 ///This means that subdivision does not result in any floating point calculations.
-///The left value must be <= the right value.
-///There is no protection against "degenerate" Ranges where left>right.
+///The start value must be <= the end value.
+///There is no protection against "degenerate" Ranges where start>end.
 ///Behavior of any of the functions with degenrate Ranges is unspecified.
 ///
 ///
-///A point is consindered inside of a range if the point is in [left,right), a semi-open interval.
+///A point is consindered inside of a range if the point is in [start,end), a semi-open interval.
 ///
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[must_use]
 pub struct Range<T> {
-    pub left: T,
-    pub right: T,
+    pub start: T,
+    pub end: T,
 }
 
 impl<T> Range<T> {
     #[inline(always)]
-    pub fn new(left: T, right: T) -> Range<T> {
-        Range { left, right }
+    pub fn new(start: T, end: T) -> Range<T> {
+        Range { start, end }
     }
 }
 impl<T: Copy + PartialOrd> Range<T> {
-    ///If the pos is to the left of the range, return less.
-    ///If the pos is to the right of the range, return greater.
+
+    ///If the pos is to the start of the range, return less.
+    ///If the pos is to the end of the range, return greater.
     ///else, return equal.
     #[inline(always)]
-    pub fn left_or_right_or_contain(&self, pos: &T) -> core::cmp::Ordering {
-        if *pos < self.left {
+    pub fn start_or_end_or_contain(&self, pos: &T) -> core::cmp::Ordering {
+        if *pos < self.start {
             core::cmp::Ordering::Less
-        } else if *pos >= self.right {
+        } else if *pos >= self.end {
             core::cmp::Ordering::Greater
         } else {
             core::cmp::Ordering::Equal
@@ -46,23 +47,23 @@ impl<T: Copy + PartialOrd> Range<T> {
     ///Returns true if the point is inside of the range or on top of.
     #[inline(always)]
     pub fn contains(&self, pos: T) -> bool {
-        self.left <= pos && pos < self.right
+        self.start <= pos && pos < self.end
     }
 
     ///Subdivides the range.
     ///No floating point calculations are done.
     #[inline(always)]
     pub fn subdivide(&self, divider: T) -> (Range<T>, Range<T>) {
-        debug_assert!(self.left <= divider);
-        debug_assert!(divider < self.right);
+        debug_assert!(self.start <= divider);
+        debug_assert!(divider < self.end);
 
         let l = Range {
-            left: self.left,
-            right: divider,
+            start: self.start,
+            end: divider,
         };
         let r = Range {
-            left: divider,
-            right: self.right,
+            start: divider,
+            end: self.end,
         };
         (l, r)
     }
@@ -70,30 +71,30 @@ impl<T: Copy + PartialOrd> Range<T> {
     #[must_use]
     #[inline(always)]
     pub fn is_valid(&self) -> bool {
-        self.left <= self.right
+        self.start <= self.end
     }
 
     #[inline(always)]
     pub fn grow_to_fit(&mut self, b: &Range<T>) {
         let a = self;
-        if b.left < a.left {
-            a.left = b.left;
+        if b.start < a.start {
+            a.start = b.start;
         }
-        if b.right > a.right {
-            a.right = b.right;
+        if b.end > a.end {
+            a.end = b.end;
         }
     }
 
     ///Returns true if self contains the specified range.
     #[inline(always)]
     pub fn contains_range(&self, val: &Range<T>) -> bool {
-        self.left <= val.left && val.right <= self.right
+        self.start <= val.start && val.end <= self.end
     }
 
     ///Returns true if two ranges intersect.
     #[inline(always)]
     pub fn intersects(&self, val: &Range<T>) -> bool {
-        self.contains(val.left) || val.contains(self.left)
+        self.contains(val.start) || val.contains(self.start)
     }
 }
 
@@ -111,15 +112,15 @@ mod tests {
 impl<T: Copy + core::ops::Sub<Output = T>> Range<T> {
     #[inline(always)]
     pub fn distance(&self) -> T {
-        self.right - self.left
+        self.end - self.start
     }
 }
 
 impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Range<T> {
     #[inline(always)]
     pub fn grow(&mut self, radius: T) -> &mut Self {
-        self.right = self.right + radius;
-        self.left = self.left - radius;
+        self.end = self.end + radius;
+        self.start = self.start - radius;
         self
     }
 }
@@ -142,24 +143,24 @@ impl<S: Copy> Range<S> {
     #[inline(always)]
     pub fn inner_as<B: PrimitiveFrom<S>>(&self) -> Range<B> {
         Range {
-            left: PrimitiveFrom::from(self.left),
-            right: PrimitiveFrom::from(self.right),
+            start: PrimitiveFrom::from(self.start),
+            end: PrimitiveFrom::from(self.end),
         }
     }
 
     #[inline(always)]
     pub fn inner_into<A: From<S>>(&self) -> Range<A> {
-        let left = A::from(self.left);
-        let right = A::from(self.right);
-        Range { left, right }
+        let start = A::from(self.start);
+        let end = A::from(self.end);
+        Range { start, end }
     }
 
     #[inline(always)]
     pub fn inner_try_into<A: TryFrom<S>>(&self) -> Result<Range<A>, A::Error> {
-        let left = A::try_from(self.left);
-        let right = A::try_from(self.right);
-        match (left, right) {
-            (Ok(left), Ok(right)) => Ok(Range { left, right }),
+        let start = A::try_from(self.start);
+        let end = A::try_from(self.end);
+        match (start, end) {
+            (Ok(start), Ok(end)) => Ok(Range { start, end }),
             (Ok(_), Err(e)) => Err(e),
             (Err(e), Ok(_)) => Err(e),
             (Err(e1), Err(_)) => Err(e1),
@@ -172,8 +173,8 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Range<T>
     #[inline(always)]
     pub fn from_point(point: T, radius: T) -> Range<T> {
         Range {
-            left: point - radius,
-            right: point + radius,
+            start: point - radius,
+            end: point + radius,
         }
     }
 }
@@ -182,12 +183,12 @@ impl<T: Copy + Ord> Range<T> {
     ///Creates a range that represents the intersection range.
     #[inline(always)]
     pub fn get_intersection(&self, val: &Range<T>) -> Option<Range<T>> {
-        let a = self.left.max(val.left);
-        let b = self.right.min(val.right);
+        let a = self.start.max(val.start);
+        let b = self.end.min(val.end);
         if a > b {
             None
         } else {
-            Some(Range { left: a, right: b })
+            Some(Range { start: a, end: b })
         }
     }
 }
