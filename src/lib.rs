@@ -8,10 +8,6 @@ mod range;
 mod rect;
 mod vec2;
 
-pub use num_traits;
-pub use ordered_float;
-pub use primitive_from;
-
 pub use self::range::Range;
 pub use self::rect::Rect;
 pub use self::vec2::arr2_as;
