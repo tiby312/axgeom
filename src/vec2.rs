@@ -225,8 +225,8 @@ impl<S: Mul<Output = S> + Copy> Mul<S> for Vec2<S> {
 }
 
 impl<S: Div<Output = S> + Copy> Div<S> for Vec2<S> {
-    #[inline(always)]
     type Output = Self;
+    #[inline(always)]
     fn div(self, rhs: S) -> Self {
         vec2(self.x / rhs, self.y / rhs)
     }
