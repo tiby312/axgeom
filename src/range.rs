@@ -3,9 +3,6 @@ use num_traits::Float;
 use ordered_float::NotNan;
 use primitive_from::PrimitiveFrom;
 
-//TODO use this:
-//https://doc.rust-lang.org/std/ops/struct.Range.html
-
 ///A 1D range. Internally represented as start and end. (as opposed to a start and length)
 ///This means that subdivision does not result in any floating point calculations.
 ///The start value must be <= the end value.
@@ -30,14 +27,15 @@ impl<T> Range<T> {
 }
 impl<T: Copy + PartialOrd> Range<T> {
 
-    ///If the pos is to the start of the range, return less.
-    ///If the pos is to the end of the range, return greater.
+    ///Like contains() but returns Ord.
+    ///If the pos is stricly less than the range.start, return less.
+    ///If the pos is greater of equal to the range.end, return greater.
     ///else, return equal.
     #[inline(always)]
-    pub fn start_or_end_or_contain(&self, pos: &T) -> core::cmp::Ordering {
-        if *pos < self.start {
+    pub fn contains_ext(&self, pos: T) -> core::cmp::Ordering {
+        if pos < self.start {
             core::cmp::Ordering::Less
-        } else if *pos >= self.end {
+        } else if pos >= self.end {
             core::cmp::Ordering::Greater
         } else {
             core::cmp::Ordering::Equal
@@ -47,7 +45,8 @@ impl<T: Copy + PartialOrd> Range<T> {
     ///Returns true if the point is inside of the range or on top of.
     #[inline(always)]
     pub fn contains(&self, pos: T) -> bool {
-        self.start <= pos && pos < self.end
+        self.contains_ext(pos) == core::cmp::Ordering::Equal
+        //self.start <= pos && pos < self.end
     }
 
     ///Subdivides the range.
