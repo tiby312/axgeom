@@ -6,9 +6,13 @@ use num_traits::Float;
 use ordered_float::NotNan;
 use primitive_from::PrimitiveFrom;
 
+
+pub fn rect<T>(a:T,b:T,c:T,d:T)->Rect<T>{
+    Rect::new(a,b,c,d)
+}
 ///An axis aligned rectangle. Stored as two Ranges.
-///It is a fully closed rectangle. Points exactly along the border of the rectangle are considered inside the rectangle.
-#[derive(Copy, Clone, Debug)]
+///It is a semi-closed rectangle. A point is considered inside the rectangle if it is in [start,end) for both x and y.
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[must_use]
 pub struct Rect<T> {
     pub x: Range<T>,
@@ -83,6 +87,16 @@ impl<T> Rect<T> {
     }
 }
 
+
+impl<T> Rect<T> {
+    ///(a,b) is the x component range.
+    ///(c,d) is the y component range.
+    #[inline(always)]
+    pub fn new(a: T, b: T, c: T, d: T) -> Rect<T> {
+        Rect { x: Range { start: a, end: b }, y: Range { start: c, end: d } }
+    }
+}
+
 impl<T: Copy> Rect<T> {
     #[inline(always)]
     pub fn top_start(&self)->Vec2<T>{
@@ -95,13 +109,6 @@ impl<T: Copy> Rect<T> {
             x: self.x.inner_as(),
             y: self.y.inner_as(),
         }
-    }
-
-    ///(a,b) is the x component range.
-    ///(c,d) is the y component range.
-    #[inline(always)]
-    pub fn new(a: T, b: T, c: T, d: T) -> Rect<T> {
-        Rect { x: Range { start: a, end: b }, y: Range { start: c, end: d } }
     }
 
     ///(a,b) is the x component range.

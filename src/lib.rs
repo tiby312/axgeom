@@ -9,6 +9,7 @@ mod vec2;
 
 pub use self::range::Range;
 pub use self::rect::Rect;
+pub use self::rect::rect;
 pub use self::vec2::arr2_as;
 pub use self::vec2::vec2;
 pub use self::vec2::vec2same;
