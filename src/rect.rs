@@ -244,8 +244,8 @@ impl<T: PartialOrd + Copy> Rect<T> {
                 }};
             }
 
-            macro_axis!(XAXISS);
-            macro_axis!(YAXISS);
+            macro_axis!(XAXIS);
+            macro_axis!(YAXIS);
         }
         self
     }
@@ -280,8 +280,8 @@ impl<T: Ord + Copy> Rect<T> {
             }};
         }
 
-        let x = macro_axis!(XAXISS);
-        let y = macro_axis!(YAXISS);
+        let x = macro_axis!(XAXIS);
+        let y = macro_axis!(YAXIS);
         Some(Rect { x, y })
     }
 }

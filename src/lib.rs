@@ -19,24 +19,24 @@ pub use self::vec2::Vec2;
 
 ///The x axis implementation of the Axis
 #[derive(Copy, Clone)]
-pub struct XAXISS;
-impl Axis for XAXISS {
-    type Next = YAXISS;
+pub struct XAXIS;
+impl Axis for XAXIS {
+    type Next = YAXIS;
     #[inline(always)]
     fn is_xaxis(&self) -> bool {
         true
     }
     #[inline(always)]
     fn next(&self) -> Self::Next {
-        YAXISS
+        YAXIS
     }
 }
 
 ///The y axis implementation of the Axis
 #[derive(Copy, Clone)]
-pub struct YAXISS;
-impl Axis for YAXISS {
-    type Next = XAXISS;
+pub struct YAXIS;
+impl Axis for YAXIS {
+    type Next = XAXIS;
 
     #[inline(always)]
     fn is_xaxis(&self) -> bool {
@@ -44,7 +44,7 @@ impl Axis for YAXISS {
     }
     #[inline(always)]
     fn next(&self) -> Self::Next {
-        XAXISS
+        XAXIS
     }
 }
 
