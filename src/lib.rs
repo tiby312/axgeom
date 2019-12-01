@@ -6,7 +6,9 @@
 mod range;
 mod rect;
 mod vec2;
+mod ray;
 
+pub use self::ray::Ray;
 pub use self::range::Range;
 pub use self::rect::Rect;
 pub use self::rect::rect;
