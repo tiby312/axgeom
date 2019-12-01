@@ -68,7 +68,7 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> 
 impl<T> Rect<T> {
     ///Get the range of one axis.
     #[inline(always)]
-    pub fn get_range(&self, axis: impl AxisTrait) -> &Range<T> {
+    pub fn get_range(&self, axis: impl Axis) -> &Range<T> {
         if axis.is_xaxis() {
             &self.x
         } else {
@@ -78,7 +78,7 @@ impl<T> Rect<T> {
 
     ///Get the mutable range of one axis.
     #[inline(always)]
-    pub fn get_range_mut(&mut self, axis: impl AxisTrait) -> &mut Range<T> {
+    pub fn get_range_mut(&mut self, axis: impl Axis) -> &mut Range<T> {
         if axis.is_xaxis() {
             &mut self.x
         } else {
@@ -185,7 +185,7 @@ impl<T: PartialOrd + Copy> Rect<T> {
     ///could actually be inside both subdivded rectangles.
     ///This is because the ranges are inclusive on both sides [start,end].
     #[inline(always)]
-    pub fn subdivide<A: AxisTrait>(&self, axis: A, divider: T) -> (Rect<T>, Rect<T>) {
+    pub fn subdivide<A: Axis>(&self, axis: A, divider: T) -> (Rect<T>, Rect<T>) {
         let ca = axis;
         let na = axis.next();
 

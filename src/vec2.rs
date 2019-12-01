@@ -1,4 +1,4 @@
-use crate::AxisTrait;
+use crate::Axis;
 use core::convert::TryFrom;
 use core::ops::*;
 use num_traits::float::Float;
@@ -161,7 +161,7 @@ impl<B> Vec2<B> {
 
     ///Get the range of one axis.
     #[inline(always)]
-    pub fn get_axis(&self, axis: impl AxisTrait) -> &B {
+    pub fn get_axis(&self, axis: impl Axis) -> &B {
         if axis.is_xaxis() {
             &self.x
         } else {
@@ -171,7 +171,7 @@ impl<B> Vec2<B> {
 
     ///Get the mutable range of one axis.
     #[inline(always)]
-    pub fn get_axis_mut(&mut self, axis: impl AxisTrait) -> &mut B {
+    pub fn get_axis_mut(&mut self, axis: impl Axis) -> &mut B {
         if axis.is_xaxis() {
             &mut self.x
         } else {

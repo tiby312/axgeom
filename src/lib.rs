@@ -15,10 +15,10 @@ pub use self::vec2::vec2;
 pub use self::vec2::vec2same;
 pub use self::vec2::Vec2;
 
-///The x axis implementation of the AxisTrait
+///The x axis implementation of the Axis
 #[derive(Copy, Clone)]
 pub struct XAXISS;
-impl AxisTrait for XAXISS {
+impl Axis for XAXISS {
     type Next = YAXISS;
     #[inline(always)]
     fn is_xaxis(&self) -> bool {
@@ -30,10 +30,10 @@ impl AxisTrait for XAXISS {
     }
 }
 
-///The y axis implementation of the AxisTrait
+///The y axis implementation of the Axis
 #[derive(Copy, Clone)]
 pub struct YAXISS;
-impl AxisTrait for YAXISS {
+impl Axis for YAXISS {
     type Next = XAXISS;
 
     #[inline(always)]
@@ -50,13 +50,13 @@ impl AxisTrait for YAXISS {
 ///when you know the axis as compile time.
 ///The X implementation of this trait's Next associated trait is the Y implementation.
 ///The Y implementation of this trait's Next associated trait is the X implementation.
-pub trait AxisTrait: Sync + Send + Copy + Clone {
-    type Next: AxisTrait;
+pub trait Axis: Sync + Send + Copy + Clone {
+    type Next: Axis;
     fn is_xaxis(&self) -> bool;
     fn next(&self) -> Self::Next;
 
     #[inline(always)]
-    fn is_equal_to<B: AxisTrait>(&self, other: B) -> bool {
+    fn is_equal_to<B: Axis>(&self, other: B) -> bool {
         if self.is_xaxis() && other.is_xaxis() {
             return true;
         }
