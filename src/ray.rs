@@ -2,6 +2,10 @@ use crate::*;
 use core::convert::TryFrom;
 use core::cmp::Ordering;
 
+pub fn ray<N>(point:Vec2<N>,dir:Vec2<N>)->Ray<N>{
+    Ray{point,dir}
+}
+
 ///A Ray.
 #[derive(Debug, Copy, Clone)]
 pub struct Ray<N> {
@@ -77,6 +81,13 @@ impl<N> CastResult<N>{
             CastResult::NoHit=>{
                 CastResult::NoHit
             }
+        }
+    }
+
+    pub fn unwrap(self)->N{
+        match self{
+            CastResult::Hit(a)=>a,
+            CastResult::NoHit=>panic!("unwrapped a NoHit in CastResult")
         }
     }
 }

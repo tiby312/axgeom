@@ -6,9 +6,9 @@ extern crate axgeom;
 
 #[test]
 fn test(){
-	use axgeom::AxisTrait;
+	use axgeom::Axis;
 
-	let a=axgeom::XAXISS;
+	let a=axgeom::XAXIS;
 	let b=a.next();
 	let c=b.next();
 
@@ -16,7 +16,7 @@ fn test(){
 	assert_eq!(generic(b),0);
 	assert_eq!(generic(c),1);
 
-	fn generic<T:AxisTrait>(a:T)->usize{
+	fn generic<T:Axis>(a:T)->usize{
 		//known at compile time
 		if a.is_xaxis(){
 			1

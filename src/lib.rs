@@ -10,6 +10,7 @@ mod ray;
 
 pub use self::ray::Ray;
 pub use self::ray::CastResult;
+pub use self::ray::ray;
 
 pub use self::range::Range;
 pub use self::rect::Rect;
