@@ -25,7 +25,39 @@ impl<T> Range<T> {
         Range { start, end }
     }
 }
+
+impl<T: Copy + Ord + core::ops::Sub<Output=T> + num_traits::sign::Signed> Range<T>{
+
+    #[inline(always)]
+    pub fn distance_to_point(&self, pos:T)->Option<T>{
+        if self.contains(pos){
+            None
+        }else{
+            Some( (pos-self.start).abs().min( (pos-self.end).abs()) )
+        }
+    }
+
+
+    ///Positive if point is to the right of the range.
+    ///Negative if point is to the left of range.
+    #[inline(always)]
+    pub fn difference_to_point(&self, pos:T)->Option<T>{
+        match self.contains_ext(pos){
+            core::cmp::Ordering::Less=>{
+                Some(pos-self.start)
+            },
+            core::cmp::Ordering::Greater=>{
+                Some(pos-self.end)
+            },
+            core::cmp::Ordering::Equal=>{
+                None
+            }
+        }
+    }
+}
 impl<T: Copy + PartialOrd> Range<T> {
+
+
 
     ///Like contains() but returns Ord.
     ///If the pos is stricly less than the range.start, return less.

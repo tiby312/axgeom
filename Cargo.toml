@@ -10,6 +10,7 @@ readme = "readme.md"
 edition = "2018"
 
 [dependencies]
+roots = "0.0.5"
 ordered-float = "1.0.2"
 num-traits = "0.2.8"
 primitive-from = "1.0.2"
