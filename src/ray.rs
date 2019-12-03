@@ -65,10 +65,21 @@ impl<N:PartialOrd + Copy> Ray<N>{
 #[derive(Copy, Clone, Debug)]
 pub enum CastResult<N> {
     Hit(N),
-    Inside,
     NoHit,
 }
 
+impl<N> CastResult<N>{
+    pub fn map<X>(self,mut func:impl FnMut(N)->X)->CastResult<X>{
+        match self{
+            CastResult::Hit(a)=>{
+                CastResult::Hit(func(a))
+            },
+            CastResult::NoHit=>{
+                CastResult::NoHit
+            }
+        }
+    }
+}
 
 use roots;
 use roots::*;
@@ -119,7 +130,7 @@ impl<N:num_traits::Float + roots::FloatType> Ray<N>{
                 if closer < zz && further < zz {
                     CastResult::NoHit
                 } else if closer < zz && further > zz {
-                    CastResult::Inside
+                    CastResult::Hit(<N as FloatType>::zero())
                 } else {
                     CastResult::Hit(closer)
                 }
@@ -130,7 +141,7 @@ impl<N:num_traits::Float + roots::FloatType> Ray<N>{
 }
 
 
-
+//TODO make a float specific one
 
 impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy + Ord+ core::fmt::Debug> Ray<N>{
     ///Returns if a ray intersects a box.
@@ -140,6 +151,7 @@ impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy + Ord+ core::fm
     ) -> CastResult<N> {
         let ray=self;
 
+        //Find the corner that the ray will hit one of its sides with.
         let next_grid_pos={
 
             vec2(if ray.dir.x<N::zero(){
@@ -158,7 +170,7 @@ impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy + Ord+ core::fm
                             }
                         },
                         None=>{
-                            return CastResult::Inside
+                            return CastResult::Hit(N::zero())
                         }
                     }
                 }else{
@@ -181,7 +193,7 @@ impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy + Ord+ core::fm
                             }
                         },
                         None=>{
-                            return CastResult::Inside
+                            return CastResult::Hit(N::zero())
                         }
                     }
 
@@ -193,14 +205,20 @@ impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy + Ord+ core::fm
             })
         };
 
-
+        //Compute the tval of hitting both the x and y axis.
         let tvalx=(next_grid_pos.x-ray.point.x)/ray.dir.x;
         let tvaly=(next_grid_pos.y-ray.point.y)/ray.dir.y;
 
-        let tvalx=if tvalx>N::zero(){Some(tvalx)}else{None};
-        let tvaly=if tvaly>N::zero(){Some(tvaly)}else{None};
+
+        fn as_positive<N:PartialOrd+num_traits::Signed>(a:N)->Option<N>{
+            if a>N::zero(){
+                Some(a)
+            }else{
+                None
+            }
+        }
         
-        match (tvalx,tvaly){
+        match (as_positive(tvalx),as_positive(tvaly)){
             (Some(x),Some(y))=>{
                 
                 let x = if rect.y.contains(ray.point_at_tval(x).y){
@@ -249,7 +267,7 @@ impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy + Ord+ core::fm
             },
             (None,None)=>{
                 if rect.contains_point(ray.point){
-                    CastResult::Inside
+                    CastResult::Hit(N::zero())
                 }else{
                     CastResult::NoHit
                 }
