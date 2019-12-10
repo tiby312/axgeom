@@ -6,10 +6,11 @@ use num_traits::Float;
 use ordered_float::NotNan;
 use primitive_from::PrimitiveFrom;
 
-
+#[inline(always)]
 pub fn rect<T>(a:T,b:T,c:T,d:T)->Rect<T>{
     Rect::new(a,b,c,d)
 }
+
 ///An axis aligned rectangle. Stored as two Ranges.
 ///It is a semi-closed rectangle. A point is considered inside the rectangle if it is in [start,end) for both x and y.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]

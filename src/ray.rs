@@ -1,6 +1,7 @@
 use crate::*;
 use core::convert::TryFrom;
 use core::cmp::Ordering;
+use primitive_from::PrimitiveFrom;
 
 pub fn ray<N>(point:Vec2<N>,dir:Vec2<N>)->Ray<N>{
     Ray{point,dir}
@@ -11,6 +12,14 @@ pub fn ray<N>(point:Vec2<N>,dir:Vec2<N>)->Ray<N>{
 pub struct Ray<N> {
     pub point: Vec2<N>,
     pub dir: Vec2<N>,
+}
+
+
+impl<B: Copy> Ray<B> {
+    #[inline(always)]
+    pub fn inner_as<A: PrimitiveFrom<B>>(&self) -> Ray<A> {
+        Ray{point:self.point.inner_as(),dir:self.dir.inner_as()}
+    }
 }
 
 impl<N:Copy+core::ops::Add<Output=N>+core::ops::Mul<Output=N>> Ray<N>{

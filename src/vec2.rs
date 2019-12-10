@@ -90,6 +90,22 @@ impl<S:Add<Output=S> + Sub<Output=S>+PartialOrd + Copy> Vec2<S>{
     
 }
 
+impl<
+        T: Copy
+            + PartialOrd
+            + core::ops::Sub<Output = T>
+            + core::ops::Mul<Output = T>
+            + core::ops::Add<Output = T>,
+    > Vec2<T>
+{
+    ///If the point is outisde the rectangle, returns the squared distance from a point to a rectangle.
+    ///If the point is inside the rectangle, it will return None.
+    #[inline(always)]
+    pub fn distance_squared_to_point(&self, point: Vec2<T>)->T {
+        (point.x-self.x)*(point.x-self.x)+(point.y-self.y)*(point.y-self.y)
+    }
+}
+
 
 #[test]
 fn test_rotate(){
