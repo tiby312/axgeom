@@ -104,6 +104,20 @@ impl<T: Copy> Rect<T> {
         vec2(self.x.start,self.y.start)
     }
 
+
+    ///Returns each corner in this order:
+    ///topleft
+    ///topright
+    ///bottomright
+    ///bottomleft
+    #[inline(always)]
+    pub fn get_corners(&self)->[Vec2<T>;4]{
+        [vec2(self.x.start,self.y.start),
+        vec2(self.x.end,self.y.start),
+        vec2(self.x.end,self.y.end),
+        vec2(self.x.start,self.y.end)]
+    }
+
     #[inline(always)]
     pub fn inner_as<B: PrimitiveFrom<T>>(&self) -> Rect<B> {
         Rect {
