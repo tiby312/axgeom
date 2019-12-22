@@ -71,3 +71,37 @@ pub trait Axis: Sync + Send + Copy + Clone {
         false
     }
 }
+
+
+///Represents a rectangle with the specified aspect ratio
+///and the specified width. The height of the rectangle
+///can be inferred by the aspect ratio.
+#[derive(Copy,Clone,Debug)]
+pub struct Vec2AspectRatio{
+    pub ratio:AspectRatio,
+    pub width:f64
+}
+impl Vec2AspectRatio{
+    pub fn vec(&self)->Vec2<f64>{
+        let height = self.ratio.height_over_width()*self.width;
+        vec2(self.width,height)
+    }
+}
+
+///An aspect ratio represented as a fraction
+///so that there is no precision loss.
+#[derive(Copy,Clone,Debug)]
+pub struct AspectRatio(pub Vec2<f64>);
+
+impl AspectRatio{
+    pub fn width_over_height(&self)->f64{
+        let v=self.0;
+        v.x as f64/v.y as f64
+    }
+
+    pub fn height_over_width(&self)->f64{
+        let v=self.0;
+        v.y as f64/v.x as f64
+    }
+       
+}

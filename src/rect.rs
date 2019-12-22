@@ -100,11 +100,10 @@ impl<T> Rect<T> {
 
 impl<T: Copy> Rect<T> {
     #[inline(always)]
-    pub fn top_start(&self)->Vec2<T>{
+    pub fn top_left(&self)->Vec2<T>{
         vec2(self.x.start,self.y.start)
     }
-
-
+    
     ///Returns each corner in this order:
     ///topleft
     ///topright
