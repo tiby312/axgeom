@@ -25,13 +25,6 @@ impl<N: Float> AsRef<Vec2<N>> for Vec2<NotNan<N>> {
     }
 }
 
-impl<N: Float> AsMut<Vec2<N>> for Vec2<NotNan<N>> {
-    #[inline(always)]
-    fn as_mut(&mut self) -> &mut Vec2<N> {
-        unsafe { &mut *((self as *mut Self) as *mut Vec2<N>) }
-    }
-}
-
 ///A 2D vector.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Vec2<N> {

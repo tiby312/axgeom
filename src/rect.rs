@@ -27,12 +27,6 @@ impl<N: Float> AsRef<Rect<N>> for Rect<NotNan<N>> {
     }
 }
 
-impl<N: Float> AsMut<Rect<N>> for Rect<NotNan<N>> {
-    #[inline(always)]
-    fn as_mut(&mut self) -> &mut Rect<N> {
-        unsafe { &mut *((self as *mut Self) as *mut Rect<N>) }
-    }
-}
 
 impl<S: Copy> Rect<S> {
     #[inline(always)]
