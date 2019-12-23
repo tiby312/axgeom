@@ -3,12 +3,14 @@ use core::convert::TryFrom;
 use core::cmp::Ordering;
 use primitive_from::PrimitiveFrom;
 
+#[must_use]
 pub fn ray<N>(point:Vec2<N>,dir:Vec2<N>)->Ray<N>{
     Ray{point,dir}
 }
 
 ///A Ray.
 #[derive(Debug, Copy, Clone)]
+#[must_use]
 pub struct Ray<N> {
     pub point: Vec2<N>,
     pub dir: Vec2<N>,
@@ -60,6 +62,7 @@ impl<N> Ray<N>{
 }
 
 impl<N:PartialOrd + Copy> Ray<N>{
+    #[inline(always)]
     pub fn range_side(&self,axis:impl Axis,range:&Range<N>)->Ordering{
         
         let v=if axis.is_xaxis(){
@@ -76,12 +79,14 @@ impl<N:PartialOrd + Copy> Ray<N>{
 
 ///Describes if a ray hit a rectangle.
 #[derive(Copy, Clone, Debug)]
+#[must_use]
 pub enum CastResult<N> {
     Hit(N),
     NoHit,
 }
 
 impl<N> CastResult<N>{
+    #[inline(always)]
     pub fn map<X>(self,mut func:impl FnMut(N)->X)->CastResult<X>{
         match self{
             CastResult::Hit(a)=>{
@@ -93,6 +98,7 @@ impl<N> CastResult<N>{
         }
     }
 
+    #[inline(always)]
     pub fn unwrap(self)->N{
         match self{
             CastResult::Hit(a)=>a,

@@ -82,6 +82,7 @@ pub struct Vec2AspectRatio{
     pub width:f64
 }
 impl Vec2AspectRatio{
+    #[inline(always)]
     pub fn vec(&self)->Vec2<f64>{
         let height = self.ratio.height_over_width()*self.width;
         vec2(self.width,height)
@@ -94,11 +95,13 @@ impl Vec2AspectRatio{
 pub struct AspectRatio(pub Vec2<f64>);
 
 impl AspectRatio{
+    #[inline(always)]
     pub fn width_over_height(&self)->f64{
         let v=self.0;
         v.x as f64/v.y as f64
     }
 
+    #[inline(always)]
     pub fn height_over_width(&self)->f64{
         let v=self.0;
         v.y as f64/v.x as f64
