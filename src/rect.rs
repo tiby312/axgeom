@@ -6,9 +6,10 @@ use num_traits::Float;
 use ordered_float::NotNan;
 use primitive_from::PrimitiveFrom;
 
+//Convenience function to create a Rect.
 #[inline(always)]
-pub fn rect<T>(a:T,b:T,c:T,d:T)->Rect<T>{
-    Rect::new(a,b,c,d)
+pub fn rect<T>(a: T, b: T, c: T, d: T) -> Rect<T> {
+    Rect::new(a, b, c, d)
 }
 
 ///An axis aligned rectangle. Stored as two Ranges.
@@ -26,7 +27,6 @@ impl<N: Float> AsRef<Rect<N>> for Rect<NotNan<N>> {
         unsafe { &*((self as *const Self) as *const Rect<N>) }
     }
 }
-
 
 impl<S: Copy> Rect<S> {
     #[inline(always)]
@@ -82,33 +82,37 @@ impl<T> Rect<T> {
     }
 }
 
-
 impl<T> Rect<T> {
     ///(a,b) is the x component range.
     ///(c,d) is the y component range.
     #[inline(always)]
     pub fn new(a: T, b: T, c: T, d: T) -> Rect<T> {
-        Rect { x: Range { start: a, end: b }, y: Range { start: c, end: d } }
+        Rect {
+            x: Range { start: a, end: b },
+            y: Range { start: c, end: d },
+        }
     }
 }
 
 impl<T: Copy> Rect<T> {
     #[inline(always)]
-    pub fn top_left(&self)->Vec2<T>{
-        vec2(self.x.start,self.y.start)
+    pub fn top_left(&self) -> Vec2<T> {
+        vec2(self.x.start, self.y.start)
     }
-    
+
     ///Returns each corner in this order:
     ///topleft
     ///topright
     ///bottomright
     ///bottomleft
     #[inline(always)]
-    pub fn get_corners(&self)->[Vec2<T>;4]{
-        [vec2(self.x.start,self.y.start),
-        vec2(self.x.end,self.y.start),
-        vec2(self.x.end,self.y.end),
-        vec2(self.x.start,self.y.end)]
+    pub fn get_corners(&self) -> [Vec2<T>; 4] {
+        [
+            vec2(self.x.start, self.y.start),
+            vec2(self.x.end, self.y.start),
+            vec2(self.x.end, self.y.end),
+            vec2(self.x.start, self.y.end),
+        ]
     }
 
     #[inline(always)]

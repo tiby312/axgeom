@@ -4,17 +4,17 @@
 #![no_std]
 
 mod range;
+mod ray;
 mod rect;
 mod vec2;
-mod ray;
 
-pub use self::ray::Ray;
-pub use self::ray::CastResult;
-pub use self::ray::ray;
-
+pub use self::range::range;
 pub use self::range::Range;
-pub use self::rect::Rect;
+pub use self::ray::ray;
+pub use self::ray::CastResult;
+pub use self::ray::Ray;
 pub use self::rect::rect;
+pub use self::rect::Rect;
 pub use self::vec2::arr2_as;
 pub use self::vec2::vec2;
 pub use self::vec2::vec2same;
@@ -72,39 +72,37 @@ pub trait Axis: Sync + Send + Copy + Clone {
     }
 }
 
-
-///Represents a rectangle with the specified aspect ratio
-///and the specified width. The height of the rectangle
+///Represents a Vec2 with the specified aspect ratio
+///and the specified width. The height of the Vec2
 ///can be inferred by the aspect ratio.
-#[derive(Copy,Clone,Debug)]
-pub struct Vec2AspectRatio{
-    pub ratio:AspectRatio,
-    pub width:f64
+#[derive(Copy, Clone, Debug)]
+pub struct FixedAspectVec2 {
+    pub ratio: AspectRatio,
+    pub width: f64,
 }
-impl Vec2AspectRatio{
+impl FixedAspectVec2 {
     #[inline(always)]
-    pub fn vec(&self)->Vec2<f64>{
-        let height = self.ratio.height_over_width()*self.width;
-        vec2(self.width,height)
+    pub fn as_vec(&self) -> Vec2<f64> {
+        let height = self.ratio.height_over_width() * self.width;
+        vec2(self.width, height)
     }
 }
 
 ///An aspect ratio represented as a fraction
 ///so that there is no precision loss.
-#[derive(Copy,Clone,Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct AspectRatio(pub Vec2<f64>);
 
-impl AspectRatio{
+impl AspectRatio {
     #[inline(always)]
-    pub fn width_over_height(&self)->f64{
-        let v=self.0;
-        v.x as f64/v.y as f64
+    pub fn width_over_height(&self) -> f64 {
+        let v = self.0;
+        v.x as f64 / v.y as f64
     }
 
     #[inline(always)]
-    pub fn height_over_width(&self)->f64{
-        let v=self.0;
-        v.y as f64/v.x as f64
+    pub fn height_over_width(&self) -> f64 {
+        let v = self.0;
+        v.y as f64 / v.x as f64
     }
-       
 }

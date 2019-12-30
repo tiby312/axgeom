@@ -33,7 +33,6 @@ pub struct Vec2<N> {
     pub y: N,
 }
 
-
 #[inline(always)]
 pub fn absdiff<T>(x: T, y: T) -> T
 where
@@ -46,42 +45,38 @@ where
     }
 }
 
-
-fn gen_abs<S:Neg<Output=S>+PartialOrd+Zero>(num:S)->S{
-    if num<S::zero(){
+fn gen_abs<S: Neg<Output = S> + PartialOrd + Zero>(num: S) -> S {
+    if num < S::zero() {
         -num
-    }else{
+    } else {
         num
     }
 }
-impl<S:Copy + Neg<Output=S>+PartialOrd+Zero> Vec2<S>{
-
+impl<S: Copy + Neg<Output = S> + PartialOrd + Zero> Vec2<S> {
     #[inline(always)]
-    pub fn abs(&self)->Vec2<S>{
-        vec2(gen_abs(self.x),gen_abs(self.y))   
-    }   
-    #[inline(always)]
-    pub fn rotate_90deg_right(&self)->Vec2<S>{
-        vec2(-self.y,self.x)
+    pub fn abs(&self) -> Vec2<S> {
+        vec2(gen_abs(self.x), gen_abs(self.y))
     }
     #[inline(always)]
-    pub fn rotate_90deg_left(&self)->Vec2<S>{
-        vec2(self.y,self.x)
+    pub fn rotate_90deg_right(&self) -> Vec2<S> {
+        vec2(-self.y, self.x)
+    }
+    #[inline(always)]
+    pub fn rotate_90deg_left(&self) -> Vec2<S> {
+        vec2(self.y, self.x)
     }
 
     #[inline(always)]
-    pub fn split_into_components(&self)->[Vec2<S>;2]{
-        [vec2(self.x,S::zero()),vec2(S::zero(),self.y)]
-    }  
- 
+    pub fn split_into_components(&self) -> [Vec2<S>; 2] {
+        [vec2(self.x, S::zero()), vec2(S::zero(), self.y)]
+    }
 }
 
-impl<S:Add<Output=S> + Sub<Output=S>+PartialOrd + Copy> Vec2<S>{
+impl<S: Add<Output = S> + Sub<Output = S> + PartialOrd + Copy> Vec2<S> {
     #[inline(always)]
-    pub fn manhattan_dis(&self,other:Vec2<S>)->S{
+    pub fn manhattan_dis(&self, other: Vec2<S>) -> S {
         (absdiff(self.x, other.x) + absdiff(self.y, other.y))
     }
-    
 }
 
 impl<
@@ -95,34 +90,29 @@ impl<
     ///If the point is outisde the rectangle, returns the squared distance from a point to a rectangle.
     ///If the point is inside the rectangle, it will return None.
     #[inline(always)]
-    pub fn distance_squared_to_point(&self, point: Vec2<T>)->T {
-        (point.x-self.x)*(point.x-self.x)+(point.y-self.y)*(point.y-self.y)
+    pub fn distance_squared_to_point(&self, point: Vec2<T>) -> T {
+        (point.x - self.x) * (point.x - self.x) + (point.y - self.y) * (point.y - self.y)
     }
 }
-
 
 #[test]
-fn test_rotate(){
+fn test_rotate() {
+    let b = vec2(1, 1).rotate_90deg_right();
+    assert_eq!(b, vec2(-1, 1));
 
-    let b=vec2(1,1).rotate_90deg_right();
-    assert_eq!(b,vec2(-1,1));
-
-    let b=vec2(1,0).rotate_90deg_right();
-    assert_eq!(b,vec2(0,1));
-
+    let b = vec2(1, 0).rotate_90deg_right();
+    assert_eq!(b, vec2(0, 1));
 }
 
-
-
-impl<S: Mul<Output = S>+ Div<Output=S>+ Add<Output = S> + Copy> Vec2<S> {
+impl<S: Mul<Output = S> + Div<Output = S> + Add<Output = S> + Copy> Vec2<S> {
     #[inline(always)]
-    pub fn scale(&self,other:Vec2<S>)->Vec2<S>{
-        vec2(self.x*other.x,self.y*other.y)
+    pub fn scale(&self, other: Vec2<S>) -> Vec2<S> {
+        vec2(self.x * other.x, self.y * other.y)
     }
 
     #[inline(always)]
-    pub fn inv_scale(&self,other:Vec2<S>)->Vec2<S>{
-        vec2(self.x/other.x,self.y/other.y)
+    pub fn inv_scale(&self, other: Vec2<S>) -> Vec2<S> {
+        vec2(self.x / other.x, self.y / other.y)
     }
 
     #[inline(always)]
@@ -137,9 +127,9 @@ impl<S: Mul<Output = S>+ Div<Output=S>+ Add<Output = S> + Copy> Vec2<S> {
 impl<S: Float> Vec2<S> {
     #[inline(always)]
     pub fn truncate_at(&self, mag: S) -> Vec2<S> {
-        if self.magnitude()>mag{
+        if self.magnitude() > mag {
             self.normalize_to(mag)
-        }else{
+        } else {
             *self
         }
     }
@@ -168,7 +158,6 @@ impl<B: Copy> Vec2<B> {
 }
 
 impl<B> Vec2<B> {
-
     ///Get the range of one axis.
     #[inline(always)]
     pub fn get_axis(&self, axis: impl Axis) -> &B {
@@ -208,7 +197,6 @@ impl<B> Vec2<B> {
         }
     }
 }
-
 
 impl<S: Add<Output = S> + Copy> Add<Self> for Vec2<S> {
     type Output = Self;
