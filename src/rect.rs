@@ -30,8 +30,9 @@ impl<N: Float> AsRef<Rect<N>> for Rect<NotNan<N>> {
 
 impl<S: Copy> Rect<S> {
     #[inline(always)]
-    pub fn as_arr(&self)->([S;2],[S;2]){
-        ([self.x.start,self.y.start],[self.x.end,self.y.end])
+    pub fn as_arr(&self)->[S;4]{
+        [self.x.start,self.x.end,self.y.start,self.y.end]
+        //([self.x.start,self.y.start],[self.x.end,self.y.end])
     }
 
 
@@ -67,6 +68,11 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> 
 }
 
 impl<T> Rect<T> {
+    #[inline(always)]
+    pub fn from_arr(rect:[T;4])->Self{
+        let [a,b,c,d]=rect;
+        Rect::new(a,b,c,d)
+    }
 
     ///Get the range of one axis.
     #[inline(always)]
