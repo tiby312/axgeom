@@ -30,6 +30,12 @@ impl<N: Float> AsRef<Rect<N>> for Rect<NotNan<N>> {
 
 impl<S: Copy> Rect<S> {
     #[inline(always)]
+    pub fn as_arr(&self)->([S;2],[S;2]){
+        ([self.x.start,self.y.start],[self.x.end,self.y.end])
+    }
+
+
+    #[inline(always)]
     pub fn inner_into<A: From<S>>(&self) -> Rect<A> {
         let x = self.x.inner_into();
         let y = self.y.inner_into();
@@ -61,6 +67,7 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> 
 }
 
 impl<T> Rect<T> {
+
     ///Get the range of one axis.
     #[inline(always)]
     pub fn get_range(&self, axis: impl Axis) -> &Range<T> {
