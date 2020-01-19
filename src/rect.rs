@@ -29,11 +29,7 @@ impl<N: Float> AsRef<Rect<N>> for Rect<NotNan<N>> {
 }
 
 impl<S: Copy> Rect<S> {
-    #[inline(always)]
-    pub fn as_arr(&self)->[S;4]{
-        [self.x.start,self.x.end,self.y.start,self.y.end]
-        //([self.x.start,self.y.start],[self.x.end,self.y.end])
-    }
+    
 
 
     #[inline(always)]
@@ -68,6 +64,21 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> 
 }
 
 impl<T> Rect<T> {
+    #[inline(always)]
+    pub fn as_arr(&self)->&[T;4]{
+        unsafe{&*(self as *const _ as *const _)}
+    }
+    
+    #[inline(always)]
+    pub fn from_ref(arr:&[T;4])->&Self{
+        unsafe{&*(arr as *const _ as *const _)}
+    }
+
+    #[inline(always)]
+    pub fn from_ref_mut(arr:&mut [T;4])->&mut Self{
+        unsafe{&mut *(arr as *mut _ as *mut _)}
+    }
+
     #[inline(always)]
     pub fn from_arr(rect:[T;4])->Self{
         let [a,b,c,d]=rect;

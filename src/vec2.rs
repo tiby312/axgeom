@@ -152,12 +152,6 @@ pub fn arr2_as<B: Copy, A: PrimitiveFrom<B>>(a: [B; 2]) -> [A; 2] {
 }
 
 impl<B: Copy> Vec2<B> {
-
-    #[inline(always)]
-    pub fn as_arr(&self)->[B;2]{
-        [self.x,self.y]
-    }
-    
     pub fn inner_as<A: PrimitiveFrom<B>>(&self) -> Vec2<A> {
         vec2(PrimitiveFrom::from(self.x), PrimitiveFrom::from(self.y))
     }
@@ -165,6 +159,21 @@ impl<B: Copy> Vec2<B> {
 
 impl<B> Vec2<B> {
 
+    #[inline(always)]
+    pub fn as_arr(&self)->&[B;2]{
+        unsafe{&*(self as *const _ as *const _)}
+    }
+
+
+    #[inline(always)]
+    pub fn from_ref(arr:&[B;2])->&Self{
+        unsafe{&*(arr as *const _ as *const _)}
+    }
+
+    #[inline(always)]
+    pub fn from_ref_mut(arr:&mut [B;2])->&mut Self{
+        unsafe{&mut *(arr as *mut _ as *mut _)}
+    }
 
     ///Get the range of one axis.
     #[inline(always)]
