@@ -116,7 +116,7 @@ impl<N: num_traits::Float + roots::FloatType> Ray<N> {
         //
         let ray = self;
         let zz = <N as FloatType>::zero();
-        let two = <N as FloatType>::two();
+        let two = <N as FloatType>::one()+<N as FloatType>::one();
 
         let a = ray.dir.x.powi(2) + ray.dir.y.powi(2);
         let b =

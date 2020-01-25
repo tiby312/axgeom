@@ -157,23 +157,53 @@ impl<B: Copy> Vec2<B> {
     }
 }
 
+
+
+impl<'a,B> From<&'a mut [B;2]> for &'a mut Vec2<B>{
+    #[inline(always)]
+    fn from(a:&'a mut [B;2])->Self{
+        unsafe{&mut *(a as *mut _ as *mut _)}
+    }
+}
+impl<'a,B> From<&'a [B;2]> for &'a Vec2<B>{
+    #[inline(always)]
+    fn from(a:&'a [B;2])->Self{
+        unsafe{&*(a as *const _ as *const _)}
+    }
+}
+
+
+impl<B> From<[B;2]> for Vec2<B>{
+    #[inline(always)]
+    fn from(a:[B;2])->Self{
+        let [a,b]=a;
+        vec2(a,b)
+    }
+}
+
+impl<B> Into<[B;2]> for Vec2<B>{
+    #[inline(always)]
+    fn into(self)->[B;2]{
+        [self.x,self.y]
+    }
+}
+
+impl<B> AsRef<[B;2]> for Vec2<B>{
+    #[inline(always)]
+    fn as_ref(& self)->&[B;2]{
+        unsafe{&*(self as *const _ as *const _)}     
+    }
+}
+
+impl<B> AsMut<[B;2]> for Vec2<B>{
+    #[inline(always)]
+    fn as_mut(&mut self)->&mut [B;2]{
+        unsafe{&mut *(self as *mut _ as *mut _)}     
+    }
+}
+
+
 impl<B> Vec2<B> {
-
-    #[inline(always)]
-    pub fn as_arr(&self)->&[B;2]{
-        unsafe{&*(self as *const _ as *const _)}
-    }
-
-
-    #[inline(always)]
-    pub fn from_ref(arr:&[B;2])->&Self{
-        unsafe{&*(arr as *const _ as *const _)}
-    }
-
-    #[inline(always)]
-    pub fn from_ref_mut(arr:&mut [B;2])->&mut Self{
-        unsafe{&mut *(arr as *mut _ as *mut _)}
-    }
 
     ///Get the range of one axis.
     #[inline(always)]

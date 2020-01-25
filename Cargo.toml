@@ -1,6 +1,6 @@
 [package]
 name = "axgeom"
-version = "1.5.2"
+version = "1.6.0"
 authors = ["Ken Reed <kenakioreed@gmail.com>"]
 description = "Library that provides ability to extract 1d ranges out of 2d objects."
 license = "MIT/Apache-2.0"
@@ -10,7 +10,7 @@ readme = "readme.md"
 edition = "2018"
 
 [dependencies]
-roots = "0.0.5"
+roots = "0.0.6"
 ordered-float = "1.0.2"
-num-traits = "0.2.10"
+num-traits = "0.2.11"
 primitive-from = "1.0.2"

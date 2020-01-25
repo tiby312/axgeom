@@ -63,28 +63,55 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> 
     }
 }
 
-impl<T> Rect<T> {
-    #[inline(always)]
-    pub fn as_arr(&self)->&[T;4]{
-        unsafe{&*(self as *const _ as *const _)}
-    }
-    
-    #[inline(always)]
-    pub fn from_ref(arr:&[T;4])->&Self{
-        unsafe{&*(arr as *const _ as *const _)}
-    }
 
+impl<'a,B> From<&'a mut [B;4]> for &'a mut Rect<B>{
     #[inline(always)]
-    pub fn from_ref_mut(arr:&mut [T;4])->&mut Self{
-        unsafe{&mut *(arr as *mut _ as *mut _)}
+    fn from(a:&'a mut [B;4])->Self{
+        unsafe{&mut *(a as *mut _ as *mut _)}
     }
-
+}
+impl<'a,B> From<&'a [B;4]> for &'a Rect<B>{
     #[inline(always)]
-    pub fn from_arr(rect:[T;4])->Self{
-        let [a,b,c,d]=rect;
+    fn from(a:&'a [B;4])->Self{
+        unsafe{&*(a as *const _ as *const _)}
+    }
+}
+
+
+impl<B> From<[B;4]> for Rect<B>{
+    #[inline(always)]
+    fn from(a:[B;4])->Self{
+        let [a,b,c,d]=a;
         Rect::new(a,b,c,d)
     }
+}
 
+impl<B> Into<[B;4]> for Rect<B>{
+    #[inline(always)]
+    fn into(self)->[B;4]{
+        [self.x.start,self.x.end,self.y.start,self.y.end]
+    }
+}
+
+impl<B> AsRef<[B;4]> for Rect<B>{
+    #[inline(always)]
+    fn as_ref(& self)->&[B;4]{
+        unsafe{&*(self as *const _ as *const _)}     
+    }
+}
+
+impl<B> AsMut<[B;4]> for Rect<B>{
+    #[inline(always)]
+    fn as_mut(&mut self)->&mut [B;4]{
+        unsafe{&mut *(self as *mut _ as *mut _)}     
+    }
+}
+
+
+
+
+impl<T> Rect<T> {
+   
     ///Get the range of one axis.
     #[inline(always)]
     pub fn get_range(&self, axis: impl Axis) -> &Range<T> {
