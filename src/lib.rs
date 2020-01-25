@@ -8,6 +8,12 @@ mod ray;
 mod rect;
 mod vec2;
 
+pub use roots;
+pub use num_traits;
+pub use ordered_float;
+pub use primitive_from;
+
+
 pub use self::range::range;
 pub use self::range::Range;
 pub use self::ray::ray;
