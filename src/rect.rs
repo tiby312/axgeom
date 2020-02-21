@@ -33,6 +33,7 @@ impl<S: Copy> Rect<S> {
 
 
     #[inline(always)]
+    #[must_use]
     pub fn inner_into<A: From<S>>(&self) -> Rect<A> {
         let x = self.x.inner_into();
         let y = self.y.inner_into();
@@ -41,6 +42,7 @@ impl<S: Copy> Rect<S> {
     }
 
     #[inline(always)]
+    #[must_use]
     pub fn inner_try_into<A: TryFrom<S>>(&self) -> Result<Rect<A>, A::Error> {
         let x = self.x.inner_try_into();
         let y = self.y.inner_try_into();
@@ -56,6 +58,7 @@ impl<S: Copy> Rect<S> {
 impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> {
     ///Create a rectangle from a point and radius.
     #[inline(always)]
+    #[must_use]
     pub fn from_point(point: Vec2<T>, radius: Vec2<T>) -> Rect<T> {
         let x = Range::from_point(point.x, radius.x);
         let y = Range::from_point(point.y, radius.y);
@@ -114,6 +117,7 @@ impl<T> Rect<T> {
    
     ///Get the range of one axis.
     #[inline(always)]
+    #[must_use]
     pub fn get_range(&self, axis: impl Axis) -> &Range<T> {
         if axis.is_xaxis() {
             &self.x
@@ -124,6 +128,7 @@ impl<T> Rect<T> {
 
     ///Get the mutable range of one axis.
     #[inline(always)]
+    #[must_use]
     pub fn get_range_mut(&mut self, axis: impl Axis) -> &mut Range<T> {
         if axis.is_xaxis() {
             &mut self.x
@@ -137,6 +142,7 @@ impl<T> Rect<T> {
     ///(a,b) is the x component range.
     ///(c,d) is the y component range.
     #[inline(always)]
+    #[must_use]
     pub fn new(a: T, b: T, c: T, d: T) -> Rect<T> {
         Rect {
             x: Range { start: a, end: b },

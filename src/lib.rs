@@ -32,10 +32,12 @@ pub struct XAXIS;
 impl Axis for XAXIS {
     type Next = YAXIS;
     #[inline(always)]
+    #[must_use]
     fn is_xaxis(&self) -> bool {
         true
     }
     #[inline(always)]
+    #[must_use]
     fn next(&self) -> Self::Next {
         YAXIS
     }
@@ -48,10 +50,13 @@ impl Axis for YAXIS {
     type Next = XAXIS;
 
     #[inline(always)]
+    #[must_use]
     fn is_xaxis(&self) -> bool {
         false
     }
+
     #[inline(always)]
+    #[must_use]
     fn next(&self) -> Self::Next {
         XAXIS
     }
@@ -67,6 +72,7 @@ pub trait Axis: Sync + Send + Copy + Clone {
     fn next(&self) -> Self::Next;
 
     #[inline(always)]
+    #[must_use]
     fn is_equal_to<B: Axis>(&self, other: B) -> bool {
         if self.is_xaxis() && other.is_xaxis() {
             return true;
@@ -88,6 +94,7 @@ pub struct FixedAspectVec2 {
 }
 impl FixedAspectVec2 {
     #[inline(always)]
+    #[must_use]
     pub fn as_vec(&self) -> Vec2<f64> {
         let height = self.ratio.height_over_width() * self.width;
         vec2(self.width, height)
@@ -101,12 +108,14 @@ pub struct AspectRatio(pub Vec2<f64>);
 
 impl AspectRatio {
     #[inline(always)]
+    #[must_use]
     pub fn width_over_height(&self) -> f64 {
         let v = self.0;
         v.x as f64 / v.y as f64
     }
 
     #[inline(always)]
+    #[must_use]
     pub fn height_over_width(&self) -> f64 {
         let v = self.0;
         v.y as f64 / v.x as f64

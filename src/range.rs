@@ -27,6 +27,7 @@ pub struct Range<T> {
 
 impl<T> Range<T> {
     #[inline(always)]
+    #[must_use]
     pub fn new(start: T, end: T) -> Range<T> {
         Range { start, end }
     }
