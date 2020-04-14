@@ -151,8 +151,137 @@ impl<N: num_traits::Float + roots::FloatType> Ray<N> {
 
 //TODO make a float specific one
 
-impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy + Ord + core::fmt::Debug> Ray<N> {
+
+
+
+impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + PartialOrd + Copy  + core::fmt::Debug> Ray<N> {
+    
+
+    //if axis is x, then the line is top to bottom
+    //if axis is y, then the line is left to right
+    pub fn cast_to_aaline<A:Axis>(&self,a:A,line:N)->CastResult<N>{
+        let ray=self;
+        let  tval=if a.is_xaxis(){
+            //ray.point.x+ray.dir.x*t=line
+            //ray.point.x-line=ray.dir.x*t
+            //
+
+            
+            (ray.point.x-line)/ray.dir.x
+        }else{
+            (ray.point.y-line)/ray.dir.y
+        };
+
+        if tval>N::zero() && !tval.is_nan(){
+            CastResult::Hit(tval)
+        }else{
+            CastResult::NoHit
+        }
+
+    }
+
+
+    pub fn find_candidate_planes(&self,rect:&Rect<N>)->[bool;4]{
+        //In cases where the ray is directly vertical or horizant, 
+        //we technically only need to check one side of the rect.
+        //but these cases are so rare, and it doesnt hurt much to check
+        //one exra side. So we condense these cases into cases
+        //where we check two sides.
+
+        let x=self.dir.x>N::zero();
+        let y=self.dir.y>N::zero();
+        
+        match (x,y){
+            (true,true)=>{
+                //left top 
+            },
+            (true,false)=>{
+                //left bottom
+            },
+            (false,true)=>{
+                //right top
+            },
+            (false,false)=>{
+                //right bottom
+            }
+        }
+
+        //Observation to make is that in each case, there was on x and one y coordinate.
+
+        todo!()
+
+    }
+
+    pub fn cast_to_rect2(&self,rect:&Rect<N>)->CastResult<N>{
+        let &Rect{x:Range{start:startx,end:endx},y:Range{start:starty,end:endy}}=rect;
+
+
+        let x=if self.dir.x>N::zero(){
+            startx
+        }else{
+            endx
+        };
+        let y=if self.dir.y>N::zero(){
+            starty
+        }else{
+            endy
+        };
+
+        let tval1=self.cast_to_aaline(XAXIS,x);
+        let tval2=self.cast_to_aaline(YAXIS,y);
+
+
+        use CastResult::*;
+        //return tval2;
+        match (tval1,tval2){
+            (Hit(a),Hit(b))=>{
+
+                //xaxis hit
+                if a>b{
+                    let yy=self.point.y+self.dir.y*a;
+                    if rect.y.contains(yy){
+                        Hit(a)
+                    }else{
+                        NoHit
+                    }
+                }else{
+                    let xx=self.point.x+self.dir.x*b;
+                    if rect.x.contains(xx){
+                        Hit(b)
+                    }else{
+                        NoHit
+                    }
+                }
+            },
+            (Hit(a),NoHit)=>{
+                let yy=self.point.y+self.dir.y*a;
+                if rect.y.contains(yy){
+                    Hit(a)
+                }else{
+                    NoHit
+                }
+            },
+            (NoHit,Hit(b))=>{
+                let xx=self.point.x+self.dir.x*b;
+                if rect.x.contains(xx){
+                    Hit(b)
+                }else{
+                    NoHit
+                }
+            },
+            (NoHit,NoHit)=>{
+                NoHit
+            }
+
+        }
+
+
+        
+    }
+
+    /*
     ///Returns if a ray intersects a box.
+    
     pub fn cast_to_rect(&self, rect: &Rect<N>) -> CastResult<N> {
         let ray = self;
 
@@ -259,5 +388,5 @@ impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy + Ord + core::f
                 }
             }
         }
-    }
+    }*/
 }
