@@ -163,13 +163,10 @@ impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + Partia
         let ray=self;
         let  tval=if a.is_xaxis(){
             //ray.point.x+ray.dir.x*t=line
-            //ray.point.x-line=ray.dir.x*t
-            //
-
-            
-            (ray.point.x-line)/ray.dir.x
+            //ray.point.x-line=-ray.dir.x*t
+            (line-ray.point.x)/ray.dir.x
         }else{
-            (ray.point.y-line)/ray.dir.y
+            (line-ray.point.y)/ray.dir.y
         };
 
         if tval>N::zero() && !tval.is_nan(){
@@ -177,50 +174,19 @@ impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + Partia
         }else{
             CastResult::NoHit
         }
-
     }
 
 
-    pub fn find_candidate_planes(&self,rect:&Rect<N>)->[bool;4]{
-        //In cases where the ray is directly vertical or horizant, 
-        //we technically only need to check one side of the rect.
-        //but these cases are so rare, and it doesnt hurt much to check
-        //one exra side. So we condense these cases into cases
-        //where we check two sides.
-
-        let x=self.dir.x>N::zero();
-        let y=self.dir.y>N::zero();
-        
-        match (x,y){
-            (true,true)=>{
-                //left top 
-            },
-            (true,false)=>{
-                //left bottom
-            },
-            (false,true)=>{
-                //right top
-            },
-            (false,false)=>{
-                //right bottom
-            }
-        }
-
-        //Observation to make is that in each case, there was on x and one y coordinate.
-
-        todo!()
-
-    }
 
     pub fn cast_to_rect2(&self,rect:&Rect<N>)->CastResult<N>{
         let &Rect{x:Range{start:startx,end:endx},y:Range{start:starty,end:endy}}=rect;
-
 
         let x=if self.dir.x>N::zero(){
             startx
         }else{
             endx
         };
+
         let y=if self.dir.y>N::zero(){
             starty
         }else{
@@ -230,9 +196,9 @@ impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + Partia
         let tval1=self.cast_to_aaline(XAXIS,x);
         let tval2=self.cast_to_aaline(YAXIS,y);
 
+        //dbg!(tval1,tval2);
 
         use CastResult::*;
-        //return tval2;
         match (tval1,tval2){
             (Hit(a),Hit(b))=>{
 
@@ -272,11 +238,39 @@ impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + Partia
             (NoHit,NoHit)=>{
                 NoHit
             }
+        } 
+    }
 
+
+    pub fn find_candidate_planes(&self,rect:&Rect<N>)->[bool;4]{
+        //In cases where the ray is directly vertical or horizant, 
+        //we technically only need to check one side of the rect.
+        //but these cases are so rare, and it doesnt hurt much to check
+        //one exra side. So we condense these cases into cases
+        //where we check two sides.
+
+        let x=self.dir.x>N::zero();
+        let y=self.dir.y>N::zero();
+        
+        match (x,y){
+            (true,true)=>{
+                //left top 
+            },
+            (true,false)=>{
+                //left bottom
+            },
+            (false,true)=>{
+                //right top
+            },
+            (false,false)=>{
+                //right bottom
+            }
         }
 
+        //Observation to make is that in each case, there was on x and one y coordinate.
 
-        
+        todo!()
+
     }
 
     /*

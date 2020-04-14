@@ -1,7 +1,8 @@
 //!	A library that provides a way to easily extract 1d ranges from a 2d container based off of the x or y axis statically through
 //! type parameters. This can help with performnace in algorithms where you need to get values for a particular axis often.
 
-#![no_std]
+//TODO add back
+//#![no_std]
 
 mod range;
 mod ray;
