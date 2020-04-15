@@ -149,8 +149,6 @@ impl<N: num_traits::Float + roots::FloatType> Ray<N> {
     }
 }
 
-//TODO make a float specific one
-
 
 
 
@@ -178,16 +176,42 @@ impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + Partia
 
 
 
-    pub fn cast_to_rect2(&self,rect:&Rect<N>)->CastResult<N>{
+    fn prune_rect_axis<A:Axis>(&self,tval:N,rect:&Rect<N>,axis:A)->CastResult<N>{
+        use CastResult::*;
+        
+        if axis.is_xaxis(){
+            let xx=self.point.x+self.dir.x*tval;
+            if rect.x.contains(xx){
+                Hit(tval)
+            }else{
+                NoHit
+            }
+        }else{
+            let yy=self.point.y+self.dir.y*tval;
+            if rect.y.contains(yy){
+                Hit(tval)
+            }else{
+                NoHit
+            }
+        }
+        
+    }
+    pub fn cast_to_rect(&self,rect:&Rect<N>)->CastResult<N>{
+        /*
+        https://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms
+        Nobody described the algorithm here, but the Graphics Gems algorithm is simply:
+        Using your ray's direction vector, determine which 3 of the 6 candidate planes would be hit first. If your (unnormalized) ray direction vector is (-1, 1, -1), then the 3 planes that are possible to be hit are +x, -y, and +z.
+        Of the 3 candidate planes, do find the t-value for the intersection for each. Accept the plane that gets the largest t value as being the plane that got hit, and check that the hit is within the box. The diagram in the text makes this clear:
+        */
         let &Rect{x:Range{start:startx,end:endx},y:Range{start:starty,end:endy}}=rect;
 
-        let x=if self.dir.x>N::zero(){
+        let x=if self.dir.x>=N::zero(){
             startx
         }else{
             endx
         };
 
-        let y=if self.dir.y>N::zero(){
+        let y=if self.dir.y>=N::zero(){
             starty
         }else{
             endy
@@ -196,44 +220,21 @@ impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + Partia
         let tval1=self.cast_to_aaline(XAXIS,x);
         let tval2=self.cast_to_aaline(YAXIS,y);
 
-        //dbg!(tval1,tval2);
-
         use CastResult::*;
         match (tval1,tval2){
             (Hit(a),Hit(b))=>{
-
                 //xaxis hit
                 if a>b{
-                    let yy=self.point.y+self.dir.y*a;
-                    if rect.y.contains(yy){
-                        Hit(a)
-                    }else{
-                        NoHit
-                    }
+                    self.prune_rect_axis(a,rect,YAXIS)
                 }else{
-                    let xx=self.point.x+self.dir.x*b;
-                    if rect.x.contains(xx){
-                        Hit(b)
-                    }else{
-                        NoHit
-                    }
+                    self.prune_rect_axis(b,rect,XAXIS)
                 }
             },
             (Hit(a),NoHit)=>{
-                let yy=self.point.y+self.dir.y*a;
-                if rect.y.contains(yy){
-                    Hit(a)
-                }else{
-                    NoHit
-                }
+                self.prune_rect_axis(a,rect,YAXIS)
             },
             (NoHit,Hit(b))=>{
-                let xx=self.point.x+self.dir.x*b;
-                if rect.x.contains(xx){
-                    Hit(b)
-                }else{
-                    NoHit
-                }
+                self.prune_rect_axis(b,rect,XAXIS)
             },
             (NoHit,NoHit)=>{
                 NoHit
@@ -241,7 +242,7 @@ impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + Partia
         } 
     }
 
-
+/*
     pub fn find_candidate_planes(&self,rect:&Rect<N>)->[bool;4]{
         //In cases where the ray is directly vertical or horizant, 
         //we technically only need to check one side of the rect.
@@ -272,115 +273,6 @@ impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + Partia
         todo!()
 
     }
-
-    /*
-    ///Returns if a ray intersects a box.
+*/
     
-    pub fn cast_to_rect(&self, rect: &Rect<N>) -> CastResult<N> {
-        let ray = self;
-
-        //Find the corner that the ray will hit one of its sides with.
-        let next_grid_pos = {
-            vec2(
-                if ray.dir.x < N::zero() {
-                    rect.x.end
-                } else if ray.dir.x > N::zero() {
-                    rect.x.start
-                } else {
-                    if rect.x.contains(ray.point.x) {
-                        let diff = rect.y.difference_to_point(ray.point.y);
-                        match diff {
-                            Some(diff) => {
-                                if diff.signum() == -ray.dir.y.signum() {
-                                    return CastResult::Hit(diff.abs());
-                                } else {
-                                    return CastResult::NoHit;
-                                }
-                            }
-                            None => return CastResult::Hit(N::zero()),
-                        }
-                    } else {
-                        return CastResult::NoHit;
-                    }
-                },
-                if ray.dir.y < N::zero() {
-                    rect.y.end
-                } else if ray.dir.y > N::zero() {
-                    rect.y.start
-                } else {
-                    if rect.y.contains(ray.point.y) {
-                        let diff = rect.x.difference_to_point(ray.point.x);
-                        match diff {
-                            Some(diff) => {
-                                if diff.signum() == -ray.dir.x.signum() {
-                                    return CastResult::Hit(diff.abs());
-                                } else {
-                                    return CastResult::NoHit;
-                                }
-                            }
-                            None => return CastResult::Hit(N::zero()),
-                        }
-                    } else {
-                        return CastResult::NoHit;
-                    }
-                },
-            )
-        };
-
-        //Compute the tval of hitting both the x and y axis.
-        let tvalx = (next_grid_pos.x - ray.point.x) / ray.dir.x;
-        let tvaly = (next_grid_pos.y - ray.point.y) / ray.dir.y;
-
-        fn as_positive<N: PartialOrd + num_traits::Signed>(a: N) -> Option<N> {
-            if a > N::zero() {
-                Some(a)
-            } else {
-                None
-            }
-        }
-
-        match (as_positive(tvalx), as_positive(tvaly)) {
-            (Some(x), Some(y)) => {
-                let x = if rect.y.contains(ray.point_at_tval(x).y) {
-                    Some(x)
-                } else {
-                    None
-                };
-
-                let y = if rect.x.contains(ray.point_at_tval(y).x) {
-                    Some(y)
-                } else {
-                    None
-                };
-
-                match (x, y) {
-                    (Some(x), Some(y)) => CastResult::Hit(x.min(y)),
-                    (Some(x), None) => CastResult::Hit(x),
-                    (None, Some(y)) => CastResult::Hit(y),
-                    (None, None) => CastResult::NoHit,
-                }
-            }
-            (Some(x), None) => {
-                if rect.y.contains(ray.point_at_tval(x).y) {
-                    CastResult::Hit(x)
-                } else {
-                    CastResult::NoHit
-                }
-            }
-            (None, Some(y)) => {
-                if rect.x.contains(ray.point_at_tval(y).x) {
-                    CastResult::Hit(y)
-                } else {
-                    CastResult::NoHit
-                }
-            }
-            (None, None) => {
-                if rect.contains_point(ray.point) {
-                    CastResult::Hit(N::zero())
-                } else {
-                    CastResult::NoHit
-                }
-            }
-        }
-    }*/
 }
