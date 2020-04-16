@@ -82,7 +82,7 @@ impl<S: Copy + Neg<Output = S> + PartialOrd + Zero> Vec2<S> {
 impl<S: Add<Output = S> + Sub<Output = S> + PartialOrd + Copy> Vec2<S> {
     #[inline(always)]
     pub fn manhattan_dis(&self, other: Vec2<S>) -> S {
-        (absdiff(self.x, other.x) + absdiff(self.y, other.y))
+        absdiff(self.x, other.x) + absdiff(self.y, other.y)
     }
 }
 

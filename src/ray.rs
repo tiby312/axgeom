@@ -152,9 +152,8 @@ impl<N: num_traits::Float + roots::FloatType> Ray<N> {
 
 
 
-impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + PartialOrd + Copy  + core::fmt::Debug> Ray<N> {
+impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy  + core::fmt::Debug> Ray<N> {
     
-
     //if axis is x, then the line is top to bottom
     //if axis is y, then the line is left to right
     pub fn cast_to_aaline<A:Axis>(&self,a:A,line:N)->CastResult<N>{
@@ -167,12 +166,12 @@ impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + Partia
             (line-ray.point.y)/ray.dir.y
         };
 
-        if tval>N::zero() && !tval.is_nan(){
+        if tval>N::zero() {
             CastResult::Hit(tval)
         }else{
             CastResult::NoHit
         }
-    }
+    }    
 
 
 
