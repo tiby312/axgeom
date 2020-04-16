@@ -197,6 +197,10 @@ impl<N: num_traits::float::Float + num_traits::Num + num_traits::Signed + Partia
         
     }
     pub fn cast_to_rect(&self,rect:&Rect<N>)->CastResult<N>{
+        
+        if rect.contains_point(self.point){
+            return CastResult::Hit(N::zero())
+        }
         /*
         https://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms
         Nobody described the algorithm here, but the Graphics Gems algorithm is simply:
