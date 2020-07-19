@@ -5,6 +5,7 @@ use num_traits::float::Float;
 use num_traits::Zero;
 use ordered_float::NotNan;
 use primitive_from::PrimitiveFrom;
+use serde::{Serialize, Deserialize};
 
 ///Convenience function to create a vector.
 #[inline(always)]
@@ -28,7 +29,7 @@ impl<N: Float> AsRef<Vec2<N>> for Vec2<NotNan<N>> {
 }
 
 ///A 2D vector.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash,Serialize,Deserialize)]
 #[must_use]
 pub struct Vec2<N> {
     pub x: N,
