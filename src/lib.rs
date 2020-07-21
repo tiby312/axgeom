@@ -2,7 +2,7 @@
 //! type parameters. This can help with performnace in algorithms where you need to get values for a particular axis often.
 
 //TODO add back
-//#![no_std]
+#![no_std]
 
 mod range;
 mod ray;
