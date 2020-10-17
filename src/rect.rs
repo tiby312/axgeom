@@ -300,6 +300,22 @@ impl<T: PartialOrd + Copy> Rect<T> {
         self.x.contains_range(&rect.x) && self.y.contains_range(&rect.y)
     }
 
+    #[inline(always)]
+    pub fn grow_to_fit_point(&mut self,point:Vec2<T>)->&mut Self{
+        //TODO simplify using range.
+        if point.x<self.x.start{
+            self.x.start=point.x
+        }else if self.x.end<point.x{
+            self.x.end=point.x
+        }
+        if point.y<self.y.start{
+            self.y.start=point.y
+        }else if self.y.end<point.y{
+            self.y.end=point.y
+        }
+        self
+    }
+
     ///Grow the rectangle to fit the specified rectangle by replacing values
     ///with the specified rectangle. No floating point computations.
     #[inline(always)]
