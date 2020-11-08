@@ -6,7 +6,7 @@ use num_traits::Float;
 use ordered_float::NotNan;
 use primitive_from::PrimitiveFrom;
 
-//Convenience function to create a Rect.
+///Convenience function to create a Rect.
 #[inline(always)]
 pub fn rect<T>(a: T, b: T, c: T, d: T) -> Rect<T> {
     Rect::new(a, b, c, d)
