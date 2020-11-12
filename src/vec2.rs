@@ -143,8 +143,12 @@ impl<S: FloatCore> Vec2<S> {
         self.x.is_nan() || self.y.is_nan()
     }
 
+}
 
-    #[cfg(std)]
+
+#[cfg(feature = "std")]
+impl<S:num_traits::Float> Vec2<S>{
+
     #[inline(always)]
     #[must_use]
     pub fn truncate_at(&self, mag: S) -> Vec2<S> {
@@ -155,7 +159,6 @@ impl<S: FloatCore> Vec2<S> {
         }
     }
 
-    #[cfg(std)]
     #[inline(always)]
     #[must_use]
     pub fn normalize_to(&self, mag: S) -> Vec2<S> {
@@ -164,7 +167,6 @@ impl<S: FloatCore> Vec2<S> {
     }
 
 
-    #[cfg(std)]
     #[inline(always)]
     #[must_use]
     pub fn magnitude(&self) -> S {
