@@ -1,7 +1,7 @@
 use crate::Axis;
 use core::convert::TryInto;
 use core::ops::*;
-use num_traits::float::Float;
+use num_traits::float::FloatCore;
 use num_traits::Zero;
 use ordered_float::NotNan;
 use serde::{Serialize, Deserialize};
@@ -20,7 +20,7 @@ pub fn vec2same<N: Copy>(a: N) -> Vec2<N> {
     Vec2 { x: a, y: a }
 }
 
-impl<N: Float> AsRef<Vec2<N>> for Vec2<NotNan<N>> {
+impl<N: FloatCore> AsRef<Vec2<N>> for Vec2<NotNan<N>> {
     #[inline(always)]
     fn as_ref(&self) -> &Vec2<N> {
         unsafe { &*((self as *const Self) as *const Vec2<N>) }
@@ -136,13 +136,15 @@ impl<S: Mul<Output = S> + Div<Output = S> + Add<Output = S> + Copy> Vec2<S> {
         self.x * other.x + self.y * other.y
     }
 }
-impl<S: Float> Vec2<S> {
+impl<S: FloatCore> Vec2<S> {
     #[inline(always)]
     #[must_use]
     pub fn is_nan(&self)->bool{
         self.x.is_nan() || self.y.is_nan()
     }
 
+
+    #[cfg(std)]
     #[inline(always)]
     #[must_use]
     pub fn truncate_at(&self, mag: S) -> Vec2<S> {
@@ -153,6 +155,7 @@ impl<S: Float> Vec2<S> {
         }
     }
 
+    #[cfg(std)]
     #[inline(always)]
     #[must_use]
     pub fn normalize_to(&self, mag: S) -> Vec2<S> {
@@ -160,6 +163,8 @@ impl<S: Float> Vec2<S> {
         (*self) * (mag / l)
     }
 
+
+    #[cfg(std)]
     #[inline(always)]
     #[must_use]
     pub fn magnitude(&self) -> S {

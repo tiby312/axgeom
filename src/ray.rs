@@ -91,7 +91,7 @@ impl<N> CastResult<N> {
 
 use roots;
 use roots::*;
-impl<N: num_traits::Float + roots::FloatType> Ray<N> {
+impl<N: num_traits::float::FloatCore + roots::FloatType> Ray<N> {
     ///Checks if a ray intersects a circle.
     pub fn cast_to_circle(&self, center: Vec2<N>, radius: N) -> CastResult<N> {
         //https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
