@@ -89,63 +89,67 @@ impl<N> CastResult<N> {
     }
 }
 
-use roots;
-use roots::*;
-impl<N: num_traits::float::FloatCore + roots::FloatType> Ray<N> {
-    ///Checks if a ray intersects a circle.
-    pub fn cast_to_circle(&self, center: Vec2<N>, radius: N) -> CastResult<N> {
-        //https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
-        //circle
-        //(x-center.x)^2+(y-center.y)^2=r2
-        //ray
-        //x(t)=ray.dir.x*t+ray.point.x
-        //y(t)=ray.dir.y*t+ray.point.y
-        //
-        //solve for t.
-        //
-        //
-        //we get:
-        //
-        //𝑎𝑡^2+𝑏𝑡+𝑐=0
-        //
-        //
-        //
-        //
-        let ray = self;
-        let zz = <N as FloatType>::zero();
-        let two = <N as FloatType>::one()+<N as FloatType>::one();
 
-        let a = ray.dir.x.powi(2) + ray.dir.y.powi(2);
-        let b =
-            two * ray.dir.x * (ray.point.x - center.x) + two * ray.dir.y * (ray.point.y - center.y);
-        let c =
-            (ray.point.x - center.x).powi(2) + (ray.point.y - center.y).powi(2) - radius.powi(2);
+#[cfg(feature = "std")]
+pub mod foo{
+    use super::*;
+    use roots;
+    use roots::*;
+    impl<N: num_traits::float::FloatCore + roots::FloatType> Ray<N> {
+        ///Checks if a ray intersects a circle.
+        pub fn cast_to_circle(&self, center: Vec2<N>, radius: N) -> CastResult<N> {
+            //https://math.stackexchange.com/questions/311921/get-location-of-vector-circle-intersection
+            //circle
+            //(x-center.x)^2+(y-center.y)^2=r2
+            //ray
+            //x(t)=ray.dir.x*t+ray.point.x
+            //y(t)=ray.dir.y*t+ray.point.y
+            //
+            //solve for t.
+            //
+            //
+            //we get:
+            //
+            //𝑎𝑡^2+𝑏𝑡+𝑐=0
+            //
+            //
+            //
+            //
+            let ray = self;
+            let zz = <N as FloatType>::zero();
+            let two = <N as FloatType>::one()+<N as FloatType>::one();
 
-        match find_roots_quadratic(a, b, c) {
-            Roots::No(_) => CastResult::NoHit,
-            Roots::One([a]) => {
-                if a < zz {
-                    CastResult::NoHit
-                } else {
-                    CastResult::Hit(a)
+            let a = ray.dir.x.powi(2) + ray.dir.y.powi(2);
+            let b =
+                two * ray.dir.x * (ray.point.x - center.x) + two * ray.dir.y * (ray.point.y - center.y);
+            let c =
+                (ray.point.x - center.x).powi(2) + (ray.point.y - center.y).powi(2) - radius.powi(2);
+
+            match find_roots_quadratic(a, b, c) {
+                Roots::No(_) => CastResult::NoHit,
+                Roots::One([a]) => {
+                    if a < zz {
+                        CastResult::NoHit
+                    } else {
+                        CastResult::Hit(a)
+                    }
                 }
-            }
-            Roots::Two([a, b]) => {
-                let (closer, further) = if a < b { (a, b) } else { (b, a) };
+                Roots::Two([a, b]) => {
+                    let (closer, further) = if a < b { (a, b) } else { (b, a) };
 
-                if closer < zz && further < zz {
-                    CastResult::NoHit
-                } else if closer < zz && further > zz {
-                    CastResult::Hit(<N as FloatType>::zero())
-                } else {
-                    CastResult::Hit(closer)
+                    if closer < zz && further < zz {
+                        CastResult::NoHit
+                    } else if closer < zz && further > zz {
+                        CastResult::Hit(<N as FloatType>::zero())
+                    } else {
+                        CastResult::Hit(closer)
+                    }
                 }
+                _ => unreachable!(),
             }
-            _ => unreachable!(),
         }
     }
 }
-
 
 
 

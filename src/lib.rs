@@ -8,7 +8,10 @@ mod ray;
 mod rect;
 mod vec2;
 
+
+#[cfg(feature = "std")]
 pub use roots;
+
 pub use num_traits;
 pub use ordered_float;
 
