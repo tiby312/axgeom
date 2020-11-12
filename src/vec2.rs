@@ -1,10 +1,9 @@
 use crate::Axis;
-use core::convert::TryFrom;
+use core::convert::TryInto;
 use core::ops::*;
 use num_traits::float::Float;
 use num_traits::Zero;
 use ordered_float::NotNan;
-use primitive_from::PrimitiveFrom;
 use serde::{Serialize, Deserialize};
 
 ///Convenience function to create a vector.
@@ -170,15 +169,19 @@ impl<S: Float> Vec2<S> {
 
 ///Cast an array of 2 elements of primitive type to another primitive type using "as" on each element.
 #[must_use]
-pub fn arr2_as<B: Copy, A: PrimitiveFrom<B>>(a: [B; 2]) -> [A; 2] {
-    [PrimitiveFrom::from(a[0]), PrimitiveFrom::from(a[1])]
+pub fn arr2_as<B: 'static+Copy, A: num_traits::AsPrimitive<B>>(a: [A; 2]) -> [B; 2] {
+    let [a,b]=a;
+    [a.as_(),b.as_()]
 }
 
-impl<B: Copy> Vec2<B> {
+impl<T: Copy> Vec2<T> {
+
+    #[inline(always)]
     #[must_use]
-    pub fn inner_as<A: PrimitiveFrom<B>>(&self) -> Vec2<A> {
-        vec2(PrimitiveFrom::from(self.x), PrimitiveFrom::from(self.y))
+    pub fn inner_as<B:'static+Copy>(&self) -> Vec2<B> where T: num_traits::AsPrimitive<B>{
+        vec2(self.x.as_(),self.y.as_())
     }
+
 }
 
 
@@ -261,9 +264,9 @@ impl<B> Vec2<B> {
 
     #[inline(always)]
     #[must_use]
-    pub fn inner_try_into<A: TryFrom<B>>(self) -> Result<Vec2<A>, A::Error> {
-        let x = A::try_from(self.x);
-        let y = A::try_from(self.y);
+    pub fn inner_try_into<A>(self) -> Result<Vec2<A>, B::Error> where B:TryInto<A> {
+        let x = self.x.try_into();
+        let y = self.y.try_into();
         match (x, y) {
             (Ok(x), Ok(y)) => Ok(vec2(x, y)),
             (Ok(_), Err(e)) => Err(e),

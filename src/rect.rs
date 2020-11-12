@@ -1,10 +1,8 @@
 use crate::range::Range;
 use crate::vec2::vec2;
 use crate::*;
-use core::convert::TryFrom;
-use num_traits::Float;
+use core::convert::TryInto;
 use ordered_float::NotNan;
-use primitive_from::PrimitiveFrom;
 
 ///Convenience function to create a Rect.
 #[inline(always)]
@@ -21,7 +19,7 @@ pub struct Rect<T> {
     pub y: Range<T>,
 }
 
-impl<N: Float> AsRef<Rect<N>> for Rect<NotNan<N>> {
+impl<N: num_traits::float::FloatCore> AsRef<Rect<N>> for Rect<NotNan<N>> {
     #[inline(always)]
     fn as_ref(&self) -> &Rect<N> {
         unsafe { &*((self as *const Self) as *const Rect<N>) }
@@ -32,18 +30,19 @@ impl<S: Copy> Rect<S> {
     
 
 
+
     #[inline(always)]
-    #[must_use]
-    pub fn inner_into<A: From<S>>(&self) -> Rect<A> {
+    pub fn inner_into<A>(&self) -> Rect<A> where S:Into<A> {
         let x = self.x.inner_into();
         let y = self.y.inner_into();
 
         Rect { x, y }
     }
 
+
     #[inline(always)]
     #[must_use]
-    pub fn inner_try_into<A: TryFrom<S>>(&self) -> Result<Rect<A>, A::Error> {
+    pub fn inner_try_into<A>(&self) -> Result<Rect<A>, S::Error> where S:TryInto<A> {
         let x = self.x.inner_try_into();
         let y = self.y.inner_try_into();
         match (x, y) {
@@ -96,12 +95,14 @@ impl<B> Into<[B;4]> for Rect<B>{
     }
 }
 
+
 impl<B> AsRef<[B;4]> for Rect<B>{
     #[inline(always)]
     fn as_ref(& self)->&[B;4]{
         unsafe{&*(self as *const _ as *const _)}     
     }
 }
+
 
 impl<B> AsMut<[B;4]> for Rect<B>{
     #[inline(always)]
@@ -173,7 +174,7 @@ impl<T: Copy> Rect<T> {
     }
 
     #[inline(always)]
-    pub fn inner_as<B: PrimitiveFrom<T>>(&self) -> Rect<B> {
+    pub fn inner_as<B:'static+Copy>(&self) -> Rect<B> where T: num_traits::AsPrimitive<B>{
         Rect {
             x: self.x.inner_as(),
             y: self.y.inner_as(),

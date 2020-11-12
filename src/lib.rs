@@ -1,7 +1,6 @@
 //!	A library that provides a way to easily extract 1d ranges from a 2d container based off of the x or y axis statically through
 //! type parameters. This can help with performnace in algorithms where you need to get values for a particular axis often.
 
-//TODO add back
 #![no_std]
 
 mod range;
@@ -12,7 +11,6 @@ mod vec2;
 pub use roots;
 pub use num_traits;
 pub use ordered_float;
-pub use primitive_from;
 
 
 pub use self::range::range;

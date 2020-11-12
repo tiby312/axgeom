@@ -1,7 +1,6 @@
-use core::convert::TryFrom;
+use core::convert::TryInto;
 use num_traits::Float;
 use ordered_float::NotNan;
-use primitive_from::PrimitiveFrom;
 
 //Convenience function to create a Range.
 #[inline(always)]
@@ -207,25 +206,28 @@ impl<N: Float> AsRef<Range<N>> for Range<NotNan<N>> {
 }
 
 impl<S: Copy> Range<S> {
+    
     #[inline(always)]
-    pub fn inner_as<B: PrimitiveFrom<S>>(&self) -> Range<B> {
+    pub fn inner_as<B:'static+Copy>(&self) -> Range<B> where S: num_traits::AsPrimitive<B>{
         Range {
-            start: PrimitiveFrom::from(self.start),
-            end: PrimitiveFrom::from(self.end),
+            start: self.start.as_(),
+            end: self.end.as_(),
         }
     }
 
+
     #[inline(always)]
-    pub fn inner_into<A: From<S>>(&self) -> Range<A> {
-        let start = A::from(self.start);
-        let end = A::from(self.end);
+    pub fn inner_into<A>(&self) -> Range<A> where S:Into<A> {
+        let start = self.start.into();
+        let end = self.end.into();
         Range { start, end }
     }
 
+
     #[inline(always)]
-    pub fn inner_try_into<A: TryFrom<S>>(&self) -> Result<Range<A>, A::Error> {
-        let start = A::try_from(self.start);
-        let end = A::try_from(self.end);
+    pub fn inner_try_into<A>(&self) -> Result<Range<A>, S::Error> where S: TryInto<A> {
+        let start = self.start.try_into();
+        let end = self.end.try_into();
         match (start, end) {
             (Ok(start), Ok(end)) => Ok(Range { start, end }),
             (Ok(_), Err(e)) => Err(e),

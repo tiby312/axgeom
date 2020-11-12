@@ -1,7 +1,6 @@
 use crate::*;
 use core::cmp::Ordering;
-use core::convert::TryFrom;
-use primitive_from::PrimitiveFrom;
+use core::convert::TryInto;
 
 ///Convenience function to create a ray.
 #[must_use]
@@ -19,11 +18,9 @@ pub struct Ray<N> {
 
 impl<B: Copy> Ray<B> {
     #[inline(always)]
-    pub fn inner_as<A: PrimitiveFrom<B>>(&self) -> Ray<A> {
-        Ray {
-            point: self.point.inner_as(),
-            dir: self.dir.inner_as(),
-        }
+    #[must_use]
+    pub fn inner_as<C:'static+Copy>(&self) -> Ray<C> where B: num_traits::AsPrimitive<C>{
+        ray(self.point.inner_as(),self.dir.inner_as())
     }
 }
 
@@ -41,7 +38,7 @@ impl<N> Ray<N> {
         Ray { point, dir }
     }
     #[inline(always)]
-    pub fn inner_try_into<B: TryFrom<N>>(self) -> Result<Ray<B>, B::Error> {
+    pub fn inner_try_into<B>(self) -> Result<Ray<B>, N::Error> where N:TryInto<B> {
         let point = self.point.inner_try_into();
         let dir = self.dir.inner_try_into();
         match (point, dir) {
