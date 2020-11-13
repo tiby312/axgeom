@@ -64,7 +64,7 @@ impl<N: PartialOrd + Copy> Ray<N> {
 }
 
 ///Describes if a ray hit a rectangle.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug,PartialEq,Eq)]
 #[must_use]
 pub enum CastResult<N> {
     Hit(N),
@@ -160,10 +160,14 @@ impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy  + core::fmt::D
     pub fn cast_to_aaline<A:Axis>(&self,a:A,line:N)->CastResult<N>{
         let ray=self;
         let  tval=if a.is_xaxis(){
-            //ray.point.x+ray.dir.x*t=line
-            //ray.point.x-line=-ray.dir.x*t
+            if ray.dir.x==N::zero(){
+                return CastResult::NoHit;
+            }
             (line-ray.point.x)/ray.dir.x
         }else{
+            if ray.dir.y==N::zero(){
+                return CastResult::NoHit;
+            }
             (line-ray.point.y)/ray.dir.y
         };
 
