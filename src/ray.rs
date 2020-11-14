@@ -11,6 +11,7 @@ pub fn ray<N>(point: Vec2<N>, dir: Vec2<N>) -> Ray<N> {
 ///A Ray.
 #[derive(Debug, Copy, Clone)]
 #[must_use]
+#[repr(C)]
 pub struct Ray<N> {
     pub point: Vec2<N>,
     pub dir: Vec2<N>,

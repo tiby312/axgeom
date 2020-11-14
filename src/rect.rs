@@ -13,6 +13,7 @@ pub fn rect<T>(a: T, b: T, c: T, d: T) -> Rect<T> {
 ///An axis aligned rectangle. Stored as two Ranges.
 ///It is a semi-closed rectangle. A point is considered inside the rectangle if it is in [start,end) for both x and y.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[repr(C)]
 #[must_use]
 pub struct Rect<T> {
     pub x: Range<T>,
