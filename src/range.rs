@@ -19,6 +19,7 @@ pub fn range<T>(start: T, end: T) -> Range<T> {
 ///
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[must_use]
+#[repr(C)]
 pub struct Range<T> {
     pub start: T,
     pub end: T,
