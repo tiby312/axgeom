@@ -26,13 +26,13 @@ impl<N: num_traits::float::FloatCore> AsRef<Rect<N>> for Rect<NotNan<N>> {
     }
 }
 
-impl<S: Copy> Rect<S> {
+impl<S> Rect<S> {
     
 
 
 
     #[inline(always)]
-    pub fn inner_into<A>(&self) -> Rect<A> where S:Into<A> {
+    pub fn inner_into<A>(self) -> Rect<A> where S:Into<A> {
         let x = self.x.inner_into();
         let y = self.y.inner_into();
 
@@ -42,7 +42,7 @@ impl<S: Copy> Rect<S> {
 
     #[inline(always)]
     #[must_use]
-    pub fn inner_try_into<A>(&self) -> Result<Rect<A>, S::Error> where S:TryInto<A> {
+    pub fn inner_try_into<A>(self) -> Result<Rect<A>, S::Error> where S:TryInto<A> {
         let x = self.x.inner_try_into();
         let y = self.y.inner_try_into();
         match (x, y) {

@@ -55,13 +55,6 @@ impl<B> From<[B;2]> for Range<B>{
     }
 }
 
-impl<B> Into<[B;2]> for Range<B>{
-    #[inline(always)]
-    fn into(self)->[B;2]{
-        [self.start,self.end]
-    }
-}
-
 impl<B> AsRef<[B;2]> for Range<B>{
     #[inline(always)]
     fn as_ref(& self)->&[B;2]{
@@ -205,10 +198,10 @@ impl<N: FloatCore> AsRef<Range<N>> for Range<NotNan<N>> {
     }
 }
 
-impl<S: Copy> Range<S> {
+impl<S> Range<S> {
     
     #[inline(always)]
-    pub fn inner_as<B:'static+Copy>(&self) -> Range<B> where S: num_traits::AsPrimitive<B>{
+    pub fn inner_as<B:'static+Copy>(self) -> Range<B> where S: num_traits::AsPrimitive<B>{
         Range {
             start: self.start.as_(),
             end: self.end.as_(),
@@ -217,7 +210,7 @@ impl<S: Copy> Range<S> {
 
 
     #[inline(always)]
-    pub fn inner_into<A>(&self) -> Range<A> where S:Into<A> {
+    pub fn inner_into<A>(self) -> Range<A> where S:Into<A> {
         let start = self.start.into();
         let end = self.end.into();
         Range { start, end }
@@ -225,7 +218,7 @@ impl<S: Copy> Range<S> {
 
 
     #[inline(always)]
-    pub fn inner_try_into<A>(&self) -> Result<Range<A>, S::Error> where S: TryInto<A> {
+    pub fn inner_try_into<A>(self) -> Result<Range<A>, S::Error> where S: TryInto<A> {
         let start = self.start.try_into();
         let end = self.end.try_into();
         match (start, end) {

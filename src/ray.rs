@@ -30,15 +30,19 @@ impl<N: Copy + core::ops::Add<Output = N> + core::ops::Mul<Output = N>> Ray<N> {
         self.point + self.dir * tval
     }
 }
-impl<N> Ray<N> {
+
+impl<S> Ray<S> {
+
     #[inline(always)]
-    pub fn inner_into<B: From<N>>(self) -> Ray<B> {
+    pub fn inner_into<A>(self) -> Ray<A> where S:Into<A> {
         let point = self.point.inner_into();
         let dir = self.dir.inner_into();
         Ray { point, dir }
     }
+
+
     #[inline(always)]
-    pub fn inner_try_into<B>(self) -> Result<Ray<B>, N::Error> where N:TryInto<B> {
+    pub fn inner_try_into<A>(self) -> Result<Ray<A>, S::Error> where S: TryInto<A> {
         let point = self.point.inner_try_into();
         let dir = self.dir.inner_try_into();
         match (point, dir) {

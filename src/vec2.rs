@@ -181,11 +181,11 @@ pub fn arr2_as<B: 'static+Copy, A: num_traits::AsPrimitive<B>>(a: [A; 2]) -> [B;
     [a.as_(),b.as_()]
 }
 
-impl<T: Copy> Vec2<T> {
+impl<T> Vec2<T> {
 
     #[inline(always)]
     #[must_use]
-    pub fn inner_as<B:'static+Copy>(&self) -> Vec2<B> where T: num_traits::AsPrimitive<B>{
+    pub fn inner_as<B:'static+Copy>(self) -> Vec2<B> where T: num_traits::AsPrimitive<B>{
         vec2(self.x.as_(),self.y.as_())
     }
 
@@ -263,9 +263,9 @@ impl<B> Vec2<B> {
 
     #[inline(always)]
     #[must_use]
-    pub fn inner_into<A: From<B>>(self) -> Vec2<A> {
-        let x = A::from(self.x);
-        let y = A::from(self.y);
+    pub fn inner_into<A>(self) -> Vec2<A> where B:Into<A> {
+        let x = self.x.into();
+        let y = self.y.into();
         vec2(x, y)
     }
 
