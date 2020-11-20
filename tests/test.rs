@@ -21,6 +21,23 @@ fn raytest(){
 }
 
 #[test]
+fn rect_rest(){
+
+    let rect=rect(0,10,0,10);
+
+    let k=rect.furthest_distance_squared_to_point(vec2(0,0));
+    assert_eq!(k,10*10+10*10);
+
+
+    let k=rect.furthest_distance_squared_to_point(vec2(10,10));
+    assert_eq!(k,10*10+10*10);
+
+
+    let k=rect.furthest_distance_squared_to_point(vec2(5,5));
+    assert_eq!(k,5*5+5*5);
+}
+
+#[test]
 fn test() {
     use axgeom::Axis;
 

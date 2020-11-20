@@ -217,7 +217,7 @@ impl<
             + core::ops::Add<Output = T>,
     > Rect<T>
 {
-    ///If the point is outisde the rectangle, returns the squared distance from a point to a rectangle.
+    ///If the point is outisde the rectangle, returns the squared distance from the closest corner of the rectangle.
     ///If the point is inside the rectangle, it will return None.
     #[inline(always)]
     pub fn distance_squared_to_point(&self, point: Vec2<T>) -> Option<T> {
@@ -238,6 +238,30 @@ impl<
             Some(dis)
         }
     }
+
+    ///If the point is outisde the rectangle, returns the squared distance from a point to the furthest corner
+    ///of the rectangle.
+    #[inline(always)]
+    pub fn furthest_distance_squared_to_point(&self, point: Vec2<T>) -> T {
+        let (px, py) = (point.x, point.y);
+
+        let ((a, b), (c, d)) = self.get();
+
+        fn reverse_clamp<N:PartialOrd+core::ops::Sub<Output=N>+Copy>(px:N,a:N,b:N)->N{
+            let aa=px-a;
+            let bb=b-px;
+            if bb>aa{
+                b
+            }else{
+                a
+            }
+        }
+        let xx = reverse_clamp(px, a, b);
+        let yy = reverse_clamp(py, c, d);
+
+        (xx - px) * (xx - px) + (yy - py) * (yy - py)
+    }
+
 }
 
 impl<T: num_traits::Num + Copy> Rect<T> {
