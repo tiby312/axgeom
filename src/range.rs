@@ -2,7 +2,7 @@ use core::convert::TryInto;
 use num_traits::float::FloatCore;
 use ordered_float::NotNan;
 
-//Convenience function to create a Range.
+///Convenience function to create a Range.
 #[inline(always)]
 pub fn range<T>(start: T, end: T) -> Range<T> {
     Range { start, end }

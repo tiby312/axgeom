@@ -6,8 +6,9 @@ use ordered_float::NotNan;
 
 ///Convenience function to create a Rect.
 #[inline(always)]
-pub fn rect<T>(a: T, b: T, c: T, d: T) -> Rect<T> {
-    Rect::new(a, b, c, d)
+#[must_use]
+pub fn rect<T>(xstart: T, xend: T, ystart: T, yend: T) -> Rect<T> {
+    Rect::new(xstart, xend, ystart, yend)
 }
 
 ///An axis aligned rectangle. Stored as two Ranges.
@@ -141,14 +142,15 @@ impl<T> Rect<T> {
 }
 
 impl<T> Rect<T> {
-    ///(a,b) is the x component range.
-    ///(c,d) is the y component range.
+    ///Constructor.
+    ///(xstart,xend) is the x component range.
+    ///(ystart,yend) is the y component range.
     #[inline(always)]
     #[must_use]
-    pub fn new(a: T, b: T, c: T, d: T) -> Rect<T> {
+    pub fn new(xstart: T, xend: T, ystart: T, yend: T) -> Rect<T> {
         Rect {
-            x: Range { start: a, end: b },
-            y: Range { start: c, end: d },
+            x: Range { start: xstart, end: xend },
+            y: Range { start: ystart, end: yend },
         }
     }
 }
