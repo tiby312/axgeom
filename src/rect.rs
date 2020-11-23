@@ -385,8 +385,7 @@ impl<T: Ord + Copy> Rect<T> {
                     end: xr.end.min(xf.end),
                 };
 
-                //TODO figure out inequality
-                if range.end < range.start {
+                if range.end <= range.start {
                     return None;
                 }
                 range
