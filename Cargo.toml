@@ -16,7 +16,6 @@ std = ["num-traits/std","roots","ordered-float/serde"]
 
 [dependencies]
 roots = {version="0.0.6",optional = true }
-ordered-float = {version="2.0", default-features = false}
 num-traits = {version="0.2",default-features = false}
 serde={version="1.0", features=["derive"] ,default-features = false}
 partial-min-max = "0.4.0"

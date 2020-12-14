@@ -3,7 +3,6 @@ use core::convert::TryInto;
 use core::ops::*;
 use num_traits::float::FloatCore;
 use num_traits::Zero;
-use ordered_float::NotNan;
 use serde::{Serialize, Deserialize};
 
 ///Convenience function to create a vector.
@@ -20,12 +19,6 @@ pub fn vec2same<N: Copy>(a: N) -> Vec2<N> {
     Vec2 { x: a, y: a }
 }
 
-impl<N: FloatCore> AsRef<Vec2<N>> for Vec2<NotNan<N>> {
-    #[inline(always)]
-    fn as_ref(&self) -> &Vec2<N> {
-        unsafe { &*((self as *const Self) as *const Vec2<N>) }
-    }
-}
 
 ///A 2D vector.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash,Serialize,Deserialize)]

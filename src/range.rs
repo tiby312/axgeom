@@ -1,6 +1,5 @@
 use core::convert::TryInto;
 use num_traits::float::FloatCore;
-use ordered_float::NotNan;
 
 ///Convenience function to create a Range.
 #[inline(always)]
@@ -189,13 +188,6 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Range<T>
         self.end = self.end + radius;
         self.start = self.start - radius;
         self
-    }
-}
-
-impl<N: FloatCore> AsRef<Range<N>> for Range<NotNan<N>> {
-    #[inline(always)]
-    fn as_ref(&self) -> &Range<N> {
-        unsafe { &*((self as *const Self) as *const Range<N>) }
     }
 }
 

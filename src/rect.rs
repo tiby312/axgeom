@@ -2,7 +2,6 @@ use crate::range::Range;
 use crate::vec2::vec2;
 use crate::*;
 use core::convert::TryInto;
-use ordered_float::NotNan;
 
 ///Convenience function to create a Rect.
 #[inline(always)]
@@ -21,12 +20,6 @@ pub struct Rect<T> {
     pub y: Range<T>,
 }
 
-impl<N: num_traits::float::FloatCore> AsRef<Rect<N>> for Rect<NotNan<N>> {
-    #[inline(always)]
-    fn as_ref(&self) -> &Rect<N> {
-        unsafe { &*((self as *const Self) as *const Rect<N>) }
-    }
-}
 
 impl<S> Rect<S> {
     
