@@ -369,7 +369,7 @@ impl<T: PartialOrd + Copy> Rect<T> {
     }
 }
 
-impl<T: Ord + Copy> Rect<T> {
+impl<T: PartialOrd + Copy> Rect<T> {
     ///Get an intersecting rectangle.
     ///No floating point calculations as the new rectangle is made up of
     ///values from this rectangle and the specified rectangle.
@@ -381,8 +381,8 @@ impl<T: Ord + Copy> Rect<T> {
                 let xf = self.get_range($axis);
 
                 let range = Range {
-                    start: xr.start.max(xf.start),
-                    end: xr.end.min(xf.end),
+                    start: partial_min_max::max(xr.start,xf.start),
+                    end: partial_min_max::min(xr.end,xf.end),
                 };
 
                 if range.end <= range.start {

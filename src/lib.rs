@@ -14,6 +14,7 @@ pub use roots;
 
 pub use num_traits;
 pub use ordered_float;
+pub use partial_min_max;
 
 
 pub use self::range::range;
