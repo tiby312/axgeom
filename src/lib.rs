@@ -13,7 +13,6 @@ mod vec2;
 pub use roots;
 
 pub use num_traits;
-pub use ordered_float;
 pub use partial_min_max;
 
 

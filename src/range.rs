@@ -1,5 +1,4 @@
 use core::convert::TryInto;
-use num_traits::float::FloatCore;
 
 ///Convenience function to create a Range.
 #[inline(always)]
