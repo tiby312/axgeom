@@ -187,19 +187,6 @@ impl<T> Vec2<T> {
 
 
 
-impl<'a,B> From<&'a mut [B;2]> for &'a mut Vec2<B>{
-    #[inline(always)]
-    fn from(a:&'a mut [B;2])->Self{
-        unsafe{&mut *(a as *mut _ as *mut _)}
-    }
-}
-impl<'a,B> From<&'a [B;2]> for &'a Vec2<B>{
-    #[inline(always)]
-    fn from(a:&'a [B;2])->Self{
-        unsafe{&*(a as *const _ as *const _)}
-    }
-}
-
 
 impl<B> From<[B;2]> for Vec2<B>{
     #[inline(always)]
@@ -208,28 +195,12 @@ impl<B> From<[B;2]> for Vec2<B>{
         vec2(a,b)
     }
 }
-
-impl<B> Into<[B;2]> for Vec2<B>{
+impl<B> From<Vec2<B>> for [B;2]{
     #[inline(always)]
-    fn into(self)->[B;2]{
-        [self.x,self.y]
+    fn from(a:Vec2<B>)->Self{
+        [a.x,a.y]
     }
 }
-
-impl<B> AsRef<[B;2]> for Vec2<B>{
-    #[inline(always)]
-    fn as_ref(& self)->&[B;2]{
-        unsafe{&*(self as *const _ as *const _)}     
-    }
-}
-
-impl<B> AsMut<[B;2]> for Vec2<B>{
-    #[inline(always)]
-    fn as_mut(&mut self)->&mut [B;2]{
-        unsafe{&mut *(self as *mut _ as *mut _)}     
-    }
-}
-
 
 impl<B> Vec2<B> {
 

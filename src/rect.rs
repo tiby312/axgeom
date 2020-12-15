@@ -61,19 +61,6 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> 
 }
 
 
-impl<'a,B> From<&'a mut [B;4]> for &'a mut Rect<B>{
-    #[inline(always)]
-    fn from(a:&'a mut [B;4])->Self{
-        unsafe{&mut *(a as *mut _ as *mut _)}
-    }
-}
-impl<'a,B> From<&'a [B;4]> for &'a Rect<B>{
-    #[inline(always)]
-    fn from(a:&'a [B;4])->Self{
-        unsafe{&*(a as *const _ as *const _)}
-    }
-}
-
 
 impl<B> From<[B;4]> for Rect<B>{
     #[inline(always)]
@@ -83,28 +70,21 @@ impl<B> From<[B;4]> for Rect<B>{
     }
 }
 
-impl<B> Into<[B;4]> for Rect<B>{
+impl<B> From<Rect<B>> for [B;4]{
     #[inline(always)]
-    fn into(self)->[B;4]{
-        [self.x.start,self.x.end,self.y.start,self.y.end]
+    fn from(a:Rect<B>)->Self{
+        [a.x.start,a.x.end,a.y.start,a.y.end]
+    }
+}
+
+impl<B:Copy> From<&Rect<B>> for [B;4]{
+    #[inline(always)]
+    fn from(a:&Rect<B>)->Self{
+        [a.x.start,a.x.end,a.y.start,a.y.end]
     }
 }
 
 
-impl<B> AsRef<[B;4]> for Rect<B>{
-    #[inline(always)]
-    fn as_ref(& self)->&[B;4]{
-        unsafe{&*(self as *const _ as *const _)}     
-    }
-}
-
-
-impl<B> AsMut<[B;4]> for Rect<B>{
-    #[inline(always)]
-    fn as_mut(&mut self)->&mut [B;4]{
-        unsafe{&mut *(self as *mut _ as *mut _)}     
-    }
-}
 
 
 

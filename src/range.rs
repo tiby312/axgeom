@@ -32,19 +32,6 @@ impl<T> Range<T> {
 }
 
 
-impl<'a,B> From<&'a mut [B;2]> for &'a mut Range<B>{
-    #[inline(always)]
-    fn from(a:&'a mut [B;2])->Self{
-        unsafe{&mut *(a as *mut _ as *mut _)}
-    }
-}
-impl<'a,B> From<&'a [B;2]> for &'a Range<B>{
-    #[inline(always)]
-    fn from(a:&'a [B;2])->Self{
-        unsafe{&*(a as *const _ as *const _)}
-    }
-}
-
 
 impl<B> From<[B;2]> for Range<B>{
     #[inline(always)]
@@ -53,20 +40,13 @@ impl<B> From<[B;2]> for Range<B>{
         Range{start:a,end:b}
     }
 }
-
-impl<B> AsRef<[B;2]> for Range<B>{
+impl<B> From<Range<B>> for [B;2]{
     #[inline(always)]
-    fn as_ref(& self)->&[B;2]{
-        unsafe{&*(self as *const _ as *const _)}     
+    fn from(a:Range<B>)->Self{
+        [a.start,a.end]
     }
 }
 
-impl<B> AsMut<[B;2]> for Range<B>{
-    #[inline(always)]
-    fn as_mut(&mut self)->&mut [B;2]{
-        unsafe{&mut *(self as *mut _ as *mut _)}     
-    }
-}
 
 
 
@@ -112,7 +92,6 @@ impl<T: Copy + PartialOrd> Range<T> {
     #[inline(always)]
     pub fn contains(&self, pos: T) -> bool {
         self.contains_ext(pos) == core::cmp::Ordering::Equal
-        //self.start <= pos && pos < self.end
     }
 
     ///Subdivides the range.
