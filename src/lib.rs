@@ -86,7 +86,3 @@ pub trait Axis: Sync + Send + Copy + Clone {
         false
     }
 }
-
-/*
-
-*/
