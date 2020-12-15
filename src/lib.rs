@@ -87,40 +87,6 @@ pub trait Axis: Sync + Send + Copy + Clone {
     }
 }
 
-///Represents a Vec2 with the specified aspect ratio
-///and the specified width. The height of the Vec2
-///can be inferred by the aspect ratio.
-#[derive(Copy, Clone, Debug)]
-pub struct FixedAspectVec2 {
-    pub ratio: AspectRatio,
-    pub width: f64,
-}
-impl FixedAspectVec2 {
-    #[inline(always)]
-    #[must_use]
-    pub fn as_vec(&self) -> Vec2<f64> {
-        let height = self.ratio.height_over_width() * self.width;
-        vec2(self.width, height)
-    }
-}
+/*
 
-///An aspect ratio represented as a fraction
-///so that there is no precision loss.
-#[derive(Copy, Clone, Debug)]
-pub struct AspectRatio(pub Vec2<f64>);
-
-impl AspectRatio {
-    #[inline(always)]
-    #[must_use]
-    pub fn width_over_height(&self) -> f64 {
-        let v = self.0;
-        v.x as f64 / v.y as f64
-    }
-
-    #[inline(always)]
-    #[must_use]
-    pub fn height_over_width(&self) -> f64 {
-        let v = self.0;
-        v.y as f64 / v.x as f64
-    }
-}
+*/
