@@ -177,10 +177,12 @@ impl<T: PartialOrd + Copy> Rect<T> {
 impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> {
     ///Grow a rectangle of a radius.
     #[inline(always)]
-    pub fn grow(&mut self, radius: T) -> &mut Self {
-        self.x.grow(radius);
-        self.y.grow(radius);
-        self
+    #[must_use]
+    pub fn grow(self, radius: T) -> Self {
+        Rect{
+            x:self.x.grow(radius),
+            y:self.y.grow(radius)
+        }
     }
 }
 

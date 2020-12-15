@@ -162,7 +162,8 @@ impl<T: Copy + core::ops::Sub<Output = T>> Range<T> {
 
 impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Range<T> {
     #[inline(always)]
-    pub fn grow(&mut self, radius: T) -> &mut Self {
+    #[must_use]
+    pub fn grow(mut self, radius: T) -> Self {
         self.end = self.end + radius;
         self.start = self.start - radius;
         self
