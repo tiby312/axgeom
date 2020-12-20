@@ -138,14 +138,31 @@ impl<T: Copy + PartialOrd> Range<T> {
     ///Returns true if two ranges intersect.
     #[inline(always)]
     pub fn intersects(&self, val: &Range<T>) -> bool {
-        self.contains(val.start) || val.contains(self.start)
+        !(self.end<=val.start || val.end<=self.start)
+        //self.contains(val.start) || val.contains(self.start)
     }
+
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    #[test]
+    fn test_intersect() {
+        let a = Range::new(0, 5);
+        let b = Range::new(5, 6);
+        assert!(!a.intersects(&b));
+
+        let a = Range::new(0, 7);
+        let b = Range::new(4, 5);
+        assert!(a.intersects(&b));
+
+
+        let a = Range::new(6, 7);
+        let b = Range::new(4, 6);
+        assert!(!a.intersects(&b));
+    }
     #[test]
     fn test_range() {
         let a = Range::new(0, 5);
