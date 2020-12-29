@@ -30,7 +30,7 @@ pub use self::vec2::vec2same;
 pub use self::vec2::Vec2;
 
 ///The x axis implementation of the Axis
-#[derive(Copy, Clone)]
+#[derive(Eq,PartialEq,Copy, Clone,Debug)]
 pub struct XAXIS;
 impl Axis for XAXIS {
     type Next = YAXIS;
@@ -47,7 +47,7 @@ impl Axis for XAXIS {
 }
 
 ///The y axis implementation of the Axis
-#[derive(Copy, Clone)]
+#[derive(Eq,PartialEq,Copy, Clone,Debug)]
 pub struct YAXIS;
 impl Axis for YAXIS {
     type Next = XAXIS;
@@ -65,6 +65,52 @@ impl Axis for YAXIS {
     }
 }
 
+
+#[derive(Eq,PartialEq,Copy,Clone,Debug)]
+pub enum AxisDyn{
+    X(XAXIS),
+    Y(YAXIS)
+}
+impl AxisDyn{
+
+    #[inline(always)]
+    pub fn is_axis(self)->bool{
+        match self{
+            AxisDyn::X(_)=>{
+                true
+            },
+            AxisDyn::Y(_)=>{
+                false
+            }
+        }
+    }
+    #[inline(always)]
+    pub fn map_val<T>(self,val1:T,val2:T)->T{
+        match self{
+            AxisDyn::X(_)=>{
+                val1
+            },
+            AxisDyn::Y(_)=>{
+                val2
+            }
+        }
+    }
+    
+    #[inline(always)]
+    pub fn map<T>(self,func1:impl FnOnce(XAXIS)->T,func2:impl FnOnce(YAXIS)->T)->T{
+        match self{
+            AxisDyn::X(a)=>{
+                func1(a)
+            },
+            AxisDyn::Y(b)=>{
+                func2(b)
+            }
+        }
+    }
+}
+
+
+
 ///Axis trait can be used to extract the x or y portions of a container.
 ///when you know the axis as compile time.
 ///The X implementation of this trait's Next associated trait is the Y implementation.
@@ -74,6 +120,14 @@ pub trait Axis: Sync + Send + Copy + Clone {
     fn is_xaxis(&self) -> bool;
     fn next(&self) -> Self::Next;
 
+    #[inline(always)]
+    fn to_dyn(&self)->AxisDyn{
+        if self.is_xaxis(){
+            AxisDyn::X(XAXIS)
+        }else{
+            AxisDyn::Y(YAXIS)
+        }
+    }
     #[inline(always)]
     #[must_use]
     fn is_equal_to<B: Axis>(&self, other: B) -> bool {
