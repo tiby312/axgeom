@@ -66,6 +66,7 @@ impl Axis for YAXIS {
 }
 
 
+///A dynamic axis as opposed to a statically known one via `impl Axis`.
 #[derive(Eq,PartialEq,Copy,Clone,Debug)]
 pub enum AxisDyn{
     X(XAXIS),
@@ -120,6 +121,7 @@ pub trait Axis: Sync + Send + Copy + Clone {
     fn is_xaxis(&self) -> bool;
     fn next(&self) -> Self::Next;
 
+    ///Convert a statically known axis into a dynamic one.
     #[inline(always)]
     fn to_dyn(&self)->AxisDyn{
         if self.is_xaxis(){
@@ -128,6 +130,8 @@ pub trait Axis: Sync + Send + Copy + Clone {
             AxisDyn::Y(YAXIS)
         }
     }
+
+
     #[inline(always)]
     #[must_use]
     fn is_equal_to<B: Axis>(&self, other: B) -> bool {
