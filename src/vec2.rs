@@ -203,6 +203,14 @@ impl<T> Vec2<T> {
 
 
 
+impl<'a,B:Copy> From<&'a [B;2]> for Vec2<B>{
+    #[inline(always)]
+    fn from(a:&'a [B;2])->Self{
+        let [a,b]=*a;
+        vec2(a,b)
+    }
+}
+
 
 impl<B> From<[B;2]> for Vec2<B>{
     #[inline(always)]
