@@ -29,6 +29,22 @@ pub struct Vec2<N> {
     pub y: N,
 }
 
+
+impl<N> AsRef<[N;2]> for Vec2<N>{
+    #[inline(always)]
+    fn as_ref(&self)->&[N;2]{
+        unsafe{&*(self as *const _ as *const _)}
+    }
+}
+
+impl<N> AsMut<[N;2]> for Vec2<N>{
+    #[inline(always)]
+    fn as_mut(&mut self)->&mut [N;2]{
+        unsafe{&mut *(self as *mut _ as *mut _)}
+    }
+}
+
+
 #[inline(always)]
 #[must_use]
 pub fn absdiff<T>(x: T, y: T) -> T
