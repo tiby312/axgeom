@@ -219,10 +219,19 @@ impl<B> From<[B;2]> for Vec2<B>{
         vec2(a,b)
     }
 }
+
+
 impl<B> From<Vec2<B>> for [B;2]{
     #[inline(always)]
     fn from(a:Vec2<B>)->Self{
         [a.x,a.y]
+    }
+}
+
+impl<'a,B> From<&'a Vec2<B>> for &'a [B;2]{
+    #[inline(always)]
+    fn from(a:&'a Vec2<B>)->Self{
+        a.as_ref()
     }
 }
 
