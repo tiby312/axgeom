@@ -194,7 +194,7 @@ impl<
             + core::ops::Add<Output = T>,
     > Rect<T>
 {
-    ///If the point is outisde the rectangle, returns the squared distance from the closest corner of the rectangle.
+    ///If the point is outside the rectangle, returns the squared distance from the closest corner of the rectangle.
     ///If the point is inside the rectangle, it will return None.
     #[inline(always)]
     pub fn distance_squared_to_point(&self, point: Vec2<T>) -> Option<T> {
@@ -216,7 +216,7 @@ impl<
         }
     }
 
-    ///If the point is outisde the rectangle, returns the squared distance from a point to the furthest corner
+    ///If the point is outside the rectangle, returns the squared distance from a point to the furthest corner
     ///of the rectangle.
     #[inline(always)]
     pub fn furthest_distance_squared_to_point(&self, point: Vec2<T>) -> T {

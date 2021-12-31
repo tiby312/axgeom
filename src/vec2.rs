@@ -104,7 +104,7 @@ impl<
             + core::ops::Add<Output = T>,
     > Vec2<T>
 {
-    ///If the point is outisde the rectangle, returns the squared distance from a point to a rectangle.
+    ///If the point is outside the rectangle, returns the squared distance from a point to a rectangle.
     ///If the point is inside the rectangle, it will return None.
     #[inline(always)]
     #[must_use]

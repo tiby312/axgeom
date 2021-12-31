@@ -260,7 +260,7 @@ impl<N: num_traits::Num + num_traits::Signed + PartialOrd + Copy  + core::fmt::D
         //In cases where the ray is directly vertical or horizant, 
         //we technically only need to check one side of the rect.
         //but these cases are so rare, and it doesnt hurt much to check
-        //one exra side. So we condense these cases into cases
+        //one extra side. So we condense these cases into cases
         //where we check two sides.
 
         let x=self.dir.x>N::zero();

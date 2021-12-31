@@ -10,7 +10,7 @@ pub fn range<T>(start: T, end: T) -> Range<T> {
 ///This means that subdivision does not result in any floating point calculations.
 ///The start value must be <= the end value.
 ///There is no protection against "degenerate" Ranges where start>end.
-///Behavior of any of the functions with degenrate Ranges is unspecified.
+///Behavior of any of the functions with degenerate Ranges is unspecified.
 ///
 ///
 ///A point is consindered inside of a range if the point is in [start,end), a semi-open interval.
@@ -74,7 +74,7 @@ impl<T: Copy + Ord + core::ops::Sub<Output = T> + num_traits::sign::Signed> Rang
 }
 impl<T: Copy + PartialOrd> Range<T> {
     ///Like contains() but returns Ord.
-    ///If the pos is stricly less than the range.start, return less.
+    ///If the pos is strictly less than the range.start, return less.
     ///If the pos is greater of equal to the range.end, return greater.
     ///else, return equal.
     #[inline(always)]
