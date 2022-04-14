@@ -13,31 +13,30 @@ pub fn rect<T>(xstart: T, xend: T, ystart: T, yend: T) -> Rect<T> {
 ///An axis aligned rectangle. Stored as two Ranges.
 ///It is a semi-closed rectangle. A point is considered inside the rectangle if it is in [start,end) for both x and y.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-#[repr(C)]
 #[must_use]
 pub struct Rect<T> {
     pub x: Range<T>,
     pub y: Range<T>,
 }
 
-
 impl<S> Rect<S> {
-    
-
-
-
     #[inline(always)]
-    pub fn inner_into<A>(self) -> Rect<A> where S:Into<A> {
+    pub fn inner_into<A>(self) -> Rect<A>
+    where
+        S: Into<A>,
+    {
         let x = self.x.inner_into();
         let y = self.y.inner_into();
 
         Rect { x, y }
     }
 
-
     #[inline(always)]
     #[must_use]
-    pub fn inner_try_into<A>(self) -> Result<Rect<A>, S::Error> where S:TryInto<A> {
+    pub fn inner_try_into<A>(self) -> Result<Rect<A>, S::Error>
+    where
+        S: TryInto<A>,
+    {
         let x = self.x.inner_try_into();
         let y = self.y.inner_try_into();
         match (x, y) {
@@ -60,37 +59,29 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> 
     }
 }
 
-
-
-impl<B> From<[B;4]> for Rect<B>{
+impl<B> From<[B; 4]> for Rect<B> {
     #[inline(always)]
-    fn from(a:[B;4])->Self{
-        let [a,b,c,d]=a;
-        Rect::new(a,b,c,d)
+    fn from(a: [B; 4]) -> Self {
+        let [a, b, c, d] = a;
+        Rect::new(a, b, c, d)
     }
 }
 
-impl<B> From<Rect<B>> for [B;4]{
+impl<B> From<Rect<B>> for [B; 4] {
     #[inline(always)]
-    fn from(a:Rect<B>)->Self{
-        [a.x.start,a.x.end,a.y.start,a.y.end]
+    fn from(a: Rect<B>) -> Self {
+        [a.x.start, a.x.end, a.y.start, a.y.end]
     }
 }
 
-impl<B:Copy> From<&Rect<B>> for [B;4]{
+impl<B: Copy> From<&Rect<B>> for [B; 4] {
     #[inline(always)]
-    fn from(a:&Rect<B>)->Self{
-        [a.x.start,a.x.end,a.y.start,a.y.end]
+    fn from(a: &Rect<B>) -> Self {
+        [a.x.start, a.x.end, a.y.start, a.y.end]
     }
 }
-
-
-
-
-
 
 impl<T> Rect<T> {
-   
     ///Get the range of one axis.
     #[inline(always)]
     #[must_use]
@@ -122,8 +113,14 @@ impl<T> Rect<T> {
     #[must_use]
     pub fn new(xstart: T, xend: T, ystart: T, yend: T) -> Rect<T> {
         Rect {
-            x: Range { start: xstart, end: xend },
-            y: Range { start: ystart, end: yend },
+            x: Range {
+                start: xstart,
+                end: xend,
+            },
+            y: Range {
+                start: ystart,
+                end: yend,
+            },
         }
     }
 }
@@ -150,7 +147,10 @@ impl<T: Copy> Rect<T> {
     }
 
     #[inline(always)]
-    pub fn inner_as<B:'static+Copy>(&self) -> Rect<B> where T: num_traits::AsPrimitive<B>{
+    pub fn inner_as<B: 'static + Copy>(&self) -> Rect<B>
+    where
+        T: num_traits::AsPrimitive<B>,
+    {
         Rect {
             x: self.x.inner_as(),
             y: self.y.inner_as(),
@@ -179,9 +179,9 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> 
     #[inline(always)]
     #[must_use]
     pub fn grow(self, radius: T) -> Self {
-        Rect{
-            x:self.x.grow(radius),
-            y:self.y.grow(radius)
+        Rect {
+            x: self.x.grow(radius),
+            y: self.y.grow(radius),
         }
     }
 }
@@ -224,12 +224,16 @@ impl<
 
         let ((a, b), (c, d)) = self.get();
 
-        fn reverse_clamp<N:PartialOrd+core::ops::Sub<Output=N>+Copy>(px:N,a:N,b:N)->N{
-            let aa=px-a;
-            let bb=b-px;
-            if bb>aa{
+        fn reverse_clamp<N: PartialOrd + core::ops::Sub<Output = N> + Copy>(
+            px: N,
+            a: N,
+            b: N,
+        ) -> N {
+            let aa = px - a;
+            let bb = b - px;
+            if bb > aa {
                 b
-            }else{
+            } else {
                 a
             }
         }
@@ -238,7 +242,6 @@ impl<
 
         (xx - px) * (xx - px) + (yy - py) * (yy - py)
     }
-
 }
 
 impl<T: num_traits::Num + Copy> Rect<T> {
@@ -304,17 +307,17 @@ impl<T: PartialOrd + Copy> Rect<T> {
     }
 
     #[inline(always)]
-    pub fn grow_to_fit_point(&mut self,point:Vec2<T>)->&mut Self{
+    pub fn grow_to_fit_point(&mut self, point: Vec2<T>) -> &mut Self {
         //TODO simplify using range.
-        if point.x<self.x.start{
-            self.x.start=point.x
-        }else if self.x.end<point.x{
-            self.x.end=point.x
+        if point.x < self.x.start {
+            self.x.start = point.x
+        } else if self.x.end < point.x {
+            self.x.end = point.x
         }
-        if point.y<self.y.start{
-            self.y.start=point.y
-        }else if self.y.end<point.y{
-            self.y.end=point.y
+        if point.y < self.y.start {
+            self.y.start = point.y
+        } else if self.y.end < point.y {
+            self.y.end = point.y
         }
         self
     }
@@ -356,8 +359,8 @@ impl<T: PartialOrd + Copy> Rect<T> {
                 let xf = self.get_range($axis);
 
                 let range = Range {
-                    start: partial_min_max::max(xr.start,xf.start),
-                    end: partial_min_max::min(xr.end,xf.end),
+                    start: partial_min_max::max(xr.start, xf.start),
+                    end: partial_min_max::min(xr.end, xf.end),
                 };
 
                 if range.end <= range.start {

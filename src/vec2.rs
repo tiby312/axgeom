@@ -3,7 +3,7 @@ use core::convert::TryInto;
 use core::ops::*;
 use num_traits::float::FloatCore;
 use num_traits::Zero;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 ///Convenience function to create a vector.
 #[inline(always)]
@@ -19,31 +19,27 @@ pub fn vec2same<N: Copy>(a: N) -> Vec2<N> {
     Vec2 { x: a, y: a }
 }
 
-
 ///A 2D vector.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash,Serialize,Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[must_use]
-#[repr(C)]
 pub struct Vec2<N> {
     pub x: N,
     pub y: N,
 }
 
-
-impl<N> AsRef<[N;2]> for Vec2<N>{
+impl<N> AsRef<[N; 2]> for Vec2<N> {
     #[inline(always)]
-    fn as_ref(&self)->&[N;2]{
-        unsafe{&*(self as *const _ as *const _)}
+    fn as_ref(&self) -> &[N; 2] {
+        unsafe { &*(self as *const _ as *const _) }
     }
 }
 
-impl<N> AsMut<[N;2]> for Vec2<N>{
+impl<N> AsMut<[N; 2]> for Vec2<N> {
     #[inline(always)]
-    fn as_mut(&mut self)->&mut [N;2]{
-        unsafe{&mut *(self as *mut _ as *mut _)}
+    fn as_mut(&mut self) -> &mut [N; 2] {
+        unsafe { &mut *(self as *mut _ as *mut _) }
     }
 }
-
 
 #[inline(always)]
 #[must_use]
@@ -149,16 +145,13 @@ impl<S: Mul<Output = S> + Div<Output = S> + Add<Output = S> + Copy> Vec2<S> {
 impl<S: FloatCore> Vec2<S> {
     #[inline(always)]
     #[must_use]
-    pub fn is_nan(&self)->bool{
+    pub fn is_nan(&self) -> bool {
         self.x.is_nan() || self.y.is_nan()
     }
-
 }
 
-
 #[cfg(feature = "std")]
-impl<S:num_traits::Float> Vec2<S>{
-
+impl<S: num_traits::Float> Vec2<S> {
     #[inline(always)]
     #[must_use]
     pub fn truncate_at(&self, mag: S) -> Vec2<S> {
@@ -176,7 +169,6 @@ impl<S:num_traits::Float> Vec2<S>{
         (*self) * (mag / l)
     }
 
-
     #[inline(always)]
     #[must_use]
     pub fn magnitude(&self) -> S {
@@ -186,57 +178,53 @@ impl<S:num_traits::Float> Vec2<S>{
 
 ///Cast an array of 2 elements of primitive type to another primitive type using "as" on each element.
 #[must_use]
-pub fn arr2_as<B: 'static+Copy, A: num_traits::AsPrimitive<B>>(a: [A; 2]) -> [B; 2] {
-    let [a,b]=a;
-    [a.as_(),b.as_()]
+pub fn arr2_as<B: 'static + Copy, A: num_traits::AsPrimitive<B>>(a: [A; 2]) -> [B; 2] {
+    let [a, b] = a;
+    [a.as_(), b.as_()]
 }
 
 impl<T> Vec2<T> {
-
     #[inline(always)]
     #[must_use]
-    pub fn inner_as<B:'static+Copy>(self) -> Vec2<B> where T: num_traits::AsPrimitive<B>{
-        vec2(self.x.as_(),self.y.as_())
-    }
-
-}
-
-
-
-impl<'a,B:Copy> From<&'a [B;2]> for Vec2<B>{
-    #[inline(always)]
-    fn from(a:&'a [B;2])->Self{
-        let [a,b]=*a;
-        vec2(a,b)
+    pub fn inner_as<B: 'static + Copy>(self) -> Vec2<B>
+    where
+        T: num_traits::AsPrimitive<B>,
+    {
+        vec2(self.x.as_(), self.y.as_())
     }
 }
 
-
-impl<B> From<[B;2]> for Vec2<B>{
+impl<'a, B: Copy> From<&'a [B; 2]> for Vec2<B> {
     #[inline(always)]
-    fn from(a:[B;2])->Self{
-        let [a,b]=a;
-        vec2(a,b)
+    fn from(a: &'a [B; 2]) -> Self {
+        let [a, b] = *a;
+        vec2(a, b)
     }
 }
 
-
-impl<B> From<Vec2<B>> for [B;2]{
+impl<B> From<[B; 2]> for Vec2<B> {
     #[inline(always)]
-    fn from(a:Vec2<B>)->Self{
-        [a.x,a.y]
+    fn from(a: [B; 2]) -> Self {
+        let [a, b] = a;
+        vec2(a, b)
     }
 }
 
-impl<'a,B> From<&'a Vec2<B>> for &'a [B;2]{
+impl<B> From<Vec2<B>> for [B; 2] {
     #[inline(always)]
-    fn from(a:&'a Vec2<B>)->Self{
+    fn from(a: Vec2<B>) -> Self {
+        [a.x, a.y]
+    }
+}
+
+impl<'a, B> From<&'a Vec2<B>> for &'a [B; 2] {
+    #[inline(always)]
+    fn from(a: &'a Vec2<B>) -> Self {
         a.as_ref()
     }
 }
 
 impl<B> Vec2<B> {
-
     ///Get the range of one axis.
     #[inline(always)]
     #[must_use]
@@ -261,7 +249,10 @@ impl<B> Vec2<B> {
 
     #[inline(always)]
     #[must_use]
-    pub fn inner_into<A>(self) -> Vec2<A> where B:Into<A> {
+    pub fn inner_into<A>(self) -> Vec2<A>
+    where
+        B: Into<A>,
+    {
         let x = self.x.into();
         let y = self.y.into();
         vec2(x, y)
@@ -269,7 +260,10 @@ impl<B> Vec2<B> {
 
     #[inline(always)]
     #[must_use]
-    pub fn inner_try_into<A>(self) -> Result<Vec2<A>, B::Error> where B:TryInto<A> {
+    pub fn inner_try_into<A>(self) -> Result<Vec2<A>, B::Error>
+    where
+        B: TryInto<A>,
+    {
         let x = self.x.try_into();
         let y = self.y.try_into();
         match (x, y) {

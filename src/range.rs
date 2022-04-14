@@ -17,7 +17,6 @@ pub fn range<T>(start: T, end: T) -> Range<T> {
 ///
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[must_use]
-#[repr(C)]
 pub struct Range<T> {
     pub start: T,
     pub end: T,
@@ -31,25 +30,19 @@ impl<T> Range<T> {
     }
 }
 
-
-
-impl<B> From<[B;2]> for Range<B>{
+impl<B> From<[B; 2]> for Range<B> {
     #[inline(always)]
-    fn from(a:[B;2])->Self{
-        let [a,b]=a;
-        Range{start:a,end:b}
+    fn from(a: [B; 2]) -> Self {
+        let [a, b] = a;
+        Range { start: a, end: b }
     }
 }
-impl<B> From<Range<B>> for [B;2]{
+impl<B> From<Range<B>> for [B; 2] {
     #[inline(always)]
-    fn from(a:Range<B>)->Self{
-        [a.start,a.end]
+    fn from(a: Range<B>) -> Self {
+        [a.start, a.end]
     }
 }
-
-
-
-
 
 impl<T: Copy + Ord + core::ops::Sub<Output = T> + num_traits::sign::Signed> Range<T> {
     #[inline(always)]
@@ -138,10 +131,9 @@ impl<T: Copy + PartialOrd> Range<T> {
     ///Returns true if two ranges intersect.
     #[inline(always)]
     pub fn intersects(&self, val: &Range<T>) -> bool {
-        !(self.end<=val.start || val.end<=self.start)
+        !(self.end <= val.start || val.end <= self.start)
         //self.contains(val.start) || val.contains(self.start)
     }
-
 }
 
 #[cfg(test)]
@@ -157,7 +149,6 @@ mod tests {
         let a = Range::new(0, 7);
         let b = Range::new(4, 5);
         assert!(a.intersects(&b));
-
 
         let a = Range::new(6, 7);
         let b = Range::new(4, 6);
@@ -188,26 +179,32 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Range<T>
 }
 
 impl<S> Range<S> {
-    
     #[inline(always)]
-    pub fn inner_as<B:'static+Copy>(self) -> Range<B> where S: num_traits::AsPrimitive<B>{
+    pub fn inner_as<B: 'static + Copy>(self) -> Range<B>
+    where
+        S: num_traits::AsPrimitive<B>,
+    {
         Range {
             start: self.start.as_(),
             end: self.end.as_(),
         }
     }
 
-
     #[inline(always)]
-    pub fn inner_into<A>(self) -> Range<A> where S:Into<A> {
+    pub fn inner_into<A>(self) -> Range<A>
+    where
+        S: Into<A>,
+    {
         let start = self.start.into();
         let end = self.end.into();
         Range { start, end }
     }
 
-
     #[inline(always)]
-    pub fn inner_try_into<A>(self) -> Result<Range<A>, S::Error> where S: TryInto<A> {
+    pub fn inner_try_into<A>(self) -> Result<Range<A>, S::Error>
+    where
+        S: TryInto<A>,
+    {
         let start = self.start.try_into();
         let end = self.end.try_into();
         match (start, end) {

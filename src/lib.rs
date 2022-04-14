@@ -9,13 +9,11 @@ mod ray;
 mod rect;
 mod vec2;
 
-
 #[cfg(feature = "std")]
 pub use roots;
 
 pub use num_traits;
 pub use partial_min_max;
-
 
 pub use self::range::range;
 pub use self::range::Range;
@@ -30,7 +28,7 @@ pub use self::vec2::vec2same;
 pub use self::vec2::Vec2;
 
 ///The x axis implementation of the Axis
-#[derive(Eq,PartialEq,Copy, Clone,Debug)]
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
 pub struct XAXIS;
 impl Axis for XAXIS {
     type Next = YAXIS;
@@ -47,7 +45,7 @@ impl Axis for XAXIS {
 }
 
 ///The y axis implementation of the Axis
-#[derive(Eq,PartialEq,Copy, Clone,Debug)]
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
 pub struct YAXIS;
 impl Axis for YAXIS {
     type Next = XAXIS;
@@ -65,52 +63,36 @@ impl Axis for YAXIS {
     }
 }
 
-
 ///A dynamic axis as opposed to a statically known one via `impl Axis`.
-#[derive(Eq,PartialEq,Copy,Clone,Debug)]
-pub enum AxisDyn{
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
+pub enum AxisDyn {
     X(XAXIS),
-    Y(YAXIS)
+    Y(YAXIS),
 }
-impl AxisDyn{
+impl AxisDyn {
+    #[inline(always)]
+    pub fn is_axis(self) -> bool {
+        match self {
+            AxisDyn::X(_) => true,
+            AxisDyn::Y(_) => false,
+        }
+    }
+    #[inline(always)]
+    pub fn map_val<T>(self, val1: T, val2: T) -> T {
+        match self {
+            AxisDyn::X(_) => val1,
+            AxisDyn::Y(_) => val2,
+        }
+    }
 
     #[inline(always)]
-    pub fn is_axis(self)->bool{
-        match self{
-            AxisDyn::X(_)=>{
-                true
-            },
-            AxisDyn::Y(_)=>{
-                false
-            }
-        }
-    }
-    #[inline(always)]
-    pub fn map_val<T>(self,val1:T,val2:T)->T{
-        match self{
-            AxisDyn::X(_)=>{
-                val1
-            },
-            AxisDyn::Y(_)=>{
-                val2
-            }
-        }
-    }
-    
-    #[inline(always)]
-    pub fn map<T>(self,func1:impl FnOnce(XAXIS)->T,func2:impl FnOnce(YAXIS)->T)->T{
-        match self{
-            AxisDyn::X(a)=>{
-                func1(a)
-            },
-            AxisDyn::Y(b)=>{
-                func2(b)
-            }
+    pub fn map<T>(self, func1: impl FnOnce(XAXIS) -> T, func2: impl FnOnce(YAXIS) -> T) -> T {
+        match self {
+            AxisDyn::X(a) => func1(a),
+            AxisDyn::Y(b) => func2(b),
         }
     }
 }
-
-
 
 ///Axis trait can be used to extract the x or y portions of a container.
 ///when you know the axis as compile time.
@@ -123,14 +105,13 @@ pub trait Axis: Sync + Send + Copy + Clone {
 
     ///Convert a statically known axis into a dynamic one.
     #[inline(always)]
-    fn to_dyn(&self)->AxisDyn{
-        if self.is_xaxis(){
+    fn to_dyn(&self) -> AxisDyn {
+        if self.is_xaxis() {
             AxisDyn::X(XAXIS)
-        }else{
+        } else {
             AxisDyn::Y(YAXIS)
         }
     }
-
 
     #[inline(always)]
     #[must_use]
