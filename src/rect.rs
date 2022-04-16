@@ -11,7 +11,6 @@ pub fn rect<T>(xstart: T, xend: T, ystart: T, yend: T) -> Rect<T> {
 }
 
 ///An axis aligned rectangle. Stored as two Ranges.
-///It is a semi-closed rectangle. A point is considered inside the rectangle if it is in [start,end) for both x and y.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[must_use]
 pub struct Rect<T> {

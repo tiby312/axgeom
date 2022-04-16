@@ -7,13 +7,11 @@ pub fn range<T>(start: T, end: T) -> Range<T> {
 }
 
 ///A 1D range. Internally represented as start and end. (as opposed to a start and length)
-///This means that subdivision does not result in any floating point calculations.
-///The start value must be <= the end value.
+///If range A contains value x and range B contains value x, then A intersects B.
 ///There is no protection against "degenerate" Ranges where start>end.
-///Behavior of any of the functions with degenerate Ranges is unspecified.
 ///
 ///
-///A point is consindered inside of a range if the point is in [start,end), a semi-open interval.
+///A point is consindered inside of a range if the point is in [start,end].
 ///
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[must_use]
@@ -74,7 +72,7 @@ impl<T: Copy + PartialOrd> Range<T> {
     pub fn contains_ext(&self, pos: T) -> core::cmp::Ordering {
         if pos < self.start {
             core::cmp::Ordering::Less
-        } else if pos >= self.end {
+        } else if pos > self.end {
             core::cmp::Ordering::Greater
         } else {
             core::cmp::Ordering::Equal
@@ -131,7 +129,7 @@ impl<T: Copy + PartialOrd> Range<T> {
     ///Returns true if two ranges intersect.
     #[inline(always)]
     pub fn intersects(&self, val: &Range<T>) -> bool {
-        !(self.end <= val.start || val.end <= self.start)
+        !(self.end < val.start || val.end < self.start)
         //self.contains(val.start) || val.contains(self.start)
     }
 }
@@ -142,18 +140,19 @@ mod tests {
 
     #[test]
     fn test_intersect() {
+
         let a = Range::new(0, 5);
         let b = Range::new(5, 6);
-        assert!(!a.intersects(&b));
-
-        let a = Range::new(0, 7);
-        let b = Range::new(4, 5);
         assert!(a.intersects(&b));
-
-        let a = Range::new(6, 7);
-        let b = Range::new(4, 6);
-        assert!(!a.intersects(&b));
+        assert!(b.intersects(&a));
+        
+        assert!(a.contains(0));
+        assert!(a.contains(5));
+        assert!(b.contains(5));
+        assert!(b.contains(6));
+        
     }
+
     #[test]
     fn test_range() {
         let a = Range::new(0, 5);

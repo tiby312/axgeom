@@ -14,7 +14,7 @@ fn raytest() {
     assert_eq!(r.cast_to_rect(&aabb), CastResult::Hit(5isize));
 
     let r = ray(vec2(10, -5), vec2(0, 1));
-    assert_eq!(r.cast_to_rect(&aabb), CastResult::NoHit);
+    assert_eq!(r.cast_to_rect(&aabb), CastResult::Hit(5isize));
 }
 
 #[test]
