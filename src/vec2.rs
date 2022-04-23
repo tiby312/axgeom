@@ -7,14 +7,12 @@ use serde::{Deserialize, Serialize};
 
 ///Convenience function to create a vector.
 #[inline(always)]
-#[must_use]
 pub const fn vec2<N>(x: N, y: N) -> Vec2<N> {
     Vec2 { x, y }
 }
 
 ///Convenience function to create a vector where both component are the same.
 #[inline(always)]
-#[must_use]
 pub fn vec2same<N: Copy>(a: N) -> Vec2<N> {
     Vec2 { x: a, y: a }
 }
@@ -42,7 +40,6 @@ impl<N> AsMut<[N; 2]> for Vec2<N> {
 }
 
 #[inline(always)]
-#[must_use]
 pub fn absdiff<T>(x: T, y: T) -> T
 where
     T: Sub<Output = T> + PartialOrd,
@@ -63,23 +60,19 @@ fn gen_abs<S: Neg<Output = S> + PartialOrd + Zero>(num: S) -> S {
 }
 impl<S: Copy + Neg<Output = S> + PartialOrd + Zero> Vec2<S> {
     #[inline(always)]
-    #[must_use]
     pub fn abs(&self) -> Vec2<S> {
         vec2(gen_abs(self.x), gen_abs(self.y))
     }
     #[inline(always)]
-    #[must_use]
     pub fn rotate_90deg_right(&self) -> Vec2<S> {
         vec2(-self.y, self.x)
     }
     #[inline(always)]
-    #[must_use]
     pub fn rotate_90deg_left(&self) -> Vec2<S> {
         vec2(self.y, self.x)
     }
 
     #[inline(always)]
-    #[must_use]
     pub fn split_into_components(&self) -> [Vec2<S>; 2] {
         [vec2(self.x, S::zero()), vec2(S::zero(), self.y)]
     }
@@ -120,13 +113,11 @@ fn test_rotate() {
 
 impl<S: Mul<Output = S> + Div<Output = S> + Add<Output = S> + Copy> Vec2<S> {
     #[inline(always)]
-    #[must_use]
     pub fn scale(&self, other: Vec2<S>) -> Vec2<S> {
         vec2(self.x * other.x, self.y * other.y)
     }
 
     #[inline(always)]
-    #[must_use]
     pub fn inv_scale(&self, other: Vec2<S>) -> Vec2<S> {
         vec2(self.x / other.x, self.y / other.y)
     }
@@ -144,7 +135,6 @@ impl<S: Mul<Output = S> + Div<Output = S> + Add<Output = S> + Copy> Vec2<S> {
 }
 impl<S: FloatCore> Vec2<S> {
     #[inline(always)]
-    #[must_use]
     pub fn is_nan(&self) -> bool {
         self.x.is_nan() || self.y.is_nan()
     }
@@ -153,7 +143,6 @@ impl<S: FloatCore> Vec2<S> {
 #[cfg(feature = "std")]
 impl<S: num_traits::Float> Vec2<S> {
     #[inline(always)]
-    #[must_use]
     pub fn truncate_at(&self, mag: S) -> Vec2<S> {
         if self.magnitude() > mag {
             self.normalize_to(mag)
@@ -163,14 +152,12 @@ impl<S: num_traits::Float> Vec2<S> {
     }
 
     #[inline(always)]
-    #[must_use]
     pub fn normalize_to(&self, mag: S) -> Vec2<S> {
         let l = self.magnitude2().sqrt();
         (*self) * (mag / l)
     }
 
     #[inline(always)]
-    #[must_use]
     pub fn magnitude(&self) -> S {
         self.magnitude2().sqrt()
     }
@@ -185,7 +172,6 @@ pub fn arr2_as<B: 'static + Copy, A: num_traits::AsPrimitive<B>>(a: [A; 2]) -> [
 
 impl<T> Vec2<T> {
     #[inline(always)]
-    #[must_use]
     pub fn inner_as<B: 'static + Copy>(self) -> Vec2<B>
     where
         T: num_traits::AsPrimitive<B>,
@@ -195,7 +181,6 @@ impl<T> Vec2<T> {
 }
 
 impl<'a, B: Copy> From<&'a [B; 2]> for Vec2<B> {
-    #[inline(always)]
     fn from(a: &'a [B; 2]) -> Self {
         let [a, b] = *a;
         vec2(a, b)
@@ -203,7 +188,6 @@ impl<'a, B: Copy> From<&'a [B; 2]> for Vec2<B> {
 }
 
 impl<B> From<[B; 2]> for Vec2<B> {
-    #[inline(always)]
     fn from(a: [B; 2]) -> Self {
         let [a, b] = a;
         vec2(a, b)
@@ -211,14 +195,12 @@ impl<B> From<[B; 2]> for Vec2<B> {
 }
 
 impl<B> From<Vec2<B>> for [B; 2] {
-    #[inline(always)]
     fn from(a: Vec2<B>) -> Self {
         [a.x, a.y]
     }
 }
 
 impl<'a, B> From<&'a Vec2<B>> for &'a [B; 2] {
-    #[inline(always)]
     fn from(a: &'a Vec2<B>) -> Self {
         a.as_ref()
     }
@@ -248,7 +230,6 @@ impl<B> Vec2<B> {
     }
 
     #[inline(always)]
-    #[must_use]
     pub fn inner_into<A>(self) -> Vec2<A>
     where
         B: Into<A>,
@@ -259,7 +240,6 @@ impl<B> Vec2<B> {
     }
 
     #[inline(always)]
-    #[must_use]
     pub fn inner_try_into<A>(self) -> Result<Vec2<A>, B::Error>
     where
         B: TryInto<A>,
@@ -348,7 +328,6 @@ impl<S: Neg<Output = S>> Neg for Vec2<S> {
 
 impl<S: Zero + Eq + Copy> Zero for Vec2<S> {
     #[inline(always)]
-    #[must_use]
     fn zero() -> Vec2<S> {
         vec2(S::zero(), S::zero())
     }

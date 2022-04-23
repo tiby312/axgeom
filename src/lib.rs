@@ -1,4 +1,4 @@
-//!	A library that provides a way to easily extract 1d ranges from a 2d container based off of the x or y axis statically through
+//! A library that provides a way to easily extract 1d ranges from a 2d container based off of the x or y axis statically through
 //! type parameters. This can help with performance in algorithms where you need to get values for a particular axis often.
 //!
 
@@ -65,31 +65,34 @@ impl Axis for YAXIS {
 
 ///A dynamic axis as opposed to a statically known one via `impl Axis`.
 #[derive(Eq, PartialEq, Copy, Clone, Debug)]
+#[must_use]
 pub enum AxisDyn {
-    X(XAXIS),
-    Y(YAXIS),
+    X,
+    Y,
 }
 impl AxisDyn {
     #[inline(always)]
-    pub fn is_axis(self) -> bool {
-        match self {
-            AxisDyn::X(_) => true,
-            AxisDyn::Y(_) => false,
-        }
+    #[must_use]
+    pub const fn is_equal_to(&self, other: AxisDyn) -> bool {
+        use AxisDyn::*;
+        matches!((self, other), (X, X) | (Y, Y))
     }
+
     #[inline(always)]
-    pub fn map_val<T>(self, val1: T, val2: T) -> T {
+    #[must_use]
+    pub const fn is_xaxis(self) -> bool {
         match self {
-            AxisDyn::X(_) => val1,
-            AxisDyn::Y(_) => val2,
+            AxisDyn::X => true,
+            AxisDyn::Y => false,
         }
     }
 
     #[inline(always)]
-    pub fn map<T>(self, func1: impl FnOnce(XAXIS) -> T, func2: impl FnOnce(YAXIS) -> T) -> T {
+    pub const fn next(&self) -> Self {
+        use AxisDyn::*;
         match self {
-            AxisDyn::X(a) => func1(a),
-            AxisDyn::Y(b) => func2(b),
+            X => Y,
+            Y => X,
         }
     }
 }
@@ -107,21 +110,15 @@ pub trait Axis: Sync + Send + Copy + Clone {
     #[inline(always)]
     fn to_dyn(&self) -> AxisDyn {
         if self.is_xaxis() {
-            AxisDyn::X(XAXIS)
+            AxisDyn::X
         } else {
-            AxisDyn::Y(YAXIS)
+            AxisDyn::Y
         }
     }
 
     #[inline(always)]
     #[must_use]
     fn is_equal_to<B: Axis>(&self, other: B) -> bool {
-        if self.is_xaxis() && other.is_xaxis() {
-            return true;
-        }
-        if !self.is_xaxis() && !other.is_xaxis() {
-            return true;
-        }
-        false
+        self.to_dyn().is_equal_to(other.to_dyn())
     }
 }

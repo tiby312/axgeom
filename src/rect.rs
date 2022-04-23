@@ -5,7 +5,6 @@ use core::convert::TryInto;
 
 ///Convenience function to create a Rect.
 #[inline(always)]
-#[must_use]
 pub fn rect<T>(xstart: T, xend: T, ystart: T, yend: T) -> Rect<T> {
     Rect::new(xstart, xend, ystart, yend)
 }
@@ -31,7 +30,6 @@ impl<S> Rect<S> {
     }
 
     #[inline(always)]
-    #[must_use]
     pub fn inner_try_into<A>(self) -> Result<Rect<A>, S::Error>
     where
         S: TryInto<A>,
@@ -50,7 +48,6 @@ impl<S> Rect<S> {
 impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> {
     ///Create a rectangle from a point and radius.
     #[inline(always)]
-    #[must_use]
     pub fn from_point(point: Vec2<T>, radius: Vec2<T>) -> Rect<T> {
         let x = Range::from_point(point.x, radius.x);
         let y = Range::from_point(point.y, radius.y);
@@ -83,7 +80,6 @@ impl<B: Copy> From<&Rect<B>> for [B; 4] {
 impl<T> Rect<T> {
     ///Get the range of one axis.
     #[inline(always)]
-    #[must_use]
     pub fn get_range(&self, axis: impl Axis) -> &Range<T> {
         if axis.is_xaxis() {
             &self.x
@@ -94,7 +90,6 @@ impl<T> Rect<T> {
 
     ///Get the mutable range of one axis.
     #[inline(always)]
-    #[must_use]
     pub fn get_range_mut(&mut self, axis: impl Axis) -> &mut Range<T> {
         if axis.is_xaxis() {
             &mut self.x
@@ -109,7 +104,6 @@ impl<T> Rect<T> {
     ///(xstart,xend) is the x component range.
     ///(ystart,yend) is the y component range.
     #[inline(always)]
-    #[must_use]
     pub fn new(xstart: T, xend: T, ystart: T, yend: T) -> Rect<T> {
         Rect {
             x: Range {
@@ -135,7 +129,6 @@ impl<T: Copy> Rect<T> {
     ///topright
     ///bottomright
     ///bottomleft
-    #[inline(always)]
     pub fn get_corners(&self) -> [Vec2<T>; 4] {
         [
             vec2(self.x.start, self.y.start),
@@ -176,7 +169,6 @@ impl<T: PartialOrd + Copy> Rect<T> {
 impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Rect<T> {
     ///Grow a rectangle of a radius.
     #[inline(always)]
-    #[must_use]
     pub fn grow(self, radius: T) -> Self {
         Rect {
             x: self.x.grow(radius),

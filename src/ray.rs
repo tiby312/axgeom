@@ -3,7 +3,6 @@ use core::cmp::Ordering;
 use core::convert::TryInto;
 
 ///Convenience function to create a ray.
-#[must_use]
 pub fn ray<N>(point: Vec2<N>, dir: Vec2<N>) -> Ray<N> {
     Ray { point, dir }
 }
@@ -18,7 +17,6 @@ pub struct Ray<N> {
 
 impl<B: Copy> Ray<B> {
     #[inline(always)]
-    #[must_use]
     pub fn inner_as<C: 'static + Copy>(&self) -> Ray<C>
     where
         B: num_traits::AsPrimitive<C>,

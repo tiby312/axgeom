@@ -22,7 +22,6 @@ pub struct Range<T> {
 
 impl<T> Range<T> {
     #[inline(always)]
-    #[must_use]
     pub fn new(start: T, end: T) -> Range<T> {
         Range { start, end }
     }
@@ -140,17 +139,15 @@ mod tests {
 
     #[test]
     fn test_intersect() {
-
         let a = Range::new(0, 5);
         let b = Range::new(5, 6);
         assert!(a.intersects(&b));
         assert!(b.intersects(&a));
-        
+
         assert!(a.contains(0));
         assert!(a.contains(5));
         assert!(b.contains(5));
         assert!(b.contains(6));
-        
     }
 
     #[test]
@@ -169,7 +166,6 @@ impl<T: Copy + core::ops::Sub<Output = T>> Range<T> {
 
 impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Range<T> {
     #[inline(always)]
-    #[must_use]
     pub fn grow(mut self, radius: T) -> Self {
         self.end = self.end + radius;
         self.start = self.start - radius;
