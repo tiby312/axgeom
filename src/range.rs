@@ -11,7 +11,7 @@ pub fn range<T>(start: T, end: T) -> Range<T> {
 ///There is no protection against "degenerate" Ranges where start>end.
 ///
 ///
-///A point is consindered inside of a range if the point is in [start,end].
+///A point is consindered inside of a range if the point is in `[start,end]`.
 ///
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[must_use]

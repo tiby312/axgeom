@@ -249,7 +249,7 @@ impl<T: PartialOrd + Copy> Rect<T> {
     ///No floating point calculations are done.
     ///Important to note that a point that was in the original rectangle,
     ///could actually be inside both subdivded rectangles.
-    ///This is because the ranges are inclusive on both sides [start,end].
+    ///This is because the ranges are inclusive on both sides `[start,end]`.
     #[inline(always)]
     pub fn subdivide<A: Axis>(&self, axis: A, divider: T) -> (Rect<T>, Rect<T>) {
         let ca = axis;
