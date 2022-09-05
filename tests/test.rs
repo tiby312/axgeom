@@ -1,6 +1,5 @@
-use axgeom::ray::*;
-use axgeom::rect::*;
-use axgeom::vec2::*;
+use axgeom::*;
+
 #[test]
 fn raytest() {
     let aabb = rect(0.0f64, 10.0, 0.0, 10.0);

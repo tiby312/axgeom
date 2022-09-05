@@ -4,10 +4,15 @@
 
 #![no_std]
 
-pub mod range;
-pub mod ray;
-pub mod rect;
-pub mod vec2;
+mod range;
+mod ray;
+mod rect;
+mod vec2;
+
+pub use range::*;
+pub use ray::*;
+pub use rect::*;
+pub use vec2::*;
 
 // pub use self::range::range;
 // pub use self::range::Range;
