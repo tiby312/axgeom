@@ -1,20 +1,21 @@
-use axgeom::*;
-
+use axgeom::ray::*;
+use axgeom::rect::*;
+use axgeom::vec2::*;
 #[test]
 fn raytest() {
-    let aabb = rect(0, 10, 0, 10);
+    let aabb = rect(0.0f64, 10.0, 0.0, 10.0);
 
-    let r = ray(vec2(5isize, 15), vec2(0, -1));
-    assert_eq!(r.cast_to_rect(&aabb), CastResult::Hit(5isize));
+    let r = ray(vec2(5.0f64, 15.0), vec2(0.0, -1.0));
+    assert_eq!(r.cast_to_rect(&aabb), CastResult::Hit(5.0));
 
-    let r = ray(vec2(-6isize, 5), vec2(1, 0));
-    assert_eq!(r.cast_to_rect(&aabb), CastResult::Hit(6isize));
+    let r = ray(vec2(-6.0f64, 5.0), vec2(1.0, 0.0));
+    assert_eq!(r.cast_to_rect(&aabb), CastResult::Hit(6.0));
 
-    let r = ray(vec2(0, -5), vec2(0, 1));
-    assert_eq!(r.cast_to_rect(&aabb), CastResult::Hit(5isize));
+    let r = ray(vec2(0.0f64, -5.0), vec2(0.0, 1.0));
+    assert_eq!(r.cast_to_rect(&aabb), CastResult::Hit(50.0));
 
-    let r = ray(vec2(10, -5), vec2(0, 1));
-    assert_eq!(r.cast_to_rect(&aabb), CastResult::Hit(5isize));
+    let r = ray(vec2(10.0f64, -5.0), vec2(0.0, 1.0));
+    assert_eq!(r.cast_to_rect(&aabb), CastResult::Hit(5.0));
 }
 
 #[test]

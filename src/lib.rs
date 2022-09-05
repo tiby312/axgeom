@@ -4,28 +4,22 @@
 
 #![no_std]
 
-mod range;
-mod ray;
-mod rect;
-mod vec2;
+pub mod range;
+pub mod ray;
+pub mod rect;
+pub mod vec2;
 
-#[cfg(feature = "std")]
-pub use roots;
-
-pub use num_traits;
-pub use partial_min_max;
-
-pub use self::range::range;
-pub use self::range::Range;
-pub use self::ray::ray;
-pub use self::ray::CastResult;
-pub use self::ray::Ray;
-pub use self::rect::rect;
-pub use self::rect::Rect;
-pub use self::vec2::arr2_as;
-pub use self::vec2::vec2;
-pub use self::vec2::vec2same;
-pub use self::vec2::Vec2;
+// pub use self::range::range;
+// pub use self::range::Range;
+// pub use self::ray::ray;
+// pub use self::ray::CastResult;
+// pub use self::ray::Ray;
+// pub use self::rect::rect;
+// pub use self::rect::Rect;
+// //pub use self::vec2::arr2_as;
+// pub use self::vec2::vec2;
+// pub use self::vec2::vec2same;
+// pub use self::vec2::Vec2;
 
 ///The x axis implementation of the Axis
 #[derive(Eq, PartialEq, Copy, Clone, Debug)]

@@ -1,9 +1,6 @@
 use crate::Axis;
 use core::convert::TryInto;
 use core::ops::*;
-use num_traits::float::FloatCore;
-use num_traits::Zero;
-use serde::{Deserialize, Serialize};
 
 ///Convenience function to create a vector.
 #[inline(always)]
@@ -18,25 +15,11 @@ pub fn vec2same<N: Copy>(a: N) -> Vec2<N> {
 }
 
 ///A 2D vector.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 #[must_use]
 pub struct Vec2<N> {
     pub x: N,
     pub y: N,
-}
-
-impl<N> AsRef<[N; 2]> for Vec2<N> {
-    #[inline(always)]
-    fn as_ref(&self) -> &[N; 2] {
-        unsafe { &*(self as *const _ as *const _) }
-    }
-}
-
-impl<N> AsMut<[N; 2]> for Vec2<N> {
-    #[inline(always)]
-    fn as_mut(&mut self) -> &mut [N; 2] {
-        unsafe { &mut *(self as *mut _ as *mut _) }
-    }
 }
 
 #[inline(always)]
@@ -48,33 +31,6 @@ where
         y - x
     } else {
         x - y
-    }
-}
-
-fn gen_abs<S: Neg<Output = S> + PartialOrd + Zero>(num: S) -> S {
-    if num < S::zero() {
-        -num
-    } else {
-        num
-    }
-}
-impl<S: Copy + Neg<Output = S> + PartialOrd + Zero> Vec2<S> {
-    #[inline(always)]
-    pub fn abs(&self) -> Vec2<S> {
-        vec2(gen_abs(self.x), gen_abs(self.y))
-    }
-    #[inline(always)]
-    pub fn rotate_90deg_right(&self) -> Vec2<S> {
-        vec2(-self.y, self.x)
-    }
-    #[inline(always)]
-    pub fn rotate_90deg_left(&self) -> Vec2<S> {
-        vec2(self.y, self.x)
-    }
-
-    #[inline(always)]
-    pub fn split_into_components(&self) -> [Vec2<S>; 2] {
-        [vec2(self.x, S::zero()), vec2(S::zero(), self.y)]
     }
 }
 
@@ -104,81 +60,112 @@ impl<
 
 #[test]
 fn test_rotate() {
-    let b = vec2(1, 1).rotate_90deg_right();
-    assert_eq!(b, vec2(-1, 1));
+    let b = vec2(1.0f64, 1.0).rotate_90deg_right();
+    assert_eq!(b, vec2(-1.0, 1.0));
 
-    let b = vec2(1, 0).rotate_90deg_right();
-    assert_eq!(b, vec2(0, 1));
+    let b = vec2(1.0f64, 0.0).rotate_90deg_right();
+    assert_eq!(b, vec2(0.0, 1.0));
 }
 
-impl<S: Mul<Output = S> + Div<Output = S> + Add<Output = S> + Copy> Vec2<S> {
-    #[inline(always)]
-    pub fn scale(&self, other: Vec2<S>) -> Vec2<S> {
-        vec2(self.x * other.x, self.y * other.y)
-    }
+macro_rules! impl_float {
+    ( $x:ty ) => {
+        impl Vec2<$x> {
+            #[inline(always)]
+            pub fn zero() -> Vec2<$x> {
+                vec2(0.0, 0.0)
+            }
 
-    #[inline(always)]
-    pub fn inv_scale(&self, other: Vec2<S>) -> Vec2<S> {
-        vec2(self.x / other.x, self.y / other.y)
-    }
+            #[inline(always)]
+            #[must_use]
+            pub fn is_zero(&self) -> bool {
+                self.x == 0.0 && self.y == 0.0
+            }
 
-    #[inline(always)]
-    #[must_use]
-    pub fn magnitude2(&self) -> S {
-        self.x * self.x + self.y * self.y
-    }
-    #[inline(always)]
-    #[must_use]
-    pub fn dot(&self, other: Vec2<S>) -> S {
-        self.x * other.x + self.y * other.y
-    }
-}
-impl<S: FloatCore> Vec2<S> {
-    #[inline(always)]
-    pub fn is_nan(&self) -> bool {
-        self.x.is_nan() || self.y.is_nan()
-    }
-}
+            #[inline(always)]
+            pub fn scale(&self, other: Vec2<$x>) -> Vec2<$x> {
+                vec2(self.x * other.x, self.y * other.y)
+            }
 
-#[cfg(feature = "std")]
-impl<S: num_traits::Float> Vec2<S> {
-    #[inline(always)]
-    pub fn truncate_at(&self, mag: S) -> Vec2<S> {
-        if self.magnitude() > mag {
-            self.normalize_to(mag)
-        } else {
-            *self
+            #[inline(always)]
+            pub fn inv_scale(&self, other: Vec2<$x>) -> Vec2<$x> {
+                vec2(self.x / other.x, self.y / other.y)
+            }
+
+            #[inline(always)]
+            #[must_use]
+            pub fn magnitude2(&self) -> $x {
+                self.x * self.x + self.y * self.y
+            }
+            #[inline(always)]
+            #[must_use]
+            pub fn dot(&self, other: Vec2<$x>) -> $x {
+                self.x * other.x + self.y * other.y
+            }
+
+            #[inline(always)]
+            pub fn is_nan(&self) -> bool {
+                self.x.is_nan() || self.y.is_nan()
+            }
+            #[inline(always)]
+            pub fn abs(&self) -> Vec2<$x> {
+                vec2(self.x.abs(), self.y.abs())
+            }
+            #[inline(always)]
+            pub fn rotate_90deg_right(&self) -> Vec2<$x> {
+                vec2(-self.y, self.x)
+            }
+            #[inline(always)]
+            pub fn rotate_90deg_left(&self) -> Vec2<$x> {
+                vec2(self.y, self.x)
+            }
+
+            #[inline(always)]
+            pub fn split_into_components(&self) -> [Vec2<$x>; 2] {
+                [vec2(self.x, 0.0), vec2(0.0, self.y)]
+            }
+
+            #[inline(always)]
+            pub fn truncate_at(&self, mag: $x) -> Vec2<$x> {
+                if self.magnitude() > mag {
+                    self.normalize_to(mag)
+                } else {
+                    *self
+                }
+            }
+
+            #[inline(always)]
+            pub fn normalize_to(&self, mag: $x) -> Vec2<$x> {
+                let l = self.magnitude2().sqrt();
+                (*self) * (mag / l)
+            }
+
+            #[inline(always)]
+            pub fn magnitude(&self) -> $x {
+                self.magnitude2().sqrt()
+            }
         }
-    }
-
-    #[inline(always)]
-    pub fn normalize_to(&self, mag: S) -> Vec2<S> {
-        let l = self.magnitude2().sqrt();
-        (*self) * (mag / l)
-    }
-
-    #[inline(always)]
-    pub fn magnitude(&self) -> S {
-        self.magnitude2().sqrt()
-    }
+    };
 }
 
-///Cast an array of 2 elements of primitive type to another primitive type using "as" on each element.
-#[must_use]
-pub fn arr2_as<B: 'static + Copy, A: num_traits::AsPrimitive<B>>(a: [A; 2]) -> [B; 2] {
-    let [a, b] = a;
-    [a.as_(), b.as_()]
-}
+impl_float!(f32);
+impl_float!(f64);
 
-impl<T> Vec2<T> {
-    #[inline(always)]
-    pub fn inner_as<B: 'static + Copy>(self) -> Vec2<B>
-    where
-        T: num_traits::AsPrimitive<B>,
-    {
-        vec2(self.x.as_(), self.y.as_())
-    }
-}
+// ///Cast an array of 2 elements of primitive type to another primitive type using "as" on each element.
+// #[must_use]
+// pub fn arr2_as<B: 'static + Copy, A: num_traits::AsPrimitive<B>>(a: [A; 2]) -> [B; 2] {
+//     let [a, b] = a;
+//     [a.as_(), b.as_()]
+// }
+
+// impl<T> Vec2<T> {
+//     #[inline(always)]
+//     pub fn inner_as<B: 'static + Copy>(self) -> Vec2<B>
+//     where
+//         T: num_traits::AsPrimitive<B>,
+//     {
+//         vec2(self.x.as_(), self.y.as_())
+//     }
+// }
 
 impl<'a, B: Copy> From<&'a [B; 2]> for Vec2<B> {
     fn from(a: &'a [B; 2]) -> Self {
@@ -197,12 +184,6 @@ impl<B> From<[B; 2]> for Vec2<B> {
 impl<B> From<Vec2<B>> for [B; 2] {
     fn from(a: Vec2<B>) -> Self {
         [a.x, a.y]
-    }
-}
-
-impl<'a, B> From<&'a Vec2<B>> for &'a [B; 2] {
-    fn from(a: &'a Vec2<B>) -> Self {
-        a.as_ref()
     }
 }
 
@@ -323,18 +304,5 @@ impl<S: Neg<Output = S>> Neg for Vec2<S> {
     #[inline]
     fn neg(self) -> Vec2<S> {
         vec2(-self.x, -self.y)
-    }
-}
-
-impl<S: Zero + Eq + Copy> Zero for Vec2<S> {
-    #[inline(always)]
-    fn zero() -> Vec2<S> {
-        vec2(S::zero(), S::zero())
-    }
-
-    #[inline(always)]
-    #[must_use]
-    fn is_zero(&self) -> bool {
-        *self == Vec2::zero()
     }
 }

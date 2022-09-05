@@ -41,27 +41,28 @@ impl<B> From<Range<B>> for [B; 2] {
     }
 }
 
-impl<T: Copy + Ord + core::ops::Sub<Output = T> + num_traits::sign::Signed> Range<T> {
-    #[inline(always)]
-    pub fn distance_to_point(&self, pos: T) -> Option<T> {
-        if self.contains(pos) {
-            None
-        } else {
-            Some((pos - self.start).abs().min((pos - self.end).abs()))
-        }
-    }
+// impl<T: Copy + Ord + core::ops::Sub<Output = T> + num_traits::sign::Signed> Range<T> {
+//     #[inline(always)]
+//     pub fn distance_to_point(&self, pos: T) -> Option<T> {
+//         if self.contains(pos) {
+//             None
+//         } else {
+//             Some((pos - self.start).abs().min((pos - self.end).abs()))
+//         }
+//     }
 
-    ///Positive if point is to the right of the range.
-    ///Negative if point is to the left of range.
-    #[inline(always)]
-    pub fn difference_to_point(&self, pos: T) -> Option<T> {
-        match self.contains_ext(pos) {
-            core::cmp::Ordering::Less => Some(pos - self.start),
-            core::cmp::Ordering::Greater => Some(pos - self.end),
-            core::cmp::Ordering::Equal => None,
-        }
-    }
-}
+//     ///Positive if point is to the right of the range.
+//     ///Negative if point is to the left of range.
+//     #[inline(always)]
+//     pub fn difference_to_point(&self, pos: T) -> Option<T> {
+//         match self.contains_ext(pos) {
+//             core::cmp::Ordering::Less => Some(pos - self.start),
+//             core::cmp::Ordering::Greater => Some(pos - self.end),
+//             core::cmp::Ordering::Equal => None,
+//         }
+//     }
+// }
+
 impl<T: Copy + PartialOrd> Range<T> {
     ///Like contains() but returns Ord.
     ///If the pos is strictly less than the range.start, return less.
@@ -174,16 +175,16 @@ impl<T: Copy + core::ops::Sub<Output = T> + core::ops::Add<Output = T>> Range<T>
 }
 
 impl<S> Range<S> {
-    #[inline(always)]
-    pub fn inner_as<B: 'static + Copy>(self) -> Range<B>
-    where
-        S: num_traits::AsPrimitive<B>,
-    {
-        Range {
-            start: self.start.as_(),
-            end: self.end.as_(),
-        }
-    }
+    // #[inline(always)]
+    // pub fn inner_as<B: 'static + Copy>(self) -> Range<B>
+    // where
+    //     S: num_traits::AsPrimitive<B>,
+    // {
+    //     Range {
+    //         start: self.start.as_(),
+    //         end: self.end.as_(),
+    //     }
+    // }
 
     #[inline(always)]
     pub fn inner_into<A>(self) -> Range<A>

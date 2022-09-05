@@ -3,6 +3,8 @@ use crate::vec2::vec2;
 use crate::*;
 use core::convert::TryInto;
 
+use crate::vec2::*;
+
 ///Convenience function to create a Rect.
 #[inline(always)]
 pub fn rect<T>(xstart: T, xend: T, ystart: T, yend: T) -> Rect<T> {
@@ -138,16 +140,16 @@ impl<T: Copy> Rect<T> {
         ]
     }
 
-    #[inline(always)]
-    pub fn inner_as<B: 'static + Copy>(&self) -> Rect<B>
-    where
-        T: num_traits::AsPrimitive<B>,
-    {
-        Rect {
-            x: self.x.inner_as(),
-            y: self.y.inner_as(),
-        }
-    }
+    // #[inline(always)]
+    // pub fn inner_as<B: 'static + Copy>(&self) -> Rect<B>
+    // where
+    //     T: num_traits::AsPrimitive<B>,
+    // {
+    //     Rect {
+    //         x: self.x.inner_as(),
+    //         y: self.y.inner_as(),
+    //     }
+    // }
 
     ///(a,b) is the x component range.
     ///(c,d) is the y component range.
@@ -185,28 +187,6 @@ impl<
             + core::ops::Add<Output = T>,
     > Rect<T>
 {
-    ///If the point is outside the rectangle, returns the squared distance from the closest corner of the rectangle.
-    ///If the point is inside the rectangle, it will return None.
-    #[inline(always)]
-    pub fn distance_squared_to_point(&self, point: Vec2<T>) -> Option<T> {
-        let (px, py) = (point.x, point.y);
-
-        let ((a, b), (c, d)) = self.get();
-
-        let xx = num_traits::clamp(px, a, b);
-        let yy = num_traits::clamp(py, c, d);
-
-        let dis = (xx - px) * (xx - px) + (yy - py) * (yy - py);
-
-        //Then the point must be insert the rect.
-        //In this case, lets return something negative.
-        if xx > a && xx < b && yy > c && yy < d {
-            None
-        } else {
-            Some(dis)
-        }
-    }
-
     ///If the point is outside the rectangle, returns the squared distance from a point to the furthest corner
     ///of the rectangle.
     #[inline(always)]
@@ -235,14 +215,42 @@ impl<
     }
 }
 
-impl<T: num_traits::Num + Copy> Rect<T> {
-    #[inline(always)]
-    pub fn derive_center(&self) -> Vec2<T> {
-        let two = T::one() + T::one();
-        let ((a, b), (c, d)) = self.get();
-        vec2(a + (b - a) / two, c + (d - c) / two)
-    }
+macro_rules! impl_float {
+    ( $x:ty ) => {
+        impl Rect<$x> {
+            ///If the point is outside the rectangle, returns the squared distance from the closest corner of the rectangle.
+            ///If the point is inside the rectangle, it will return None.
+            #[inline(always)]
+            pub fn distance_squared_to_point(&self, point: Vec2<$x>) -> Option<$x> {
+                let (px, py) = (point.x, point.y);
+
+                let ((a, b), (c, d)) = self.get();
+
+                let xx = px.clamp(a, b);
+                let yy = py.clamp(c, d);
+
+                let dis = (xx - px) * (xx - px) + (yy - py) * (yy - py);
+
+                //Then the point must be insert the rect.
+                //In this case, lets return something negative.
+                if xx > a && xx < b && yy > c && yy < d {
+                    None
+                } else {
+                    Some(dis)
+                }
+            }
+
+            #[inline(always)]
+            pub fn derive_center(&self) -> Vec2<$x> {
+                let two = 2.0;
+                let ((a, b), (c, d)) = self.get();
+                vec2(a + (b - a) / two, c + (d - c) / two)
+            }
+        }
+    };
 }
+impl_float!(f32);
+impl_float!(f64);
 
 impl<T: PartialOrd + Copy> Rect<T> {
     ///Subdivides the rectangle.
@@ -338,31 +346,31 @@ impl<T: PartialOrd + Copy> Rect<T> {
     }
 }
 
-impl<T: PartialOrd + Copy> Rect<T> {
-    ///Get an intersecting rectangle.
-    ///No floating point calculations as the new rectangle is made up of
-    ///values from this rectangle and the specified rectangle.
-    #[inline(always)]
-    pub fn get_intersect_rect(&self, other: &Rect<T>) -> Option<Rect<T>> {
-        macro_rules! macro_axis {
-            ($axis:ident) => {{
-                let xr = other.get_range($axis);
-                let xf = self.get_range($axis);
+// impl<T: PartialOrd + Copy> Rect<T> {
+//     ///Get an intersecting rectangle.
+//     ///No floating point calculations as the new rectangle is made up of
+//     ///values from this rectangle and the specified rectangle.
+//     #[inline(always)]
+//     pub fn get_intersect_rect(&self, other: &Rect<T>) -> Option<Rect<T>> {
+//         macro_rules! macro_axis {
+//             ($axis:ident) => {{
+//                 let xr = other.get_range($axis);
+//                 let xf = self.get_range($axis);
 
-                let range = Range {
-                    start: partial_min_max::max(xr.start, xf.start),
-                    end: partial_min_max::min(xr.end, xf.end),
-                };
+//                 let range = Range {
+//                     start: partial_min_max::max(xr.start, xf.start),
+//                     end: partial_min_max::min(xr.end, xf.end),
+//                 };
 
-                if range.end <= range.start {
-                    return None;
-                }
-                range
-            }};
-        }
+//                 if range.end <= range.start {
+//                     return None;
+//                 }
+//                 range
+//             }};
+//         }
 
-        let x = macro_axis!(XAXIS);
-        let y = macro_axis!(YAXIS);
-        Some(Rect { x, y })
-    }
-}
+//         let x = macro_axis!(XAXIS);
+//         let y = macro_axis!(YAXIS);
+//         Some(Rect { x, y })
+//     }
+// }
