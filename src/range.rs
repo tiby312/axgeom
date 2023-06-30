@@ -13,7 +13,7 @@ pub fn range<T>(start: T, end: T) -> Range<T> {
 ///
 ///A point is consindered inside of a range if the point is in `[start,end]`.
 ///
-#[derive(Hash,Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Default,Hash,Copy, Clone, Debug, Eq, PartialEq)]
 #[must_use]
 pub struct Range<T> {
     pub start: T,

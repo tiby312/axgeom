@@ -10,7 +10,7 @@ pub fn rect<T>(xstart: T, xend: T, ystart: T, yend: T) -> Rect<T> {
 }
 
 ///An axis aligned rectangle. Stored as two Ranges.
-#[derive(Hash,Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Default,Hash,Copy, Clone, Debug, Eq, PartialEq)]
 #[must_use]
 pub struct Rect<T> {
     pub x: Range<T>,
