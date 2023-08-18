@@ -3,6 +3,7 @@ use core::convert::TryInto;
 use core::ops::*;
 use num_traits::float::FloatCore;
 use num_traits::Zero;
+#[cfg(feature="serde")]
 use serde::{Deserialize, Serialize};
 
 ///Convenience function to create a vector.
