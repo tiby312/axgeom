@@ -33,12 +33,12 @@ pub struct XAXIS;
 impl Axis for XAXIS {
     type Next = YAXIS;
     #[inline(always)]
-    #[must_use]
+    
     fn is_xaxis(&self) -> bool {
         true
     }
     #[inline(always)]
-    #[must_use]
+    
     fn next(&self) -> Self::Next {
         YAXIS
     }
@@ -51,13 +51,13 @@ impl Axis for YAXIS {
     type Next = XAXIS;
 
     #[inline(always)]
-    #[must_use]
+    
     fn is_xaxis(&self) -> bool {
         false
     }
 
     #[inline(always)]
-    #[must_use]
+    
     fn next(&self) -> Self::Next {
         XAXIS
     }

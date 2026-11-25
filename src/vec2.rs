@@ -336,7 +336,7 @@ impl<S: Zero + Eq + Copy> Zero for Vec2<S> {
     }
 
     #[inline(always)]
-    #[must_use]
+    
     fn is_zero(&self) -> bool {
         *self == Vec2::zero()
     }
