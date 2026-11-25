@@ -22,6 +22,7 @@ pub fn vec2same<N: Copy>(a: N) -> Vec2<N> {
 #[derive(Default, Copy, Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[must_use]
+#[repr(C)]
 pub struct Vec2<N> {
     pub x: N,
     pub y: N,
